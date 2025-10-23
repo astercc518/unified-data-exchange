@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国家选择器功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #409eff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .feature-list {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .feature-list h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .feature-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .feature-list li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .test-section h3 {
+            color: #409eff;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+        .search-example {
+            background-color: #f0f9ff;
+            padding: 10px;
+            border-left: 4px solid #409eff;
+            margin: 10px 0;
+        }
+        .country-display {
+            display: inline-block;
+            background-color: #e7f3ff;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #409eff;
+        }
+        .navigation-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .navigation-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .navigation-links a:hover {
+            background-color: #66b1ff;
+        }
+        .code-block {
+            background-color: #f8f8f8;
+            border: 1px solid #e4e7ed;
+            border-radius: 4px;
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #666;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 数据上传国家选择器功能测试</h1>
+        
+        <div class="feature-list">
+            <h2>✨ 新功能特性</h2>
+            <ul>
+                <li>🔍 <strong>智能搜索</strong>：支持输入国家名（中文/英文）、国家代码或区号搜索</li>
+                <li>🌟 <strong>热门国家</strong>：优先显示常用的热门国家，便于快速选择</li>
+                <li>🗺️ <strong>全球覆盖</strong>：包含全球190+个国家和地区</li>
+                <li>📊 <strong>地区分组</strong>：按洲际地区智能分组显示</li>
+                <li>🎯 <strong>精确匹配</strong>：支持模糊搜索和精确匹配</li>
+                <li>💾 <strong>数据规范</strong>：遵循项目规范，按时效性和国家归类数据</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 搜索功能测试</h3>
+            <p>国家选择器支持以下搜索方式：</p>
+            
+            <div class="search-example">
+                <strong>1. 中文国家名搜索：</strong><br>
+                输入 "孟加拉" → 找到 <span class="country-display">孟加拉国 (Bangladesh) [BD]</span>
+            </div>
+            
+            <div class="search-example">
+                <strong>2. 英文国家名搜索：</strong><br>
+                输入 "india" → 找到 <span class="country-display">印度 (India) [IN]</span>
+            </div>
+            
+            <div class="search-example">
+                <strong>3. 国家代码搜索：</strong><br>
+                输入 "BD" → 找到 <span class="country-display">孟加拉国 (Bangladesh) [BD]</span>
+            </div>
+            
+            <div class="search-example">
+                <strong>4. 区号搜索：</strong><br>
+                输入 "+91" → 找到 <span class="country-display">印度 (India) [IN]</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🌟 热门国家</h3>
+            <p>系统预设了以下热门国家，会优先显示在下拉列表顶部：</p>
+            <div style="margin: 10px 0;">
+                <span class="country-display">孟加拉国 [BD]</span>
+                <span class="country-display">印度 [IN]</span>
+                <span class="country-display">巴基斯坦 [PK]</span>
+                <span class="country-display">印度尼西亚 [ID]</span>
+                <span class="country-display">泰国 [TH]</span>
+                <span class="country-display">马来西亚 [MY]</span>
+                <span class="country-display">越南 [VN]</span>
+                <span class="country-display">菲律宾 [PH]</span>
+                <span class="country-display">中国 [CN]</span>
+                <span class="country-display">美国 [US]</span>
+                <span class="country-display">英国 [GB]</span>
+                <span class="country-display">德国 [DE]</span>
+                <span class="country-display">法国 [FR]</span>
+                <span class="country-display">巴西 [BR]</span>
+                <span class="country-display">尼日利亚 [NG]</span>
+                <span class="country-display">埃及 [EG]</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 数据分类规范</h3>
+            <p>根据项目规范，上传的数据将按以下规则自动归类：</p>
+            <div class="code-block">
+时效性分类：
+├── 3天内 (高时效数据)
+├── 30天内 (中等时效数据)  
+└── 30天以上 (长期有效数据)
+
+国家分类：
+├── 亚洲 (Asia)
+│   ├── 孟加拉国、印度、巴基斯坦...
+├── 欧洲 (Europe)
+│   ├── 德国、英国、法国...
+├── 北美洲 (North America)
+│   ├── 美国、加拿大、墨西哥...
+├── 南美洲 (South America)
+│   ├── 巴西、阿根廷、哥伦比亚...
+├── 非洲 (Africa)
+│   ├── 尼日利亚、埃及、南非...
+└── 大洋洲 (Oceania)
+    ├── 澳大利亚、新西兰...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 测试步骤</h3>
+            <ol>
+                <li>访问数据上传页面</li>
+                <li>点击国家选择下拉框</li>
+                <li>观察热门国家是否优先显示</li>
+                <li>尝试输入不同类型的搜索关键词</li>
+                <li>验证搜索结果的准确性</li>
+                <li>选择国家后检查表单数据</li>
+                <li>提交表单验证数据归类是否正确</li>
+            </ol>
+        </div>
+
+        <div class="navigation-links">
+            <a href="http://localhost:9533/#/login" target="_blank">登录系统</a>
+            <a href="http://localhost:9533/#/data/upload" target="_blank">数据上传页面</a>
+            <a href="http://localhost:8080/system-test.html" target="_blank">系统测试中心</a>
+        </div>
+
+        <div class="test-section">
+            <h3>📝 功能验证清单</h3>
+            <ul style="list-style: none; padding-left: 0;">
+                <li>☐ 国家下拉框可以正常打开</li>
+                <li>☐ 热门国家显示在顶部</li>
+                <li>☐ 可以通过中文国家名搜索</li>
+                <li>☐ 可以通过英文国家名搜索</li>
+                <li>☐ 可以通过国家代码搜索</li>
+                <li>☐ 可以通过区号搜索</li>
+                <li>☐ 搜索结果准确显示</li>
+                <li>☐ 选择国家后表单更新正确</li>
+                <li>☐ 清空选项功能正常</li>
+                <li>☐ 表单验证规则正确</li>
+                <li>☐ 上传成功后国家显示正确</li>
+                <li>☐ 数据按规范正确归类</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

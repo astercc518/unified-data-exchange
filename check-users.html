@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>检查用户数据</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>检查 localStorage 用户数据</h1>
+    <div id="result"></div>
+    <script>
+        const userList = localStorage.getItem('userList');
+        const agentList = localStorage.getItem('agentList');
+        let html = '';
+        
+        if (userList) {
+            html += '<h2>客户数据:</h2><pre>' + userList + '</pre>';
+        } else {
+            html += '<h2>客户数据: 未找到</h2>';
+        }
+        
+        if (agentList) {
+            html += '<h2>代理数据:</h2><pre>' + agentList + '</pre>';
+        } else {
+            html += '<h2>代理数据: 未找到</h2>';
+        }
+        
+        document.getElementById('result').innerHTML = html;
+    </script>
+</body>
+</html>

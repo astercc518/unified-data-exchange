@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美国数据上传测试</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .test-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-success {
+            background-color: #2ecc71;
+            color: white;
+        }
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-info {
+            background-color: #1abc9c;
+            color: white;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .result-area {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13px;
+            min-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success { background-color: #2ecc71; }
+        .status-error { background-color: #e74c3c; }
+        .status-warning { background-color: #f39c12; }
+        .status-info { background-color: #3498db; }
+        .workflow-steps {
+            counter-reset: step-counter;
+        }
+        .workflow-steps li {
+            counter-increment: step-counter;
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+        }
+        .workflow-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background-color: #3498db;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .data-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .summary-number {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .navigation-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .navigation-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 10px 20px;
+            background-color: #34495e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .navigation-links a:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇺🇸 美国数据上传测试中心</h1>
+            <p>测试新上传的美国数据是否正确显示到资源中心</p>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 快速测试</h3>
+            <div class="test-buttons">
+                <button class="btn-primary" onclick="uploadTestData()">上传美国测试数据</button>
+                <button class="btn-success" onclick="checkUSAData()">检查美国数据</button>
+                <button class="btn-info" onclick="viewResourceCenter()">查看资源中心</button>
+                <button class="btn-warning" onclick="clearUSAData()">清除美国数据</button>
+                <button class="btn-danger" onclick="clearResults()">清空结果</button>
+            </div>
+            <div id="testResults" class="result-area">欢迎使用美国数据测试工具！点击上方按钮开始测试...\n</div>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 数据统计</h3>
+            <div class="data-summary" id="dataSummary">
+                <div class="summary-card">
+                    <div class="summary-number" id="totalDataCount">0</div>
+                    <div class="summary-label">总数据条数</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="usaDataCount">0</div>
+                    <div class="summary-label">美国数据条数</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="totalQuantity">0</div>
+                    <div class="summary-label">美国数据总量</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-number" id="avgPrice">$0.00</div>
+                    <div class="summary-label">平均销售价</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔄 测试流程</h3>
+            <ol class="workflow-steps">
+                <li><strong>上传测试数据</strong>：点击"上传美国测试数据"按钮，系统会自动创建3条美国数据记录</li>
+                <li><strong>验证数据存储</strong>：点击"检查美国数据"按钮，确认数据已正确保存到localStorage</li>
+                <li><strong>访问资源中心</strong>：点击"查看资源中心"按钮，或手动访问资源中心页面</li>
+                <li><strong>筛选美国数据</strong>：在资源中心页面的筛选条件中选择"美国"</li>
+                <li><strong>验证显示效果</strong>：确认美国数据正确显示在资源中心列表中</li>
+                <li><strong>测试购买功能</strong>：尝试点击"购买"按钮，验证购买流程</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 预期结果</h3>
+            <ul>
+                <li><span class="status-indicator status-success"></span>资源中心能够正确显示上传的美国数据</li>
+                <li><span class="status-indicator status-success"></span>筛选功能可以正确筛选出美国数据</li>
+                <li><span class="status-indicator status-success"></span>数据类型、时效性、数量等信息显示正确</li>
+                <li><span class="status-indicator status-success"></span>销售价格根据客户折扣比例正确计算</li>
+                <li><span class="status-indicator status-success"></span>运营商分布信息合理显示</li>
+            </ul>
+        </div>
+
+        <div class="navigation-links">
+            <a href="http://localhost:9534/#/login" target="_blank">登录系统</a>
+            <a href="http://localhost:9534/#/data/upload" target="_blank">数据上传页面</a>
+            <a href="http://localhost:9534/#/resource/center" target="_blank">资源中心</a>
+            <a href="/system-test.html" target="_blank">系统测试中心</a>
+        </div>
+    </div>
+
+    <script src="test-upload-usa-data.js"></script>
+    <script>
+        // 页面加载时自动刷新统计
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStatistics();
+        });
+
+        // 上传测试数据
+        function uploadTestData() {
+            appendResult('🚀 开始上传美国测试数据...');
+            
+            try {
+                const uploadedData = uploadUSAData();
+                appendResult('✅ 美国数据上传成功！');
+                appendResult(`📊 共上传 ${uploadedData.length} 条数据记录`);
+                
+                uploadedData.forEach((item, index) => {
+                    appendResult(`   ${index + 1}. ${item.dataType} - ${item.source} (${item.availableQuantity.toLocaleString()}条)`);
+                });
+                
+                updateStatistics();
+                appendResult('💡 提示：现在可以访问资源中心查看数据');
+                
+            } catch (error) {
+                appendResult(`❌ 上传失败: ${error.message}`);
+            }
+        }
+
+        // 检查美国数据
+        function checkUSAData() {
+            appendResult('🔍 检查美国数据...');
+            
+            const exists = window.checkUSAData();
+            if (exists) {
+                appendResult('✅ 美国数据检查通过');
+                updateStatistics();
+            } else {
+                appendResult('❌ 未找到美国数据，请先上传测试数据');
+            }
+        }
+
+        // 查看资源中心
+        function viewResourceCenter() {
+            appendResult('🌐 正在打开资源中心...');
+            window.open('http://localhost:9534/#/resource/center', '_blank');
+            appendResult('💡 提示：请在资源中心页面筛选"美国"查看数据');
+        }
+
+        // 清除美国数据
+        function clearUSAData() {
+            if (confirm('确定要清除所有美国数据吗？')) {
+                appendResult('🗑️ 正在清除美国数据...');
+                window.clearUSAData();
+                appendResult('✅ 美国数据已清除');
+                updateStatistics();
+            }
+        }
+
+        // 清空结果
+        function clearResults() {
+            document.getElementById('testResults').textContent = '结果已清空，等待新的测试...\n';
+        }
+
+        // 添加结果到显示区域
+        function appendResult(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const resultArea = document.getElementById('testResults');
+            resultArea.textContent += `[${timestamp}] ${message}\n`;
+            resultArea.scrollTop = resultArea.scrollHeight;
+        }
+
+        // 更新统计信息
+        function updateStatistics() {
+            try {
+                const savedDataList = localStorage.getItem('dataList');
+                if (!savedDataList) {
+                    resetStatistics();
+                    return;
+                }
+
+                const dataList = JSON.parse(savedDataList);
+                const usaData = dataList.filter(item => item.countryCode === 'US');
+                
+                // 总数据条数
+                document.getElementById('totalDataCount').textContent = dataList.length;
+                
+                // 美国数据条数
+                document.getElementById('usaDataCount').textContent = usaData.length;
+                
+                // 美国数据总量
+                const totalQuantity = usaData.reduce((sum, item) => sum + item.availableQuantity, 0);
+                document.getElementById('totalQuantity').textContent = totalQuantity.toLocaleString();
+                
+                // 平均销售价
+                if (usaData.length > 0) {
+                    const avgPrice = usaData.reduce((sum, item) => sum + item.sellPrice, 0) / usaData.length;
+                    document.getElementById('avgPrice').textContent = '$' + avgPrice.toFixed(4);
+                } else {
+                    document.getElementById('avgPrice').textContent = '$0.00';
+                }
+                
+            } catch (error) {
+                console.error('更新统计失败:', error);
+                resetStatistics();
+            }
+        }
+
+        // 重置统计信息
+        function resetStatistics() {
+            document.getElementById('totalDataCount').textContent = '0';
+            document.getElementById('usaDataCount').textContent = '0';
+            document.getElementById('totalQuantity').textContent = '0';
+            document.getElementById('avgPrice').textContent = '$0.00';
+        }
+
+        // 定期更新统计（每30秒）
+        setInterval(updateStatistics, 30000);
+    </script>
+</body>
+</html>

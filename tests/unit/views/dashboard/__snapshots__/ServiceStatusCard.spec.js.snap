@@ -1,0 +1,234 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ServiceStatusCard.vue component matches snapshot 1`] = `
+<div
+  class="service-status-card"
+>
+  <div
+    class="card-header"
+  >
+    <h3>
+      服务状态
+    </h3>
+     
+    <el-button-stub
+      icon="el-icon-refresh"
+      nativetype="button"
+      size="small"
+      type="text"
+    >
+      
+      立即检查
+    
+    </el-button-stub>
+  </div>
+   
+  <div
+    class="service-list"
+  >
+    <div
+      class="service-item"
+    >
+      <div
+        class="service-info"
+      >
+        <div
+          class="service-icon frontend"
+        >
+          <i
+            class="el-icon-monitor"
+          />
+        </div>
+         
+        <div
+          class="service-details"
+        >
+          <div
+            class="service-name"
+          >
+            前端服务
+          </div>
+           
+          <div
+            class="service-meta"
+          >
+            <span
+              class="version"
+            >
+              版本: v1.0.0
+            </span>
+          </div>
+        </div>
+      </div>
+       
+      <div
+        class="service-status"
+      >
+        <el-tag-stub
+          effect="dark"
+          size="small"
+          type="success"
+        >
+          
+          运行中
+        
+        </el-tag-stub>
+         
+        <div
+          class="response-time"
+        >
+          
+          29毫秒
+        
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="service-item"
+    >
+      <div
+        class="service-info"
+      >
+        <div
+          class="service-icon backend"
+        >
+          <i
+            class="el-icon-s-platform"
+          />
+        </div>
+         
+        <div
+          class="service-details"
+        >
+          <div
+            class="service-name"
+          >
+            后端服务
+          </div>
+           
+          <div
+            class="service-meta"
+          >
+            <span
+              class="version"
+            >
+              版本: v1.0.0
+            </span>
+             
+            <span
+              class="port"
+            >
+              Port: 3000
+            </span>
+          </div>
+        </div>
+      </div>
+       
+      <div
+        class="service-status"
+      >
+        <el-tag-stub
+          effect="dark"
+          size="small"
+          type="success"
+        >
+          
+          运行中
+        
+        </el-tag-stub>
+         
+        <div
+          class="response-time"
+        >
+          
+          20毫秒
+        
+        </div>
+      </div>
+    </div>
+     
+    <div
+      class="service-item"
+    >
+      <div
+        class="service-info"
+      >
+        <div
+          class="service-icon database"
+        >
+          <i
+            class="el-icon-coin"
+          />
+        </div>
+         
+        <div
+          class="service-details"
+        >
+          <div
+            class="service-name"
+          >
+            数据库服务
+          </div>
+           
+          <div
+            class="service-meta"
+          >
+            <span
+              class="version"
+            >
+              MySQL
+            </span>
+             
+            <span
+              class="db-name"
+            >
+              vue_admin
+            </span>
+          </div>
+        </div>
+      </div>
+       
+      <div
+        class="service-status"
+      >
+        <el-tag-stub
+          effect="dark"
+          size="small"
+          type="danger"
+        >
+          
+          错误
+        
+        </el-tag-stub>
+         
+        <!---->
+      </div>
+    </div>
+  </div>
+   
+  <div
+    class="last-check"
+  >
+    <i
+      class="el-icon-time"
+    />
+    
+    最后检查: 2025-10-13 09:15:21
+  
+  </div>
+   
+  <div
+    class="overall-status"
+  >
+    <el-alert-stub
+      closetext=""
+      description=""
+      effect="light"
+      showicon="true"
+      title="2/3 服务状态"
+      type="warning"
+    />
+  </div>
+</div>
+`;

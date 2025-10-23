@@ -15,8 +15,14 @@ export function isExternal(path) {
  * @returns {Boolean}
  */
 export function validUsername(str) {
+  // 允许系统管理员和编辑器登录
   const valid_map = ['admin', 'editor']
-  return valid_map.indexOf(str.trim()) >= 0
+  if (valid_map.indexOf(str.trim()) >= 0) {
+    return true
+  }
+
+  // 允许任何非空的用户名（支持新创建的用户）
+  return str && str.trim().length >= 3
 }
 
 /**

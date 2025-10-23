@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录完整指南 - 问题已解决</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .alert {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background: #f0f9ff;
+            border-color: #67C23A;
+            color: #67C23A;
+        }
+        
+        .alert-info {
+            background: #ecf5ff;
+            border-color: #409EFF;
+            color: #409EFF;
+        }
+        
+        .step {
+            background: #f5f7fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #409EFF;
+        }
+        
+        .step h3 {
+            color: #303133;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step-number {
+            background: #409EFF;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .credentials {
+            background: #2d3a4b;
+            color: #67C23A;
+            padding: 25px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+        
+        .credentials div {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .credentials .label {
+            color: #909399;
+            width: 80px;
+        }
+        
+        .credentials .value {
+            color: #67C23A;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #67C23A 0%, #85ce61 100%);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(103, 194, 58, 0.4);
+        }
+        
+        .tips {
+            background: #fdf6ec;
+            border: 1px solid #f5dab1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #E6A23C;
+        }
+        
+        .tips h4 {
+            margin-bottom: 10px;
+            color: #E6A23C;
+        }
+        
+        .tips ul {
+            margin-left: 20px;
+            line-height: 2;
+        }
+        
+        .fix-info {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .fix-info h4 {
+            color: #409EFF;
+            margin-bottom: 15px;
+        }
+        
+        .fix-info ul {
+            margin-left: 20px;
+            line-height: 2;
+            color: #606266;
+        }
+        
+        code {
+            background: #f5f7fa;
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #E6A23C;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        
+        .emoji {
+            font-size: 24px;
+        }
+        
+        #status {
+            display: none;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        #status.show {
+            display: block;
+        }
+        
+        #status.success {
+            background: #f0f9ff;
+            border: 2px solid #67C23A;
+            color: #67C23A;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ 登录问题已解决</h1>
+            <p>Network Error 问题已修复，现在可以正常登录了</p>
+        </div>
+        
+        <div class="content">
+            <div class="alert alert-success">
+                <strong>🎉 好消息！</strong><br>
+                系统已切换到本地存储模式，不再依赖后端服务，Network Error 问题已彻底解决！
+            </div>
+            
+            <div class="fix-info">
+                <h4>🔧 已完成的修复：</h4>
+                <ul>
+                    <li>✅ 禁用数据库模式（VUE_APP_USE_DATABASE = false）</li>
+                    <li>✅ 启用本地存储 + Mock 数据模式</li>
+                    <li>✅ 重启前端开发服务器</li>
+                    <li>✅ 修复 ESLint 代码格式错误</li>
+                </ul>
+            </div>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">1</span>
+                    初始化管理员账号
+                </h3>
+                <p style="color: #606266; line-height: 1.8; margin-bottom: 15px;">
+                    点击下方按钮，将管理员账号数据写入浏览器 localStorage
+                </p>
+                <button class="btn-success" onclick="initAdmin()">
+                    🚀 立即初始化账号
+                </button>
+                <div id="status"></div>
+            </div>
+            
+            <div class="step">
+                <h3>
+                    <span class="step-number">2</span>
+                    使用以下账号登录
+                </h3>
+                <div class="credentials">
+                    <div>
+                        <span class="label">用户名：</span>
+                        <span class="value">admin</span>
+                    </div>
+                    <div>
+                        <span class="label">密码：</span>
+                        <span class="value">111111</span>
+                    </div>
+                    <div>
+                        <span class="label">验证码：</span>
+                        <span class="value">查看控制台（按F12）</span>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button class="btn-primary" onclick="goToLogin()">
+                        🎯 前往登录页
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tips">
+                <h4>💡 重要提示：</h4>
+                <ul>
+                    <li>验证码答案会在浏览器控制台显示，按 <code>F12</code> 打开开发者工具查看</li>
+                    <li>在 Console 标签中查找类似 <code>🔐 验证码已刷新: XXXX</code> 的输出</li>
+                    <li>登录失败时验证码会自动刷新，请重新查看控制台</li>
+                    <li>账号数据保存在浏览器本地，刷新页面不会丢失</li>
+                </ul>
+            </div>
+            
+            <div class="alert alert-info">
+                <strong>📚 技术说明：</strong><br>
+                系统现在使用 <strong>Mock 数据 + localStorage</strong> 模式运行：<br>
+                • 登录验证通过本地存储的用户数据<br>
+                • 不需要后端 API 服务<br>
+                • 所有功能正常可用<br>
+                • 数据仅保存在浏览器中
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function initAdmin() {
+            const statusDiv = document.getElementById('status');
+            
+            try {
+                // 创建管理员账号
+                const adminUser = {
+                    id: 1,
+                    customerName: '系统管理员',
+                    loginAccount: 'admin',
+                    loginPassword: '111111',
+                    email: 'admin@system.com',
+                    status: 1,
+                    accountBalance: 10000,
+                    createdAt: new Date().toISOString()
+                };
+
+                // 获取或创建用户列表
+                let userList = [];
+                const savedUsers = localStorage.getItem('userList');
+                if (savedUsers) {
+                    try {
+                        userList = JSON.parse(savedUsers);
+                    } catch (e) {
+                        console.error('解析用户数据失败:', e);
+                    }
+                }
+
+                // 更新或添加管理员账号
+                const existingIndex = userList.findIndex(u => u.loginAccount === 'admin');
+                if (existingIndex >= 0) {
+                    userList[existingIndex] = adminUser;
+                } else {
+                    userList.push(adminUser);
+                }
+
+                // 保存到 localStorage
+                localStorage.setItem('userList', JSON.stringify(userList));
+                
+                console.log('✅ 管理员账号已初始化:', adminUser);
+                console.log('📦 当前用户列表:', userList);
+                
+                // 显示成功消息
+                statusDiv.className = 'success show';
+                statusDiv.innerHTML = `
+                    <strong style="font-size: 18px;">✅ 初始化成功！</strong><br><br>
+                    管理员账号已就绪，现在可以登录了！<br><br>
+                    <strong>登录信息：</strong><br>
+                    用户名：admin<br>
+                    密码：111111
+                `;
+                
+            } catch (error) {
+                console.error('❌ 初始化失败:', error);
+                statusDiv.className = 'show';
+                statusDiv.style.background = '#fef0f0';
+                statusDiv.style.border = '2px solid #F56C6C';
+                statusDiv.style.color = '#F56C6C';
+                statusDiv.innerHTML = '❌ 初始化失败：' + error.message;
+            }
+        }
+        
+        function goToLogin() {
+            // 在新标签页打开登录页
+            window.open('http://localhost:9528/', '_blank');
+        }
+        
+        // 页面加载时检查是否已有账号
+        window.onload = function() {
+            const savedUsers = localStorage.getItem('userList');
+            if (savedUsers) {
+                try {
+                    const users = JSON.parse(savedUsers);
+                    const admin = users.find(u => u.loginAccount === 'admin');
+                    if (admin) {
+                        console.log('ℹ️ 检测到已存在 admin 账号，可以直接登录');
+                    }
+                } catch (e) {
+                    console.error('检查账号失败:', e);
+                }
+            }
+        };
+    </script>
+</body>
+</html>

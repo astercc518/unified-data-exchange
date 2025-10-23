@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>订单详情测试</title>
+</head>
+<body>
+    <h1>订单详情页面测试</h1>
+    <p>请在浏览器控制台中运行以下代码来添加测试数据：</p>
+    
+    <pre id="testScript">
+// 清除现有数据并添加测试订单数据
+const testOrders = [
+  {
+    id: 1,
+    orderNo: 'ORD' + Date.now() + 'TEST01',
+    customerId: 1,
+    customerName: 'KL01880V01',
+    dataId: 1,
+    country: '孟加拉',
+    validity: '30',
+    source: '实时抓取',
+    quantity: 10000,
+    unitPrice: 0.2,
+    totalAmount: '2000.00',
+    deliveryEmail: 'test@example.com',
+    operators: [
+      { name: 'Grameenphone', count: 4000 },
+      { name: 'Banglalink', count: 3000 },
+      { name: 'Robi', count: 2000 },
+      { name: 'Teletalk', count: 1000 }
+    ],
+    status: 'pending',
+    deliveryStatus: 'pending',
+    remark: '测试订单数据',
+    createTime: new Date().getTime() - 86400000, // 1天前
+    deliveryTime: null
+  }
+];
+
+localStorage.setItem('orderList', JSON.stringify(testOrders));
+console.log('测试订单数据已添加');
+
+// 然后访问以下URL来测试订单详情页面
+// http://localhost:9533/#/order/detail/1
+    </pre>
+    
+    <button onclick="runTest()">运行测试脚本</button>
+    <button onclick="checkData()">检查数据</button>
+    <button onclick="openOrderDetail()">打开订单详情</button>
+    
+    <div id="result"></div>
+    
+    <script>
+        function runTest() {
+            const testOrders = [
+              {
+                id: 1,
+                orderNo: 'ORD' + Date.now() + 'TEST01',
+                customerId: 1,
+                customerName: 'KL01880V01',
+                dataId: 1,
+                country: '孟加拉',
+                validity: '30',
+                source: '实时抓取',
+                quantity: 10000,
+                unitPrice: 0.2,
+                totalAmount: '2000.00',
+                deliveryEmail: 'test@example.com',
+                operators: [
+                  { name: 'Grameenphone', count: 4000 },
+                  { name: 'Banglalink', count: 3000 },
+                  { name: 'Robi', count: 2000 },
+                  { name: 'Teletalk', count: 1000 }
+                ],
+                status: 'pending',
+                deliveryStatus: 'pending',
+                remark: '测试订单数据',
+                createTime: new Date().getTime() - 86400000,
+                deliveryTime: null
+              },
+              {
+                id: 2,
+                orderNo: 'ORD' + Date.now() + 'TEST02',
+                customerId: 1,
+                customerName: 'KL01880V01',
+                dataId: 2,
+                country: '印度',
+                validity: '3',
+                source: '实时抓取',
+                quantity: 5000,
+                unitPrice: 0.15,
+                totalAmount: '750.00',
+                deliveryEmail: 'test@example.com',
+                operators: [
+                  { name: 'Jio', count: 2000 },
+                  { name: 'Airtel', count: 1500 },
+                  { name: 'Vi', count: 1500 }
+                ],
+                status: 'processing',
+                deliveryStatus: 'processing',
+                remark: '测试订单数据 - 处理中',
+                createTime: new Date().getTime() - 43200000,
+                processTime: new Date().getTime() - 21600000,
+                deliveryTime: null
+              }
+            ];
+            
+            localStorage.setItem('orderList', JSON.stringify(testOrders));
+            document.getElementById('result').innerHTML = '<p style="color: green;">测试数据已添加成功！</p>';
+        }
+        
+        function checkData() {
+            const savedOrders = localStorage.getItem('orderList');
+            if (savedOrders) {
+                const orders = JSON.parse(savedOrders);
+                document.getElementById('result').innerHTML = 
+                    '<p style="color: blue;">找到 ' + orders.length + ' 个订单：</p>' +
+                    '<pre>' + JSON.stringify(orders, null, 2) + '</pre>';
+            } else {
+                document.getElementById('result').innerHTML = '<p style="color: red;">未找到订单数据</p>';
+            }
+        }
+        
+        function openOrderDetail() {
+            window.open('http://localhost:9533/#/order/detail/1', '_blank');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1760355930620,
+    "loginAccount": "admin",
+    "loginPassword": "111111",
+    "agentName": "系统管理员",
+    "agentCode": "ADMIN001",
+    "email": "admin@system.com",
+    "phone": "13800138000",
+    "level": "super",
+    "commissionRate": 0,
+    "salePriceRate": 1,
+    "status": 1,
+    "createTime": 1760355930620
+  }
+]

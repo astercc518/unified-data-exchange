@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据持久化检测工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .tool-section {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .status-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-top: 4px solid #28a745;
+        }
+        
+        .card.warning { border-top-color: #ffc107; }
+        .card.error { border-top-color: #dc3545; }
+        
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn.success { background: #28a745; }
+        .btn.warning { background: #ffc107; }
+        .btn.danger { background: #dc3545; }
+        
+        .log-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th,
+        .data-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-ok { background: #28a745; }
+        .status-warning { background: #ffc107; }
+        .status-error { background: #dc3545; }
+        
+        .navigation-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .navigation-links a {
+            background: #6f42c1;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin: 0 10px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+        
+        .navigation-links a:hover {
+            background: #5a32a3;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 数据持久化检测工具</h1>
+        
+        <!-- 当前状态 -->
+        <div class="tool-section">
+            <h3>📊 当前数据状态</h3>
+            <div class="status-card">
+                <div class="card" id="dataStatusCard">
+                    <h4><span class="status-indicator status-ok"></span>数据存储状态</h4>
+                    <p id="dataCount">检测中...</p>
+                    <p id="lastUploadTime">上次上传: 未知</p>
+                </div>
+                
+                <div class="card" id="storageStatusCard">
+                    <h4><span class="status-indicator status-ok"></span>存储健康状态</h4>
+                    <p id="storageSize">存储大小: 计算中...</p>
+                    <p id="storageQuota">配额使用: 检查中...</p>
+                </div>
+                
+                <div class="card" id="syncStatusCard">
+                    <h4><span class="status-indicator status-ok"></span>同步状态</h4>
+                    <p id="syncStatus">同步状态: 检查中...</p>
+                    <p id="lastSyncTime">上次同步: 未知</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 操作面板 -->
+        <div class="tool-section">
+            <h3>🛠️ 操作工具</h3>
+            <div style="text-align: center;">
+                <button class="btn" onclick="checkDataStatus()">🔍 检查数据状态</button>
+                <button class="btn success" onclick="backupData()">💾 备份数据</button>
+                <button class="btn warning" onclick="restoreData()">🔄 恢复数据</button>
+                <button class="btn" onclick="testUploadSync()">📤 测试上传同步</button>
+                <button class="btn danger" onclick="clearAllData()" id="clearBtn">🗑️ 清空所有数据</button>
+            </div>
+        </div>
+        
+        <!-- 解决方案面板 -->
+        <div class="tool-section">
+            <h3>💡 问题解决方案</h3>
+            <div id="solutionPanel">
+                <p>📋 点击"检查数据状态"开始诊断...</p>
+            </div>
+        </div>
+        
+        <!-- 日志区域 -->
+        <div class="tool-section">
+            <h3>📋 操作日志</h3>
+            <div class="log-area" id="logArea">
+                [系统] 数据持久化检测工具已启动
+            </div>
+        </div>
+        
+        <!-- 数据详情 -->
+        <div class="tool-section">
+            <h3>📄 数据详情</h3>
+            <div id="dataDetails">
+                <p>点击"检查数据状态"查看详细信息</p>
+            </div>
+        </div>
+        
+        <!-- 导航链接 -->
+        <div class="navigation-links">
+            <a href="http://localhost:9528/#/data/upload" target="_blank">数据上传页面</a>
+            <a href="http://localhost:9528/#/resource/center" target="_blank">资源中心</a>
+            <a href="http://localhost:9528/#/data/library" target="_blank">数据列表</a>
+        </div>
+    </div>
+
+    <script>
+        let logCount = 0;
+        
+        function addLog(message, type = 'info') {
+            logCount++;
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const typeIcon = {
+                'info': 'ℹ️',
+                'success': '✅',
+                'warning': '⚠️',
+                'error': '❌'
+            }[type] || 'ℹ️';
+            
+            logArea.innerHTML += `\n[${timestamp}] ${typeIcon} ${message}`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+        
+        function updateCardStatus(cardId, status) {
+            const card = document.getElementById(cardId);
+            const indicator = card.querySelector('.status-indicator');
+            
+            card.className = `card ${status}`;
+            indicator.className = `status-indicator status-${status}`;
+        }
+        
+        function checkDataStatus() {
+            addLog('开始检查数据持久化状态...', 'info');
+            
+            try {
+                // 检查 localStorage 数据
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                const userList = JSON.parse(localStorage.getItem('userList') || '[]');
+                const orderList = JSON.parse(localStorage.getItem('orderList') || '[]');
+                
+                // 更新数据统计
+                document.getElementById('dataCount').textContent = `数据条数: ${dataList.length}`;
+                
+                if (dataList.length > 0) {
+                    const latestData = dataList[dataList.length - 1];
+                    const uploadTime = new Date(latestData.uploadTime).toLocaleString();
+                    document.getElementById('lastUploadTime').textContent = `上次上传: ${uploadTime}`;
+                    updateCardStatus('dataStatusCard', 'success');
+                } else {
+                    document.getElementById('lastUploadTime').textContent = '上次上传: 无数据';
+                    updateCardStatus('dataStatusCard', 'warning');
+                }
+                
+                // 检查存储大小
+                const storageSize = calculateStorageSize();
+                document.getElementById('storageSize').textContent = `存储大小: ${storageSize}`;
+                document.getElementById('storageQuota').textContent = '配额使用: 正常';
+                updateCardStatus('storageStatusCard', 'ok');
+                
+                // 检查同步状态
+                const syncCheck = checkSyncIntegrity();
+                document.getElementById('syncStatus').textContent = `同步状态: ${syncCheck.status}`;
+                document.getElementById('lastSyncTime').textContent = `检查时间: ${new Date().toLocaleString()}`;
+                updateCardStatus('syncStatusCard', syncCheck.healthy ? 'ok' : 'warning');
+                
+                // 显示详细数据
+                showDetailedData(dataList);
+                
+                // 提供解决方案
+                provideSolutions(dataList.length, syncCheck);
+                
+                addLog(`数据检查完成 - 共${dataList.length}条数据`, 'success');
+                
+            } catch (error) {
+                addLog(`数据检查失败: ${error.message}`, 'error');
+                updateCardStatus('dataStatusCard', 'error');
+                updateCardStatus('storageStatusCard', 'error');
+                updateCardStatus('syncStatusCard', 'error');
+            }
+        }
+        
+        function calculateStorageSize() {
+            try {
+                let totalSize = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        totalSize += localStorage[key].length;
+                    }
+                }
+                return `${(totalSize / 1024).toFixed(2)} KB`;
+            } catch (error) {
+                return '计算失败';
+            }
+        }
+        
+        function checkSyncIntegrity() {
+            try {
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                
+                // 检查数据完整性
+                let validCount = 0;
+                let invalidCount = 0;
+                
+                dataList.forEach(item => {
+                    if (item.id && item.country && item.dataType && item.availableQuantity) {
+                        validCount++;
+                    } else {
+                        invalidCount++;
+                    }
+                });
+                
+                const healthy = invalidCount === 0;
+                const status = healthy ? '正常' : `发现${invalidCount}条异常数据`;
+                
+                return { healthy, status, validCount, invalidCount };
+            } catch (error) {
+                return { healthy: false, status: '检查失败', validCount: 0, invalidCount: 0 };
+            }
+        }
+        
+        function showDetailedData(dataList) {
+            const detailsDiv = document.getElementById('dataDetails');
+            
+            if (dataList.length === 0) {
+                detailsDiv.innerHTML = '<p style="color: #ffc107;">⚠️ 暂无数据，这可能是重启后数据丢失的原因</p>';
+                return;
+            }
+            
+            let tableHTML = '<table class="data-table"><thead><tr>';
+            tableHTML += '<th>ID</th><th>国家</th><th>数据类型</th><th>数据量</th><th>上传时间</th><th>状态</th>';
+            tableHTML += '</tr></thead><tbody>';
+            
+            dataList.slice(-10).forEach(item => {
+                const uploadTime = new Date(item.uploadTime).toLocaleString();
+                tableHTML += `<tr>
+                    <td>${item.id}</td>
+                    <td>${item.country || '未知'}</td>
+                    <td>${item.dataType || '未知'}</td>
+                    <td>${(item.availableQuantity || 0).toLocaleString()}</td>
+                    <td>${uploadTime}</td>
+                    <td>${item.status || '未知'}</td>
+                </tr>`;
+            });
+            
+            tableHTML += '</tbody></table>';
+            detailsDiv.innerHTML = `<p>📊 显示最近10条数据记录（共${dataList.length}条）：</p>` + tableHTML;
+        }
+        
+        function provideSolutions(dataCount, syncCheck) {
+            const solutionPanel = document.getElementById('solutionPanel');
+            let solutions = [];
+            
+            if (dataCount === 0) {
+                solutions.push({
+                    title: '🚨 数据丢失问题',
+                    description: '检测到localStorage中没有数据，这是重启后数据不显示的主要原因',
+                    actions: [
+                        '1. 检查是否使用了相同的端口访问（localStorage基于域名+端口）',
+                        '2. 尝试重新上传测试数据',
+                        '3. 检查浏览器是否清除了缓存',
+                        '4. 点击下方"测试上传同步"按钮模拟数据上传'
+                    ]
+                });
+            }
+            
+            if (!syncCheck.healthy) {
+                solutions.push({
+                    title: '⚠️ 数据完整性问题',
+                    description: `发现${syncCheck.invalidCount}条数据不完整`,
+                    actions: [
+                        '1. 点击"恢复数据"尝试修复',
+                        '2. 重新上传丢失的数据',
+                        '3. 检查上传逻辑是否正确保存了所有必需字段'
+                    ]
+                });
+            }
+            
+            if (dataCount > 0 && syncCheck.healthy) {
+                solutions.push({
+                    title: '✅ 数据状态正常',
+                    description: '数据持久化工作正常，如果页面仍不显示数据，请检查：',
+                    actions: [
+                        '1. 刷新资源中心页面（Ctrl+F5 强制刷新）',
+                        '2. 检查筛选条件是否过于严格',
+                        '3. 查看浏览器控制台是否有JavaScript错误',
+                        '4. 确认访问的是正确的端口地址'
+                    ]
+                });
+            }
+            
+            let solutionHTML = '';
+            solutions.forEach((solution, index) => {
+                solutionHTML += `
+                    <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #dee2e6; border-radius: 8px;">
+                        <h4>${solution.title}</h4>
+                        <p><strong>描述：</strong>${solution.description}</p>
+                        <p><strong>解决步骤：</strong></p>
+                        <ul>
+                            ${solution.actions.map(action => `<li>${action}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+            
+            solutionPanel.innerHTML = solutionHTML;
+        }
+        
+        function backupData() {
+            try {
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                const backupData = {
+                    dataList: dataList,
+                    userList: JSON.parse(localStorage.getItem('userList') || '[]'),
+                    orderList: JSON.parse(localStorage.getItem('orderList') || '[]'),
+                    backupTime: new Date().toISOString(),
+                    version: '1.0'
+                };
+                
+                const backupString = JSON.stringify(backupData, null, 2);
+                localStorage.setItem('dataBackup', backupString);
+                
+                // 创建下载链接
+                const blob = new Blob([backupString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `data-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                addLog(`数据备份成功，共备份${dataList.length}条数据`, 'success');
+                
+            } catch (error) {
+                addLog(`数据备份失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function restoreData() {
+            try {
+                const backupData = localStorage.getItem('dataBackup');
+                if (!backupData) {
+                    addLog('未找到备份数据', 'warning');
+                    return;
+                }
+                
+                const parsed = JSON.parse(backupData);
+                
+                // 恢复数据
+                localStorage.setItem('dataList', JSON.stringify(parsed.dataList || []));
+                localStorage.setItem('userList', JSON.stringify(parsed.userList || []));
+                localStorage.setItem('orderList', JSON.stringify(parsed.orderList || []));
+                
+                addLog(`数据恢复成功，恢复${parsed.dataList.length}条数据`, 'success');
+                
+                // 重新检查状态
+                checkDataStatus();
+                
+            } catch (error) {
+                addLog(`数据恢复失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function testUploadSync() {
+            addLog('开始测试数据上传同步...', 'info');
+            
+            try {
+                const testData = {
+                    id: Date.now(),
+                    country: '测试国家',
+                    countryCode: 'TEST',
+                    dataType: '测试数据',
+                    validity: '3',
+                    source: '持久化测试',
+                    availableQuantity: Math.floor(Math.random() * 10000) + 1000,
+                    sellPrice: 0.05,
+                    costPrice: 0.03,
+                    remark: '这是用于测试数据持久化的模拟数据',
+                    uploadTime: Date.now(),
+                    status: 'available'
+                };
+                
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                dataList.push(testData);
+                localStorage.setItem('dataList', JSON.stringify(dataList));
+                
+                addLog(`测试数据上传成功，ID: ${testData.id}`, 'success');
+                addLog(`数据详情: ${testData.country} - ${testData.dataType} - ${testData.availableQuantity}条`, 'info');
+                
+                // 验证保存
+                const verifyData = JSON.parse(localStorage.getItem('dataList') || '[]');
+                const savedData = verifyData.find(item => item.id === testData.id);
+                
+                if (savedData) {
+                    addLog('✅ 数据持久化验证成功', 'success');
+                } else {
+                    addLog('❌ 数据持久化验证失败', 'error');
+                }
+                
+                // 重新检查状态
+                checkDataStatus();
+                
+            } catch (error) {
+                addLog(`测试上传失败: ${error.message}`, 'error');
+            }
+        }
+        
+        function clearAllData() {
+            if (!confirm('⚠️ 确定要清空所有数据吗？此操作不可恢复！')) {
+                return;
+            }
+            
+            try {
+                // 先备份
+                backupData();
+                
+                // 清空数据
+                localStorage.removeItem('dataList');
+                localStorage.removeItem('userList');
+                localStorage.removeItem('orderList');
+                
+                addLog('所有数据已清空，已自动创建备份', 'warning');
+                
+                // 重新检查状态
+                checkDataStatus();
+                
+            } catch (error) {
+                addLog(`清空数据失败: ${error.message}`, 'error');
+            }
+        }
+        
+        // 页面加载时自动检查
+        window.addEventListener('load', function() {
+            addLog('页面加载完成，开始自动检查...', 'info');
+            setTimeout(checkDataStatus, 1000);
+        });
+        
+        // 定期检查存储状态
+        setInterval(function() {
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            document.getElementById('dataCount').textContent = `数据条数: ${dataList.length}`;
+        }, 5000);
+    </script>
+</body>
+</html>

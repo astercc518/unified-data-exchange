@@ -1,243 +1,366 @@
-<p align="center">
-  <img width="320" src="https://wpimg.wallstcn.com/ecc53a42-d79b-42e2-8852-5126b810a4c8.svg">
-</p>
+# Vue Element Admin - 数据管理系统
 
-<p align="center">
-  <a href="https://github.com/vuejs/vue">
-    <img src="https://img.shields.io/badge/vue-2.6.10-brightgreen.svg" alt="vue">
-  </a>
-  <a href="https://github.com/ElemeFE/element">
-    <img src="https://img.shields.io/badge/element--ui-2.7.0-brightgreen.svg" alt="element-ui">
-  </a>
-  <a href="https://travis-ci.org/PanJiaChen/vue-element-admin" rel="nofollow">
-    <img src="https://travis-ci.org/PanJiaChen/vue-element-admin.svg?branch=master" alt="Build Status">
-  </a>
-  <a href="https://github.com/PanJiaChen/vue-element-admin/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license">
-  </a>
-  <a href="https://github.com/PanJiaChen/vue-element-admin/releases">
-    <img src="https://img.shields.io/github/release/PanJiaChen/vue-element-admin.svg" alt="GitHub release">
-  </a>
-  <a href="https://gitter.im/vue-element-admin/discuss">
-    <img src="https://badges.gitter.im/Join%20Chat.svg" alt="gitter">
-  </a>
-  <a href="https://panjiachen.github.io/vue-element-admin-site/donate">
-    <img src="https://img.shields.io/badge/%24-donate-ff69b4.svg" alt="donate">
-  </a>
-</p>
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Vue](https://img.shields.io/badge/vue-2.6.10-brightgreen.svg)](https://vuejs.org/)
 
-English | [简体中文](./README.zh-CN.md) | [日本語](./README.ja.md) | [Spanish](./README.es.md)
+一个基于 Vue.js 和 Element UI 的现代化数据管理系统，提供完整的用户管理、数据管理、订单管理和系统配置功能。
 
-<!-- <p align="center">
-  <b>SPONSORED BY</b>
-</p>
-<table align="center" cellspacing="0" cellpadding="0">
-  <tbody>
-    <tr>
-      <td align="center" valign="middle">
-       <a href="" title="" target="_blank" style="padding-right: 20px;">
-        <img height="200px" style="padding-right: 20px;" src="" title="variantForm">
-        </a>
-      </td>
-    </tr>
-  </tbody> 
-</table>-->
+## ✨ 特性
 
-## Introduction
+- 🎨 **现代化界面** - 基于 Element UI 的精美界面设计
+- 👥 **多角色权限** - 支持管理员、代理、客户三种角色
+- 📊 **数据管理** - 完整的数据上传、发布、定价功能
+- 🛒 **订单系统** - 购买流程、订单管理、发货管理
+- ⭐ **收藏订阅** - 数据收藏和智能推荐订阅中心
+- 💰 **财务管理** - 充值记录、结算管理、佣金计算
+- 🌐 **国际化** - 支持中英文切换
+- 📱 **响应式设计** - 完美适配各种设备
 
-[vue-element-admin](https://panjiachen.github.io/vue-element-admin) is a production-ready front-end solution for admin interfaces. It is based on [vue](https://github.com/vuejs/vue) and uses the UI Toolkit [element-ui](https://github.com/ElemeFE/element).
+## 🚀 快速开始
 
-[vue-element-admin](https://panjiachen.github.io/vue-element-admin) is based on the newest development stack of vue and it has a built-in i18n solution, typical templates for enterprise applications, and lots of awesome features. It helps you build large and complex Single-Page Applications. I believe whatever your needs are, this project will help you.
+### 前置要求
 
-- [Preview](https://panjiachen.github.io/vue-element-admin)
+- Node.js >= 14.0.0
+- MySQL >= 5.7
+- PM2 (生产环境推荐)
 
-- [Documentation](https://panjiachen.github.io/vue-element-admin-site/)
-
-- [Gitter](https://gitter.im/vue-element-admin/discuss)
-
-- [Donate](https://panjiachen.github.io/vue-element-admin-site/donate/)
-
-- [Wiki](https://github.com/PanJiaChen/vue-element-admin/wiki)
-
-- [Gitee](https://panjiachen.gitee.io/vue-element-admin/) 国内用户可访问该地址在线预览
-
-- Base template recommends using: [vue-admin-template](https://github.com/PanJiaChen/vue-admin-template)
-- Desktop: [electron-vue-admin](https://github.com/PanJiaChen/electron-vue-admin)
-- Typescript: [vue-typescript-admin-template](https://github.com/Armour/vue-typescript-admin-template) (Credits: [@Armour](https://github.com/Armour))
-- [awesome-project](https://github.com/PanJiaChen/vue-element-admin/issues/2312)
-
-**After the `v4.1.0+` version, the default master branch will not support i18n. Please use [i18n Branch](https://github.com/PanJiaChen/vue-element-admin/tree/i18n), it will keep up with the master update**
-
-**The current version is `v4.0+` build on `vue-cli`. If you find a problem, please put [issue](https://github.com/PanJiaChen/vue-element-admin/issues/new). If you want to use the old version , you can switch branch to [tag/3.11.0](https://github.com/PanJiaChen/vue-element-admin/tree/tag/3.11.0), it does not rely on `vue-cli`**
-
-**This project does not support low version browsers (e.g. IE). Please add polyfill by yourself.**
-
-## Preparation
-
-You need to install [node](https://nodejs.org/) and [git](https://git-scm.com/) locally. The project is based on [ES2015+](https://es6.ruanyifeng.com/), [vue](https://cn.vuejs.org/index.html), [vuex](https://vuex.vuejs.org/zh-cn/), [vue-router](https://router.vuejs.org/zh-cn/), [vue-cli](https://github.com/vuejs/vue-cli) , [axios](https://github.com/axios/axios) and [element-ui](https://github.com/ElemeFE/element), all request data is simulated using [Mock.js](https://github.com/nuysoft/Mock).
-Understanding and learning this knowledge in advance will greatly help the use of this project.
-
-[![Edit on CodeSandbox](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/github/PanJiaChen/vue-element-admin/tree/CodeSandbox)
-
-<p align="center">
-  <img width="900" src="https://wpimg.wallstcn.com/a5894c1b-f6af-456e-82df-1151da0839bf.png">
-</p>
-
-## Sponsors
-
-Become a sponsor and get your logo on our README on GitHub with a link to your site. [[Become a sponsor]](https://www.patreon.com/panjiachen)
-
-### Akveo
-<a href="https://store.akveo.com/products/vue-java-admin-dashboard-spring?utm_campaign=akveo_store-Vue-Vue_demo%2Fgithub&utm_source=vue_admin&utm_medium=referral&utm_content=github_banner"><img width="500px" src="https://raw.githubusercontent.com/PanJiaChen/vue-element-admin-site/master/docs/.vuepress/public/images/vue-java-banner.png" /></a><p>Get Java backend for Vue admin with 20% discount for 39$ use coupon code SWB0RAZPZR1M
-</p>
-
-### Flatlogic
-
-<a href="https://flatlogic.com/admin-dashboards?from=vue-element-admin"><img width="150px" src="https://wpimg.wallstcn.com/9c0b719b-5551-4c1e-b776-63994632d94a.png" /></a><p>Admin Dashboard Templates made with Vue, React and Angular.</p>
-
-## Features
-
-```
-- Login / Logout
-
-- Permission Authentication
-  - Page permission
-  - Directive permission
-  - Permission configuration page
-  - Two-step login
-
-- Multi-environment build
-  - Develop (dev)
-  - sit
-  - Stage Test (stage)
-  - Production (prod)
-
-- Global Features
-  - I18n
-  - Multiple dynamic themes
-  - Dynamic sidebar (supports multi-level routing)
-  - Dynamic breadcrumb
-  - Tags-view (Tab page Support right-click operation)
-  - Svg Sprite
-  - Mock data
-  - Screenfull
-  - Responsive Sidebar
-
-- Editor
-  - Rich Text Editor
-  - Markdown Editor
-  - JSON Editor
-
-- Excel
-  - Export Excel
-  - Upload Excel
-  - Visualization Excel
-  - Export zip
-
-- Table
-  - Dynamic Table
-  - Drag And Drop Table
-  - Inline Edit Table
-
-- Error Page
-  - 401
-  - 404
-
-- Components
-  - Avatar Upload
-  - Back To Top
-  - Drag Dialog
-  - Drag Select
-  - Drag Kanban
-  - Drag List
-  - SplitPane
-  - Dropzone
-  - Sticky
-  - CountTo
-
-- Advanced Example
-- Error Log
-- Dashboard
-- Guide Page
-- ECharts
-- Clipboard
-- Markdown to html
-```
-
-## Getting started
+### 一键部署
 
 ```bash
-# clone the project
-git clone https://github.com/PanJiaChen/vue-element-admin.git
-
-# enter the project directory
+# 克隆项目
+git clone https://github.com/your-username/vue-element-admin.git
 cd vue-element-admin
 
-# install dependency
+# 运行一键部署脚本
+chmod +x deploy.sh
+./deploy.sh
+```
+
+### 手动部署
+
+#### 1. 安装依赖
+
+```bash
+# 安装前端依赖
 npm install
 
-# develop
+# 安装后端依赖
+cd backend
+npm install
+cd ..
+```
+
+#### 2. 配置数据库
+
+创建 MySQL 数据库：
+```sql
+CREATE DATABASE vue_admin CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+配置数据库连接（`backend/config/database.js`）：
+```javascript
+{
+  host: 'localhost',
+  port: 3306,
+  database: 'vue_admin',
+  username: 'root',
+  password: 'your_password'
+}
+```
+
+#### 3. 初始化数据库
+
+```bash
+node backend/scripts/init-database.js
+```
+
+#### 4. 启动服务
+
+**开发环境：**
+```bash
+# 启动后端
+npm run backend
+
+# 启动前端（新终端）
 npm run dev
 ```
 
-This will automatically open http://localhost:9527
-
-## Build
-
+**生产环境（使用 PM2）：**
 ```bash
-# build for test environment
-npm run build:stage
+# 启动所有服务
+pm2 start ecosystem.config.js
 
-# build for production environment
-npm run build:prod
+# 查看服务状态
+pm2 status
+
+# 查看日志
+pm2 logs
+
+# 重启服务
+pm2 restart all
 ```
 
-## Advanced
+## 📖 项目结构
 
-```bash
-# preview the release environment effect
-npm run preview
-
-# preview the release environment effect + static resource analysis
-npm run preview -- --report
-
-# code format check
-npm run lint
-
-# code format check and auto fix
-npm run lint -- --fix
+```
+vue-element-admin/
+├── backend/                 # 后端代码
+│   ├── config/             # 配置文件
+│   ├── models/             # 数据模型
+│   ├── routes/             # API 路由
+│   ├── middleware/         # 中间件
+│   ├── utils/              # 工具函数
+│   └── server.js           # 服务入口
+├── src/                    # 前端代码
+│   ├── api/               # API 接口
+│   ├── components/        # 公共组件
+│   ├── layout/            # 布局组件
+│   ├── router/            # 路由配置
+│   ├── store/             # Vuex 状态管理
+│   ├── views/             # 页面组件
+│   ├── lang/              # 国际化
+│   └── styles/            # 样式文件
+├── public/                # 静态资源
+├── ecosystem.config.js    # PM2 配置
+├── deploy.sh             # 一键部署脚本
+├── package.json          # 项目配置
+└── README.md            # 项目说明
 ```
 
-Refer to [Documentation](https://panjiachen.github.io/vue-element-admin-site/guide/essentials/deploy.html) for more information
+## 🔑 默认账号
 
-## Changelog
+| 角色 | 账号 | 密码 | 说明 |
+|------|------|------|------|
+| 管理员 | admin | admin123 | 拥有全部权限 |
+| 代理 | agent001 | agent123 | 管理客户和订单 |
+| 客户 | KL08066V01 | 123456 | 查看和购买数据 |
 
-Detailed changes for each release are documented in the [release notes](https://github.com/PanJiaChen/vue-element-admin/releases).
+**⚠️ 重要：首次登录后请立即修改默认密码！**
 
-## Online Demo
+## 📚 功能模块
 
-[Preview](https://panjiachen.github.io/vue-element-admin)
+### 用户管理
+- 客户列表和管理
+- 代理列表和管理
+- 充值记录查询
+- 客户结算管理
+- 代理结算管理
 
-## Donate
+### 数据管理
+- 数据上传（Excel/CSV）
+- 数据列表和筛选
+- 定价模板管理
+- 数据发布测试
+- 数据处理工具
 
-If you find this project useful, you can buy author a glass of juice :tropical_drink:
+### 资源中心
+- 可购买数据浏览
+- 订阅中心（智能推荐）
+- 数据收藏功能
+- 数据详情查看
 
-![donate](https://wpimg.wallstcn.com/bd273f0d-83a0-4ef2-92e1-9ac8ed3746b9.png)
+### 订单管理
+- 订单列表查询
+- 订单审核处理
+- 订单发货管理
+- 发货配置设置
 
-[Paypal Me](https://www.paypal.me/panfree23)
+### 数据反馈
+- 反馈提交
+- 反馈列表查询
+- 反馈详情查看
 
-[Buy me a coffee](https://www.buymeacoffee.com/Pan)
+### 系统管理
+- 系统配置（Logo/项目名称）
+- 页面样式设置
+- 服务器状态监控
+- 操作日志查询
+- 密码修改
+- 安全管理
 
-## Browsers support
+## 🔧 技术栈
 
-Modern browsers and Internet Explorer 10+.
+### 前端
+- Vue.js 2.6.10
+- Element UI 2.13.2
+- Vuex 3.1.0
+- Vue Router 3.0.6
+- Axios 0.18.1
+- Vue I18n 8.15.3
 
-| [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_48x48.png" alt="IE / Edge" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>IE / Edge | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png" alt="Firefox" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Firefox | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png" alt="Chrome" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Chrome | [<img src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_48x48.png" alt="Safari" width="24px" height="24px" />](https://godban.github.io/browsers-support-badges/)</br>Safari |
-| --------- | --------- | --------- | --------- |
-| IE10, IE11, Edge | last 2 versions | last 2 versions | last 2 versions |
+### 后端
+- Node.js
+- Express 4.17.1
+- Sequelize 6.x (ORM)
+- MySQL
+- JSON Web Token (JWT)
+- Winston (日志)
 
-## License
+## 🌍 环境变量
 
-[MIT](https://github.com/PanJiaChen/vue-element-admin/blob/master/LICENSE)
+创建 `backend/.env` 文件：
 
-Copyright (c) 2017-present PanJiaChen
+```env
+# 服务器配置
+PORT=3000
+NODE_ENV=production
+
+# 数据库配置
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=vue_admin
+DB_USER=root
+DB_PASSWORD=your_password
+
+# JWT 密钥
+JWT_SECRET=your-secret-key-change-in-production
+
+# 日志配置
+LOG_LEVEL=info
+```
+
+## 📊 API 文档
+
+主要 API 接口：
+
+### 认证相关
+- `POST /api/auth/login` - 用户登录
+- `GET /api/auth/info` - 获取用户信息
+- `POST /api/auth/logout` - 用户登出
+- `POST /api/auth/change-password` - 修改密码
+
+### 用户管理
+- `GET /api/users` - 获取用户列表
+- `POST /api/users` - 创建用户
+- `PUT /api/users/:id` - 更新用户
+- `DELETE /api/users/:id` - 删除用户
+
+### 数据管理
+- `GET /api/data-library/published` - 获取已发布数据
+- `GET /api/data-library/subscription/:customerId` - 获取订阅数据
+- `POST /api/favorites` - 添加收藏
+- `DELETE /api/favorites/:id` - 取消收藏
+
+### 订单管理
+- `GET /api/orders` - 获取订单列表
+- `POST /api/orders` - 创建订单
+- `PUT /api/orders/:id` - 更新订单
+- `POST /api/orders/:id/deliver` - 订单发货
+
+## 🛠️ 开发指南
+
+### 添加新页面
+
+1. 在 `src/views/` 创建页面组件
+2. 在 `src/router/index.js` 添加路由配置
+3. 在 `src/lang/index.js` 添加国际化文本
+4. 如需 API，在 `src/api/` 和 `backend/routes/` 添加接口
+
+### 添加新角色权限
+
+1. 在路由配置的 `meta.roles` 中添加角色
+2. 在后端中间件添加权限验证
+3. 更新前端权限判断逻辑
+
+## 🔒 安全建议
+
+1. **修改默认密码** - 部署后立即修改所有默认账号密码
+2. **更新 JWT 密钥** - 使用强随机密钥替换默认值
+3. **HTTPS** - 生产环境启用 HTTPS
+4. **防火墙** - 配置防火墙规则，仅开放必要端口
+5. **定期备份** - 定期备份数据库和重要文件
+6. **更新依赖** - 定期更新依赖包，修复安全漏洞
+
+## 📈 性能优化
+
+- 使用 PM2 cluster 模式提高并发处理能力
+- 启用 Webpack 缓存加速编译
+- 使用 CDN 加载第三方库
+- 启用 gzip 压缩
+- 数据库连接池优化
+- Redis 缓存热点数据（可选）
+
+## 🐛 常见问题
+
+### 1. 端口被占用
+
+```bash
+# 查看占用端口的进程
+lsof -i :9527
+lsof -i :3000
+
+# 杀死进程
+kill -9 <PID>
+```
+
+### 2. 数据库连接失败
+
+检查：
+- 数据库服务是否启动
+- 数据库配置是否正确
+- 用户权限是否足够
+
+### 3. PM2 服务异常
+
+```bash
+# 查看详细日志
+pm2 logs --lines 100
+
+# 重启服务
+pm2 restart all
+
+# 重载配置
+pm2 reload ecosystem.config.js
+```
+
+### 4. 前端编译错误
+
+```bash
+# 清除缓存
+rm -rf node_modules/.cache
+
+# 重新安装依赖
+rm -rf node_modules
+npm install
+```
+
+## 📝 更新日志
+
+### v1.0.0 (2025-10-23)
+- ✨ 初始版本发布
+- 👥 用户管理系统
+- 📊 数据管理功能
+- 🛒 订单管理系统
+- ⭐ 收藏订阅功能
+- 🌐 国际化支持
+- 🎨 系统配置功能
+
+## 🤝 贡献指南
+
+欢迎提交 Issue 和 Pull Request！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 📄 开源协议
+
+本项目基于 [MIT](LICENSE) 协议开源。
+
+## 👨‍💻 联系方式
+
+- 项目主页：[https://github.com/your-username/vue-element-admin](https://github.com/your-username/vue-element-admin)
+- 问题反馈：[https://github.com/your-username/vue-element-admin/issues](https://github.com/your-username/vue-element-admin/issues)
+
+## 🙏 鸣谢
+
+- [Vue.js](https://vuejs.org/)
+- [Element UI](https://element.eleme.io/)
+- [vue-element-admin](https://github.com/PanJiaChen/vue-element-admin)
+
+---
+
+⭐ 如果这个项目对你有帮助，请给它一个星标！

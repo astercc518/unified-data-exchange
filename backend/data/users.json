@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "login_account": "admin",
+    "login_password": "111111",
+    "customer_name": "系统管理员",
+    "email": "admin@system.com",
+    "account_balance": 10000,
+    "status": 1,
+    "create_time": 1760331778795
+  }
+]

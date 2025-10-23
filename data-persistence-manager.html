@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据持久化管理中心</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            background: #f5f7fa;
+            padding: 25px;
+            border-radius: 12px;
+        }
+        
+        .section h2 {
+            color: #303133;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #409EFF;
+        }
+        
+        .stat-card h3 {
+            color: #909399;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            color: #303133;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stat-card .sub-value {
+            color: #606266;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background: #409EFF;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #67C23A;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #E6A23C;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #F56C6C;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #909399;
+            color: white;
+        }
+        
+        .log-container {
+            background: #2d3a4b;
+            color: #67C23A;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #409EFF;
+            padding-left: 10px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .alert-success {
+            background: #f0f9ff;
+            border-left: 4px solid #67C23A;
+            color: #67C23A;
+        }
+        
+        .alert-error {
+            background: #fef0f0;
+            border-left: 4px solid #F56C6C;
+            color: #F56C6C;
+        }
+        
+        .alert-warning {
+            background: #fdf6ec;
+            border-left: 4px solid #E6A23C;
+            color: #E6A23C;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #f5f7fa;
+            padding: 12px;
+            text-align: left;
+            color: #606266;
+            font-weight: bold;
+            border-bottom: 2px solid #e4e7ed;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ebeef5;
+            color: #303133;
+        }
+        
+        .data-table tr:hover {
+            background: #f5f7fa;
+        }
+        
+        .emoji {
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💾 数据持久化管理中心</h1>
+            <p>管理和监控系统数据的永久存储</p>
+        </div>
+        
+        <div class="content">
+            <div id="alertBox" class="alert"></div>
+            
+            <!-- 数据统计 -->
+            <div class="section">
+                <h2><span class="emoji">📊</span> 存储统计</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <h3>总数据量</h3>
+                        <div class="value" id="totalItems">-</div>
+                        <div class="sub-value">跨 <span id="totalKeys">-</span> 个数据表</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>存储空间</h3>
+                        <div class="value" id="totalSize">-</div>
+                        <div class="sub-value">LocalStorage 使用量</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>客户数据</h3>
+                        <div class="value" id="userCount">-</div>
+                        <div class="sub-value">活跃用户记录</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>订单数据</h3>
+                        <div class="value" id="orderCount">-</div>
+                        <div class="sub-value">历史订单记录</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 数据管理操作 -->
+            <div class="section">
+                <h2><span class="emoji">🛠️</span> 数据管理</h2>
+                <div class="button-group">
+                    <button class="btn-success" onclick="createBackup()">
+                        💾 创建备份
+                    </button>
+                    <button class="btn-primary" onclick="checkIntegrity()">
+                        🔍 数据完整性检查
+                    </button>
+                    <button class="btn-info" onclick="exportData()">
+                        📤 导出数据
+                    </button>
+                    <button class="btn-warning" onclick="showImport()">
+                        📥 导入数据
+                    </button>
+                    <button class="btn-danger" onclick="confirmClear()">
+                        🗑️ 清空数据
+                    </button>
+                </div>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+            </div>
+            
+            <!-- 详细统计 -->
+            <div class="section">
+                <h2><span class="emoji">📈</span> 数据详情</h2>
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>数据表</th>
+                                <th>记录数</th>
+                                <th>大小</th>
+                                <th>状态</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailsTable">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #909399;">加载中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 变更日志 -->
+            <div class="section">
+                <h2><span class="emoji">📝</span> 最近变更日志</h2>
+                <div class="log-container" id="changeLog">
+                    <div class="log-entry">暂无日志</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 持久化存储管理类（简化版）
+        class PersistentStorage {
+            constructor() {
+                this.storageKeys = {
+                    userList: '客户列表',
+                    agentList: '代理列表',
+                    dataLibrary: '数据库',
+                    orderList: '订单列表',
+                    rechargeRecords: '充值记录',
+                    feedbackList: '反馈记录'
+                }
+                this.backupKey = '_storage_backup_'
+                this.changeLogKey = '_change_log_'
+            }
+
+            get(key) {
+                try {
+                    const data = localStorage.getItem(key)
+                    return data ? JSON.parse(data) : []
+                } catch (error) {
+                    console.error(`读取失败 [${key}]:`, error)
+                    return []
+                }
+            }
+
+            set(key, value) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(value))
+                    this.logChange(key, {
+                        action: 'set',
+                        timestamp: Date.now(),
+                        count: Array.isArray(value) ? value.length : 1
+                    })
+                    return true
+                } catch (error) {
+                    console.error(`保存失败 [${key}]:`, error)
+                    return false
+                }
+            }
+
+            createBackup() {
+                try {
+                    const backup = {}
+                    Object.keys(this.storageKeys).forEach(key => {
+                        backup[key] = this.get(key)
+                    })
+                    backup._timestamp = Date.now()
+                    localStorage.setItem(this.backupKey, JSON.stringify(backup))
+                    console.log('✅ 备份创建成功')
+                    return true
+                } catch (error) {
+                    console.error('❌ 备份失败:', error)
+                    return false
+                }
+            }
+
+            recoverFromBackup() {
+                try {
+                    const backupData = localStorage.getItem(this.backupKey)
+                    if (!backupData) {
+                        throw new Error('未找到备份')
+                    }
+                    const backup = JSON.parse(backupData)
+                    Object.keys(this.storageKeys).forEach(key => {
+                        if (backup[key]) {
+                            this.set(key, backup[key])
+                        }
+                    })
+                    console.log('✅ 恢复成功')
+                    return true
+                } catch (error) {
+                    console.error('❌ 恢复失败:', error)
+                    return false
+                }
+            }
+
+            logChange(key, info) {
+                try {
+                    const logs = JSON.parse(localStorage.getItem(this.changeLogKey) || '[]')
+                    logs.push({ key, ...info })
+                    if (logs.length > 100) logs.shift()
+                    localStorage.setItem(this.changeLogKey, JSON.stringify(logs))
+                } catch (error) {
+                    console.error('日志记录失败:', error)
+                }
+            }
+
+            getChangeLogs(limit = 10) {
+                try {
+                    const logs = JSON.parse(localStorage.getItem(this.changeLogKey) || '[]')
+                    return logs.slice(-limit).reverse()
+                } catch (error) {
+                    return []
+                }
+            }
+
+            getStatistics() {
+                const stats = {
+                    totalKeys: 0,
+                    totalItems: 0,
+                    totalSize: 0,
+                    details: {}
+                }
+
+                Object.keys(this.storageKeys).forEach(key => {
+                    const data = this.get(key)
+                    const jsonStr = JSON.stringify(data)
+                    
+                    stats.details[key] = {
+                        count: Array.isArray(data) ? data.length : 0,
+                        size: jsonStr.length,
+                        sizeKB: (jsonStr.length / 1024).toFixed(2)
+                    }
+
+                    stats.totalKeys++
+                    stats.totalItems += stats.details[key].count
+                    stats.totalSize += stats.details[key].size
+                })
+
+                stats.totalSizeKB = (stats.totalSize / 1024).toFixed(2)
+                return stats
+            }
+
+            exportAllData() {
+                const exportData = {
+                    version: '1.0',
+                    exportTime: Date.now(),
+                    data: {}
+                }
+
+                Object.keys(this.storageKeys).forEach(key => {
+                    exportData.data[key] = this.get(key)
+                })
+
+                return exportData
+            }
+
+            importData(importData) {
+                try {
+                    if (!importData || !importData.data) {
+                        throw new Error('无效的导入数据')
+                    }
+
+                    this.createBackup()
+                    
+                    Object.entries(importData.data).forEach(([key, value]) => {
+                        this.set(key, value)
+                    })
+
+                    return true
+                } catch (error) {
+                    console.error('导入失败:', error)
+                    this.recoverFromBackup()
+                    return false
+                }
+            }
+
+            clearAll() {
+                this.createBackup()
+                Object.keys(this.storageKeys).forEach(key => {
+                    localStorage.removeItem(key)
+                })
+                return true
+            }
+
+            checkDataIntegrity() {
+                const report = {
+                    valid: true,
+                    issues: [],
+                    details: {}
+                }
+
+                Object.keys(this.storageKeys).forEach(key => {
+                    const data = this.get(key)
+                    report.details[key] = {
+                        exists: data !== null,
+                        count: Array.isArray(data) ? data.length : 0,
+                        isArray: Array.isArray(data)
+                    }
+
+                    if (!Array.isArray(data)) {
+                        report.issues.push(`${this.storageKeys[key]}: 数据格式错误`)
+                        report.valid = false
+                    }
+                })
+
+                return report
+            }
+        }
+
+        const storage = new PersistentStorage()
+
+        // 初始化页面
+        function init() {
+            loadStatistics()
+            loadChangeLogs()
+        }
+
+        function loadStatistics() {
+            const stats = storage.getStatistics()
+            
+            document.getElementById('totalItems').textContent = stats.totalItems
+            document.getElementById('totalKeys').textContent = stats.totalKeys
+            document.getElementById('totalSize').textContent = stats.totalSizeKB + ' KB'
+            document.getElementById('userCount').textContent = stats.details.userList?.count || 0
+            document.getElementById('orderCount').textContent = stats.details.orderList?.count || 0
+
+            // 更新详情表格
+            const tbody = document.getElementById('detailsTable')
+            tbody.innerHTML = ''
+            
+            Object.entries(storage.storageKeys).forEach(([key, name]) => {
+                const detail = stats.details[key]
+                const row = tbody.insertRow()
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${detail.count} 条</td>
+                    <td>${detail.sizeKB} KB</td>
+                    <td><span style="color: #67C23A;">✓ 正常</span></td>
+                `
+            })
+        }
+
+        function loadChangeLogs() {
+            const logs = storage.getChangeLogs()
+            const logContainer = document.getElementById('changeLog')
+            
+            if (logs.length === 0) {
+                logContainer.innerHTML = '<div class="log-entry">暂无变更记录</div>'
+                return
+            }
+
+            logContainer.innerHTML = logs.map(log => {
+                const time = new Date(log.timestamp).toLocaleString('zh-CN')
+                const keyName = storage.storageKeys[log.key] || log.key
+                return `<div class="log-entry">
+                    [${time}] ${keyName} - ${log.action} - ${log.count || 0} 条记录
+                </div>`
+            }).join('')
+        }
+
+        function createBackup() {
+            const result = storage.createBackup()
+            showAlert(result ? 'success' : 'error', 
+                result ? '✅ 备份创建成功！' : '❌ 备份创建失败')
+            loadChangeLogs()
+        }
+
+        function checkIntegrity() {
+            const report = storage.checkDataIntegrity()
+            if (report.valid) {
+                showAlert('success', '✅ 数据完整性检查通过！所有数据正常')
+            } else {
+                showAlert('warning', '⚠️ 发现问题：' + report.issues.join('、'))
+            }
+        }
+
+        function exportData() {
+            const data = storage.exportAllData()
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `data-export-${Date.now()}.json`
+            a.click()
+            URL.revokeObjectURL(url)
+            showAlert('success', '✅ 数据导出成功！')
+        }
+
+        function showImport() {
+            document.getElementById('importFile').click()
+        }
+
+        function importData(event) {
+            const file = event.target.files[0]
+            if (!file) return
+
+            const reader = new FileReader()
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result)
+                    const result = storage.importData(data)
+                    showAlert(result ? 'success' : 'error',
+                        result ? '✅ 数据导入成功！' : '❌ 数据导入失败')
+                    if (result) {
+                        loadStatistics()
+                        loadChangeLogs()
+                    }
+                } catch (error) {
+                    showAlert('error', '❌ 文件格式错误：' + error.message)
+                }
+            }
+            reader.readAsText(file)
+        }
+
+        function confirmClear() {
+            if (confirm('⚠️ 确定要清空所有数据吗？\n\n此操作会先创建备份，可以通过备份恢复。')) {
+                storage.clearAll()
+                showAlert('warning', '⚠️ 数据已清空（备份已保留）')
+                loadStatistics()
+                loadChangeLogs()
+            }
+        }
+
+        function showAlert(type, message) {
+            const alertBox = document.getElementById('alertBox')
+            alertBox.className = `alert alert-${type} show`
+            alertBox.innerHTML = `<strong>${message}</strong>`
+            
+            setTimeout(() => {
+                alertBox.classList.remove('show')
+            }, 5000)
+        }
+
+        // 页面加载时初始化
+        window.onload = init
+    </script>
+</body>
+</html>

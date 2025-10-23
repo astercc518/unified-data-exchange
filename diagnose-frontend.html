@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>前端诊断工具 - Vue Element Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .test-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .test-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #ddd;
+            background: #f9f9f9;
+        }
+        
+        .test-item.success {
+            border-left-color: #52c41a;
+            background: #f6ffed;
+        }
+        
+        .test-item.error {
+            border-left-color: #ff4d4f;
+            background: #fff2f0;
+        }
+        
+        .test-item.loading {
+            border-left-color: #1890ff;
+            background: #e6f7ff;
+        }
+        
+        .test-label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .test-result {
+            font-size: 14px;
+            color: #666;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            transition: all 0.3s;
+        }
+        
+        .button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-badge.success {
+            background: #52c41a;
+            color: white;
+        }
+        
+        .status-badge.error {
+            background: #ff4d4f;
+            color: white;
+        }
+        
+        .status-badge.loading {
+            background: #1890ff;
+            color: white;
+        }
+        
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .console-output .log-success {
+            color: #4ec9b0;
+        }
+        
+        .console-output .log-error {
+            color: #f48771;
+        }
+        
+        .console-output .log-info {
+            color: #569cd6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Vue Element Admin 前端诊断工具</h1>
+            <p>检测前端页面无法显示的问题</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>📡 服务连接测试</h2>
+            <div id="service-tests"></div>
+            <button class="button" onclick="runServiceTests()">开始测试</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔌 API 接口测试</h2>
+            <div id="api-tests"></div>
+            <button class="button" onclick="runAPITests()">测试接口</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>📦 静态资源测试</h2>
+            <div id="resource-tests"></div>
+            <button class="button" onclick="runResourceTests()">测试资源</button>
+        </div>
+        
+        <div class="test-section">
+            <h2>🎯 推荐解决方案</h2>
+            <div id="solutions"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>📋 诊断日志</h2>
+            <div class="console-output" id="console"></div>
+        </div>
+    </div>
+
+    <script>
+        const console_log = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'log-error' : type === 'success' ? 'log-success' : 'log-info';
+            console_log.push(`<span class="${colorClass}">[${timestamp}] ${message}</span>`);
+            document.getElementById('console').innerHTML = console_log.join('<br>');
+            console.log(message);
+        }
+
+        function createTestItem(label, status = 'loading', result = '测试中...') {
+            return `
+                <div class="test-item ${status}">
+                    <div class="test-label">${label} <span class="status-badge ${status}">${status === 'loading' ? '测试中' : status === 'success' ? '通过' : '失败'}</span></div>
+                    <div class="test-result">${result}</div>
+                </div>
+            `;
+        }
+
+        async function testURL(url, description) {
+            log(`测试 ${description}: ${url}`);
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                log(`✅ ${description} 成功 (${response.status})`, 'success');
+                return { success: true, status: response.status, data: text };
+            } catch (error) {
+                log(`❌ ${description} 失败: ${error.message}`, 'error');
+                return { success: false, error: error.message };
+            }
+        }
+
+        async function runServiceTests() {
+            const container = document.getElementById('service-tests');
+            container.innerHTML = '<div class="test-item loading"><div class="test-label">正在测试服务连接...</div></div>';
+            
+            const tests = [];
+            
+            // 测试前端服务
+            const frontendTest = await testURL('http://localhost:9528', '前端服务');
+            tests.push({
+                label: '前端服务 (http://localhost:9528)',
+                status: frontendTest.success ? 'success' : 'error',
+                result: frontendTest.success 
+                    ? `状态码: ${frontendTest.status}\n页面长度: ${frontendTest.data.length} 字符\n✅ HTML页面正常返回`
+                    : `错误: ${frontendTest.error}`
+            });
+            
+            // 测试后端服务
+            const backendTest = await testURL('http://localhost:3000/health', '后端服务');
+            tests.push({
+                label: '后端服务 (http://localhost:3000)',
+                status: backendTest.success ? 'success' : 'error',
+                result: backendTest.success 
+                    ? `状态码: ${backendTest.status}\n响应: ${backendTest.data}`
+                    : `错误: ${backendTest.error}`
+            });
+            
+            container.innerHTML = tests.map(t => createTestItem(t.label, t.status, t.result)).join('');
+        }
+
+        async function runAPITests() {
+            const container = document.getElementById('api-tests');
+            container.innerHTML = '<div class="test-item loading"><div class="test-label">正在测试API接口...</div></div>';
+            
+            const tests = [];
+            
+            const apiEndpoints = [
+                { url: 'http://localhost:3000/api/agents?page=1&limit=10', name: '代理列表 API' },
+                { url: 'http://localhost:3000/api/users?page=1&limit=10', name: '用户列表 API' },
+                { url: 'http://localhost:3000/api/data-library?page=1&limit=10', name: '数据库 API' },
+                { url: 'http://localhost:3000/api/orders?page=1&limit=10', name: '订单 API' }
+            ];
+            
+            for (const endpoint of apiEndpoints) {
+                const result = await testURL(endpoint.url, endpoint.name);
+                tests.push({
+                    label: endpoint.name,
+                    status: result.success ? 'success' : 'error',
+                    result: result.success 
+                        ? `状态码: ${result.status}\n响应预览: ${result.data.substring(0, 200)}...`
+                        : `错误: ${result.error}`
+                });
+            }
+            
+            container.innerHTML = tests.map(t => createTestItem(t.label, t.status, t.result)).join('');
+        }
+
+        async function runResourceTests() {
+            const container = document.getElementById('resource-tests');
+            container.innerHTML = '<div class="test-item loading"><div class="test-label">正在测试静态资源...</div></div>';
+            
+            const tests = [];
+            
+            const resources = [
+                { url: 'http://localhost:9528/static/js/app.js', name: 'app.js' },
+                { url: 'http://localhost:9528/static/js/vendors.js', name: 'vendors.js' },
+                { url: 'http://localhost:9528/favicon.ico', name: 'favicon.ico' }
+            ];
+            
+            for (const resource of resources) {
+                const result = await testURL(resource.url, resource.name);
+                tests.push({
+                    label: resource.name,
+                    status: result.success ? 'success' : 'error',
+                    result: result.success 
+                        ? `状态码: ${result.status}\n文件大小: ${result.data.length} 字节`
+                        : `错误: ${result.error}`
+                });
+            }
+            
+            container.innerHTML = tests.map(t => createTestItem(t.label, t.status, t.result)).join('');
+        }
+
+        // 自动运行所有测试
+        window.onload = async function() {
+            log('🚀 开始自动诊断...', 'info');
+            await runServiceTests();
+            await runAPITests();
+            await runResourceTests();
+            
+            // 生成解决方案
+            const solutions = document.getElementById('solutions');
+            solutions.innerHTML = `
+                <div class="test-item">
+                    <div class="test-label">🔍 常见问题排查</div>
+                    <div class="test-result">
+1. <strong>页面空白但服务正常</strong>：
+   - 打开浏览器开发者工具 (F12)
+   - 查看 Console 标签页是否有 JavaScript 错误
+   - 查看 Network 标签页是否有请求失败（红色）
+   
+2. <strong>检查浏览器控制台错误</strong>：
+   - 访问: http://localhost:9528
+   - 按 F12 打开开发者工具
+   - 截图控制台的错误信息
+   
+3. <strong>清除浏览器缓存</strong>：
+   - Chrome: Ctrl+Shift+Delete
+   - 选择"缓存的图像和文件"
+   - 点击"清除数据"
+   
+4. <strong>Vue Router 问题</strong>：
+   - 尝试访问: http://localhost:9528/#/login
+   - 尝试访问: http://localhost:9528/#/dashboard
+   
+5. <strong>API 请求失败</strong>：
+   - 检查后端服务是否运行 (http://localhost:3000/health)
+   - 检查网络请求是否被 CORS 阻止
+                    </div>
+                </div>
+                <div class="test-item success">
+                    <div class="test-label">✅ 快速操作</div>
+                    <div class="test-result">
+• <a href="http://localhost:9528" target="_blank" style="color: #667eea; font-weight: bold;">打开前端应用</a><br>
+• <a href="http://localhost:9528/#/login" target="_blank" style="color: #667eea; font-weight: bold;">打开登录页面</a><br>
+• <a href="http://localhost:3000/health" target="_blank" style="color: #667eea; font-weight: bold;">检查后端健康</a><br>
+• <button class="button" onclick="location.reload()">重新运行诊断</button>
+                    </div>
+                </div>
+            `;
+            
+            log('✅ 诊断完成！', 'success');
+        };
+    </script>
+</body>
+</html>

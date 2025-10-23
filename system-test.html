@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Element Admin 系统测试</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #409eff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+        }
+        .test-section h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #409eff;
+            padding-bottom: 10px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background-color: #409eff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #66b1ff;
+        }
+        .btn-success {
+            background-color: #67c23a;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #85ce61;
+        }
+        .btn-warning {
+            background-color: #e6a23c;
+            color: white;
+        }
+        .btn-warning:hover {
+            background-color: #ebb563;
+        }
+        .btn-danger {
+            background-color: #f56c6c;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #f78989;
+        }
+        .result-area {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #67c23a;
+        }
+        .error {
+            color: #f56c6c;
+        }
+        .warning {
+            color: #e6a23c;
+        }
+        .info {
+            color: #409eff;
+        }
+        .quick-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .quick-links a {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .quick-links a:hover {
+            background-color: #66b1ff;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success {
+            background-color: #67c23a;
+        }
+        .status-error {
+            background-color: #f56c6c;
+        }
+        .status-warning {
+            background-color: #e6a23c;
+        }
+        .status-info {
+            background-color: #409eff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vue Element Admin 系统测试中心</h1>
+        
+        <!-- 系统状态 -->
+        <div class="test-section">
+            <h2>系统状态</h2>
+            <div id="systemStatus">
+                <p><span class="status-indicator status-info"></span>开发服务器: <span id="serverStatus">检查中...</span></p>
+                <p><span class="status-indicator status-info"></span>数据状态: <span id="dataStatus">检查中...</span></p>
+                <p><span class="status-indicator status-info"></span>订单功能: <span id="orderStatus">检查中...</span></p>
+            </div>
+        </div>
+
+        <!-- 数据管理 -->
+        <div class="test-section">
+            <h2>测试数据管理</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="initAllTestData()">初始化完整测试数据</button>
+                <button class="btn-success" onclick="checkDataIntegrity()">验证数据完整性</button>
+                <button class="btn-warning" onclick="clearAllData()">清空所有数据</button>
+                <button class="btn-danger" onclick="resetToDefaults()">重置为默认</button>
+            </div>
+            <div class="result-area" id="dataResult"></div>
+        </div>
+
+        <!-- 功能测试 -->
+        <div class="test-section">
+            <h2>功能模块测试</h2>
+            <div class="button-group">
+                <button class="btn-primary" onclick="testOrderDetailPage()">测试订单详情页面</button>
+                <button class="btn-primary" onclick="testOrderListPage()">测试订单列表页面</button>
+                <button class="btn-primary" onclick="testResourceCenter()">测试资源中心</button>
+                <button class="btn-primary" onclick="testCustomerDashboard()">测试客户首页</button>
+                <button class="btn-success" onclick="runFullSystemTest()">运行完整系统测试</button>
+            </div>
+            <div class="result-area" id="functionResult"></div>
+        </div>
+
+        <!-- 快速导航 -->
+        <div class="test-section">
+            <h2>快速导航</h2>
+            <p>测试数据初始化后，可以直接访问以下页面进行功能验证：</p>
+            <div class="quick-links">
+                <a href="http://localhost:9533/#/login" target="_blank">登录页面</a>
+                <a href="http://localhost:9533/#/dashboard" target="_blank">管理员首页</a>
+                <a href="http://localhost:9533/#/order/list" target="_blank">订单列表</a>
+                <a href="http://localhost:9533/#/order/detail/1" target="_blank">订单详情(ID:1)</a>
+                <a href="http://localhost:9533/#/order/detail/2" target="_blank">订单详情(ID:2)</a>
+                <a href="http://localhost:9533/#/order/detail/3" target="_blank">订单详情(ID:3)</a>
+                <a href="http://localhost:9533/#/resource/center" target="_blank">资源中心</a>
+                <a href="http://localhost:9533/#/user/customer-list" target="_blank">客户列表</a>
+            </div>
+        </div>
+
+        <!-- 测试报告 -->
+        <div class="test-section">
+            <h2>测试报告</h2>
+            <div class="result-area" id="testReport"></div>
+        </div>
+    </div>
+
+    <script src="system-test.js"></script>
+    <script>
+        // 页面加载时检查系统状态
+        window.onload = function() {
+            checkSystemStatus();
+        };
+
+        // 检查系统状态
+        function checkSystemStatus() {
+            // 检查开发服务器
+            fetch('http://localhost:9533')
+                .then(() => {
+                    updateStatus('serverStatus', '运行中', 'success');
+                })
+                .catch(() => {
+                    updateStatus('serverStatus', '未启动', 'error');
+                });
+
+            // 检查数据状态
+            const hasData = localStorage.getItem('orderList') && 
+                           localStorage.getItem('userList') && 
+                           localStorage.getItem('dataList');
+            
+            if (hasData) {
+                updateStatus('dataStatus', '已初始化', 'success');
+            } else {
+                updateStatus('dataStatus', '未初始化', 'warning');
+            }
+
+            // 检查订单功能
+            try {
+                const orders = JSON.parse(localStorage.getItem('orderList') || '[]');
+                if (orders.length > 0) {
+                    updateStatus('orderStatus', '数据就绪', 'success');
+                } else {
+                    updateStatus('orderStatus', '无测试数据', 'warning');
+                }
+            } catch {
+                updateStatus('orderStatus', '数据错误', 'error');
+            }
+        }
+
+        function updateStatus(elementId, text, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = text;
+            element.className = type;
+            
+            // 更新指示器
+            const indicator = element.parentElement.querySelector('.status-indicator');
+            indicator.className = `status-indicator status-${type}`;
+        }
+
+        // 初始化完整测试数据
+        function initAllTestData() {
+            try {
+                const result = initTestData();
+                if (result) {
+                    appendResult('dataResult', '✅ 完整测试数据初始化成功', 'success');
+                    checkSystemStatus(); // 重新检查状态
+                } else {
+                    appendResult('dataResult', '❌ 测试数据初始化失败', 'error');
+                }
+            } catch (error) {
+                appendResult('dataResult', `❌ 初始化错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 验证数据完整性
+        function checkDataIntegrity() {
+            const tester = new SystemTester();
+            const isValid = tester.validateData();
+            
+            if (isValid) {
+                appendResult('dataResult', '✅ 数据完整性验证通过', 'success');
+            } else {
+                appendResult('dataResult', '⚠️ 数据完整性验证有问题，请查看控制台', 'warning');
+            }
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            const keys = ['userList', 'dataList', 'orderList', 'rechargeRecords', 'currentUser'];
+            keys.forEach(key => localStorage.removeItem(key));
+            appendResult('dataResult', '🗑️ 所有测试数据已清空', 'info');
+            checkSystemStatus();
+        }
+
+        // 重置为默认
+        function resetToDefaults() {
+            clearAllData();
+            setTimeout(() => {
+                initAllTestData();
+            }, 500);
+        }
+
+        // 测试订单详情页面
+        function testOrderDetailPage() {
+            const tester = new SystemTester();
+            const result = tester.testOrderDetailData();
+            
+            if (result) {
+                appendResult('functionResult', '✅ 订单详情页面数据格式测试通过', 'success');
+                appendResult('functionResult', '📝 建议手动访问订单详情页面进行完整测试', 'info');
+            } else {
+                appendResult('functionResult', '❌ 订单详情页面测试失败，请查看控制台', 'error');
+            }
+        }
+
+        // 测试订单列表页面
+        function testOrderListPage() {
+            try {
+                const orders = JSON.parse(localStorage.getItem('orderList') || '[]');
+                if (orders.length > 0) {
+                    appendResult('functionResult', `✅ 订单列表数据就绪 (${orders.length}条订单)`, 'success');
+                    appendResult('functionResult', '📝 请访问 /order/list 页面进行手动测试', 'info');
+                } else {
+                    appendResult('functionResult', '⚠️ 没有订单数据，请先初始化测试数据', 'warning');
+                }
+            } catch (error) {
+                appendResult('functionResult', `❌ 订单列表测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试资源中心
+        function testResourceCenter() {
+            try {
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                
+                if (dataList.length > 0 && currentUser) {
+                    appendResult('functionResult', `✅ 资源中心数据就绪 (${dataList.length}个数据源)`, 'success');
+                    appendResult('functionResult', `👤 当前用户: ${currentUser.customerName}`, 'info');
+                    appendResult('functionResult', '📝 请访问 /resource/center 页面进行手动测试', 'info');
+                } else {
+                    appendResult('functionResult', '⚠️ 资源中心缺少必要数据，请先初始化测试数据', 'warning');
+                }
+            } catch (error) {
+                appendResult('functionResult', `❌ 资源中心测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 测试客户首页
+        function testCustomerDashboard() {
+            try {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+                const orders = JSON.parse(localStorage.getItem('orderList') || '[]');
+                const records = JSON.parse(localStorage.getItem('rechargeRecords') || '[]');
+                
+                if (currentUser && orders.length > 0 && records.length > 0) {
+                    appendResult('functionResult', '✅ 客户首页数据完整', 'success');
+                    appendResult('functionResult', `👤 用户: ${currentUser.customerName}`, 'info');
+                    appendResult('functionResult', `📊 订单: ${orders.length}条, 记录: ${records.length}条`, 'info');
+                } else {
+                    appendResult('functionResult', '⚠️ 客户首页缺少必要数据', 'warning');
+                }
+            } catch (error) {
+                appendResult('functionResult', `❌ 客户首页测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 运行完整系统测试
+        function runFullSystemTest() {
+            const tester = new SystemTester();
+            const results = tester.runFullTest();
+            
+            // 显示测试报告
+            let reportHtml = '<h3>完整系统测试报告</h3>';
+            reportHtml += `<p>数据初始化: ${results.dataInit ? '✅ 通过' : '❌ 失败'}</p>`;
+            reportHtml += `<p>订单详情: ${results.orderDetail ? '✅ 通过' : '❌ 失败'}</p>`;
+            
+            if (results.errors.length > 0) {
+                reportHtml += '<h4>错误详情:</h4><ul>';
+                results.errors.forEach(error => {
+                    reportHtml += `<li class="error">${error}</li>`;
+                });
+                reportHtml += '</ul>';
+            }
+            
+            const passedTests = Object.values(results).filter(result => result === true).length;
+            const totalTests = Object.keys(results).length - 1;
+            reportHtml += `<p><strong>总体结果: ${passedTests}/${totalTests} 项测试通过</strong></p>`;
+            
+            document.getElementById('testReport').innerHTML = reportHtml;
+            appendResult('functionResult', '📋 完整系统测试已完成，请查看测试报告', 'info');
+        }
+
+        // 辅助函数：添加结果到指定区域
+        function appendResult(areaId, message, type = 'info') {
+            const area = document.getElementById(areaId);
+            const timestamp = new Date().toLocaleTimeString();
+            const resultLine = `<div class="${type}">[${timestamp}] ${message}</div>`;
+            area.innerHTML += resultLine;
+            area.scrollTop = area.scrollHeight;
+        }
+
+        // 清空结果区域
+        function clearResults(areaId) {
+            document.getElementById(areaId).innerHTML = '';
+        }
+    </script>
+</body>
+</html>

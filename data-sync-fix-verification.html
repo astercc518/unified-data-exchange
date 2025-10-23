@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据同步修复验证</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary { background: #409eff; color: white; }
+        .btn-success { background: #67c23a; color: white; }
+        .btn-warning { background: #e6a23c; color: white; }
+        .btn:hover { opacity: 0.8; }
+        
+        .result-area {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 14px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+        
+        .status-card {
+            display: inline-block;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #409eff;
+        }
+        
+        .status-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .success { color: #67c23a; }
+        .warning { color: #e6a23c; }
+        .error { color: #f56c6c; }
+        
+        .navigation-links {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .navigation-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 10px;
+            background: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        
+        .navigation-links a:hover {
+            background: #66b1ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 数据同步修复验证</h1>
+        <p>此页面用于验证"最新上传的数据不在数据库里"问题的修复效果</p>
+        
+        <!-- 修复内容说明 -->
+        <div class="status-section">
+            <h3>🛠️ 修复内容</h3>
+            <ul>
+                <li><strong>数据上传页面优化</strong>：增强了 saveToResourceCenter 方法的错误处理和日志记录</li>
+                <li><strong>资源中心页面优化</strong>：增强了数据加载逻辑，添加详细的调试信息</li>
+                <li><strong>数据验证机制</strong>：添加了数据保存后的验证检查</li>
+                <li><strong>调试工具</strong>：提供了详细的数据同步调试工具</li>
+            </ul>
+        </div>
+
+        <!-- 系统状态 -->
+        <div class="status-section">
+            <h3>📊 系统状态</h3>
+            <div class="status-card">
+                <div class="status-value" id="localStorageCount">0</div>
+                <div class="status-label">localStorage数据量</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="latestDataTime">未知</div>
+                <div class="status-label">最新数据时间</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value" id="syncStatus">检查中</div>
+                <div class="status-label">同步状态</div>
+            </div>
+        </div>
+
+        <!-- 测试操作 -->
+        <div class="status-section">
+            <h3>🧪 测试操作</h3>
+            <button class="btn btn-primary" onclick="checkCurrentStatus()">检查当前状态</button>
+            <button class="btn btn-success" onclick="simulateUpload()">模拟数据上传</button>
+            <button class="btn btn-warning" onclick="clearTestData()">清除测试数据</button>
+        </div>
+
+        <!-- 结果显示 -->
+        <div class="status-section">
+            <h3>📝 测试结果</h3>
+            <div class="result-area" id="testResults">等待测试操作...</div>
+        </div>
+
+        <!-- 验证步骤 -->
+        <div class="status-section">
+            <h3>✅ 验证步骤</h3>
+            <ol>
+                <li><strong>点击"检查当前状态"</strong>：查看系统当前的数据状态</li>
+                <li><strong>点击"模拟数据上传"</strong>：模拟上传一条测试数据</li>
+                <li><strong>访问资源中心</strong>：查看数据是否正确显示</li>
+                <li><strong>检查浏览器控制台</strong>：查看详细的调试日志</li>
+            </ol>
+        </div>
+
+        <!-- 预期效果 -->
+        <div class="status-section">
+            <h3>🎯 预期效果</h3>
+            <ul>
+                <li>✅ 数据上传后立即保存到localStorage</li>
+                <li>✅ 资源中心能立即显示最新上传的数据</li>
+                <li>✅ 控制台显示详细的调试信息</li>
+                <li>✅ 数据同步过程完全透明可追踪</li>
+            </ul>
+        </div>
+
+        <!-- 导航链接 -->
+        <div class="navigation-links">
+            <a href="http://localhost:9534/#/data/upload" target="_blank">数据上传页面</a>
+            <a href="http://localhost:9534/#/resource/center" target="_blank">资源中心</a>
+            <a href="/debug-data-sync.html" target="_blank">数据同步调试工具</a>
+        </div>
+    </div>
+
+    <script>
+        // 添加日志函数
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const resultArea = document.getElementById('testResults');
+            const icons = {
+                'info': '📝',
+                'success': '✅',
+                'warning': '⚠️',
+                'error': '❌'
+            };
+            const icon = icons[type] || '📝';
+            resultArea.textContent += `[${timestamp}] ${icon} ${message}\n`;
+            resultArea.scrollTop = resultArea.scrollHeight;
+        }
+
+        // 更新状态显示
+        function updateStatus() {
+            try {
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                document.getElementById('localStorageCount').textContent = dataList.length;
+
+                if (dataList.length > 0) {
+                    const latestData = dataList.reduce((latest, current) => {
+                        const currentTime = new Date(current.uploadTime || 0).getTime();
+                        const latestTime = new Date(latest.uploadTime || 0).getTime();
+                        return currentTime > latestTime ? current : latest;
+                    });
+                    document.getElementById('latestDataTime').textContent = 
+                        new Date(latestData.uploadTime).toLocaleString();
+                    
+                    // 检查同步状态
+                    const now = Date.now();
+                    const latestTime = new Date(latestData.uploadTime).getTime();
+                    if (now - latestTime < 3600000) { // 1小时内
+                        document.getElementById('syncStatus').textContent = '正常';
+                        document.getElementById('syncStatus').className = 'status-value success';
+                    } else {
+                        document.getElementById('syncStatus').textContent = '数据较旧';
+                        document.getElementById('syncStatus').className = 'status-value warning';
+                    }
+                } else {
+                    document.getElementById('latestDataTime').textContent = '无数据';
+                    document.getElementById('syncStatus').textContent = '无数据';
+                    document.getElementById('syncStatus').className = 'status-value error';
+                }
+            } catch (error) {
+                addLog(`状态更新失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 检查当前状态
+        function checkCurrentStatus() {
+            addLog('开始检查系统状态...', 'info');
+            
+            try {
+                const dataListStr = localStorage.getItem('dataList');
+                if (!dataListStr) {
+                    addLog('localStorage中没有dataList数据', 'warning');
+                    return;
+                }
+
+                const dataList = JSON.parse(dataListStr);
+                addLog(`localStorage中有 ${dataList.length} 条数据`, 'success');
+
+                if (dataList.length > 0) {
+                    // 显示最新的3条数据
+                    const recentData = dataList.slice(-3);
+                    addLog('最新的数据记录:', 'info');
+                    recentData.forEach((item, index) => {
+                        const uploadTime = new Date(item.uploadTime).toLocaleString();
+                        addLog(`  ${index + 1}. ${item.country} - ${item.dataType} (${uploadTime})`, 'info');
+                    });
+
+                    // 检查最近上传的数据
+                    const now = Date.now();
+                    const recentUploads = dataList.filter(item => {
+                        const uploadTime = new Date(item.uploadTime).getTime();
+                        return (now - uploadTime) < 3600000; // 1小时内
+                    });
+
+                    if (recentUploads.length > 0) {
+                        addLog(`发现 ${recentUploads.length} 条最近上传的数据`, 'success');
+                    } else {
+                        addLog('没有发现最近上传的数据（1小时内）', 'warning');
+                    }
+                }
+
+                updateStatus();
+
+            } catch (error) {
+                addLog(`检查状态失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 模拟数据上传
+        function simulateUpload() {
+            addLog('开始模拟数据上传...', 'info');
+            
+            try {
+                const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                const maxId = dataList.reduce((max, item) => Math.max(max, item.id || 0), 0);
+                
+                const testData = {
+                    id: maxId + 1,
+                    country: '测试国家',
+                    countryCode: 'TEST',
+                    dataType: '验证数据',
+                    validity: '3',
+                    source: '修复验证测试',
+                    availableQuantity: 5000,
+                    operators: [
+                        { name: 'Test Operator', count: 5000 }
+                    ],
+                    sellPrice: 0.05,
+                    costPrice: 0.03,
+                    remark: '这是用于验证数据同步修复的测试数据',
+                    uploadTime: Date.now(),
+                    status: 'available'
+                };
+
+                dataList.push(testData);
+                localStorage.setItem('dataList', JSON.stringify(dataList));
+
+                addLog('测试数据上传成功！', 'success');
+                addLog(`数据ID: ${testData.id}`, 'info');
+                addLog(`国家: ${testData.country}`, 'info');
+                addLog(`数据类型: ${testData.dataType}`, 'info');
+                addLog(`数据量: ${testData.availableQuantity.toLocaleString()}`, 'info');
+                addLog('现在可以访问资源中心查看此数据', 'success');
+
+                updateStatus();
+
+            } catch (error) {
+                addLog(`模拟上传失败: ${error.message}`, 'error');
+            }
+        }
+
+        // 清除测试数据
+        function clearTestData() {
+            if (confirm('确定要清除所有测试数据吗？')) {
+                try {
+                    const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+                    const filteredList = dataList.filter(item => 
+                        !item.source || !item.source.includes('测试') && !item.source.includes('验证')
+                    );
+                    
+                    localStorage.setItem('dataList', JSON.stringify(filteredList));
+                    addLog(`清除完成，剩余 ${filteredList.length} 条数据`, 'success');
+                    updateStatus();
+                    
+                } catch (error) {
+                    addLog(`清除失败: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        // 页面加载时自动检查状态
+        window.onload = function() {
+            addLog('数据同步修复验证工具已就绪', 'success');
+            updateStatus();
+        };
+    </script>
+</body>
+</html>

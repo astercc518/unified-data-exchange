@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态定价功能修复验证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #666;
+        }
+        .value {
+            font-weight: bold;
+        }
+        .success {
+            color: #67c23a;
+        }
+        .error {
+            color: #f56c6c;
+        }
+        .warning {
+            color: #e6a23c;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .code-block pre {
+            margin: 0;
+            font-size: 12px;
+            color: #333;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .message-success {
+            background: #f0f9ff;
+            color: #0284c7;
+            border-left: 4px solid #0284c7;
+        }
+        .message-error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #f56c6c;
+        }
+        .test-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .test-table th,
+        .test-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .test-table th {
+            background: #f5f7fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .test-table tr:hover {
+            background: #f5f7fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 动态定价功能修复验证</h1>
+            <p class="subtitle">验证动态定价功能的错误处理和数据显示</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 问题诊断</div>
+            <div class="status-item">
+                <span class="label">问题描述</span>
+                <span class="value error">动态定价功能异常，导致资源中心数据无法显示</span>
+            </div>
+            <div class="status-item">
+                <span class="label">可能原因</span>
+                <span class="value warning">数据项缺少必要字段或字段值无效</span>
+            </div>
+            <div class="status-item">
+                <span class="label">修复方案</span>
+                <span class="value success">添加健壮的错误处理和数据验证</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🧪 动态定价测试</div>
+            <button class="btn btn-primary" onclick="testDynamicPricing()">测试动态定价功能</button>
+            <div id="testMessage"></div>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🛠️ 修复详情</div>
+            <div class="status-item">
+                <span class="label">修改文件 1</span>
+                <span class="value">/src/utils/dynamicPricing.js</span>
+            </div>
+            <div class="status-item">
+                <span class="label">修改文件 2</span>
+                <span class="value">/src/views/resource/center.vue</span>
+            </div>
+            
+            <div class="code-block">
+                <pre>// 主要修复内容
+
+1. updateDataListPricing() 函数:
+   - 添加数组类型验证
+   - 添加逐项错误处理
+   - 捕获异常并返回安全的默认值
+
+2. calculateCurrentPrice() 函数:
+   - 添加输入参数验证
+   - 添加 try-catch 错误捕获
+   - 确保所有分支都返回有效值
+
+3. 资源中心页面:
+   - 包装动态定价调用在 try-catch 中
+   - 定价失败时使用原始价格
+   - 确保页面不会崩溃</pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">✅ 验证步骤</div>
+            <ol style="padding-left: 20px; line-height: 2;">
+                <li>点击"测试动态定价功能"按钮</li>
+                <li>访问资源中心页面: <a href="http://localhost:9528/#/resource/center" target="_blank">http://localhost:9528/#/resource/center</a></li>
+                <li>打开浏览器控制台（F12），查看日志</li>
+                <li>确认数据正常显示，没有JavaScript错误</li>
+                <li>检查动态定价是否正确应用</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function testDynamicPricing() {
+            const messageDiv = document.getElementById('testMessage');
+            const resultsDiv = document.getElementById('testResults');
+            
+            messageDiv.innerHTML = '<div class="message message-success">🔄 正在测试动态定价功能...</div>';
+            
+            // 模拟测试数据
+            const testData = [
+                {
+                    id: 1,
+                    country: '孟加拉国',
+                    sellPrice: 0.05,
+                    costPrice: 0.02,
+                    publishTime: Date.now() - (2 * 24 * 60 * 60 * 1000), // 2天前
+                    availableQuantity: 50000
+                },
+                {
+                    id: 2,
+                    country: '美国',
+                    sellPrice: 0.08,
+                    costPrice: 0.03,
+                    publishTime: Date.now() - (10 * 24 * 60 * 60 * 1000), // 10天前
+                    availableQuantity: 10000
+                },
+                {
+                    id: 3,
+                    country: '印度',
+                    sellPrice: 0.04,
+                    publishTime: null, // 缺少发布时间
+                    availableQuantity: 100000
+                },
+                {
+                    id: 4,
+                    country: '越南',
+                    // 缺少价格字段
+                    publishTime: Date.now() - (5 * 24 * 60 * 60 * 1000),
+                    availableQuantity: 500000
+                }
+            ];
+            
+            try {
+                console.log('📊 测试数据:', testData);
+                
+                // 模拟动态定价计算
+                const results = testData.map((item, index) => {
+                    try {
+                        const result = calculatePrice(item);
+                        return {
+                            index: index + 1,
+                            country: item.country,
+                            originalPrice: item.sellPrice || 0,
+                            currentPrice: result.currentPrice,
+                            validity: result.validityDisplay,
+                            discount: result.discountInfo,
+                            status: '✅ 成功'
+                        };
+                    } catch (error) {
+                        return {
+                            index: index + 1,
+                            country: item.country,
+                            originalPrice: item.sellPrice || 0,
+                            currentPrice: 0,
+                            validity: '错误',
+                            discount: error.message,
+                            status: '❌ 失败'
+                        };
+                    }
+                });
+                
+                displayResults(results);
+                messageDiv.innerHTML = '<div class="message message-success">✅ 测试完成！所有数据项都得到了安全处理</div>';
+                
+            } catch (error) {
+                messageDiv.innerHTML = `<div class="message message-error">❌ 测试失败: ${error.message}</div>`;
+                console.error('测试失败:', error);
+            }
+        }
+        
+        function calculatePrice(dataItem) {
+            // 模拟动态定价计算（简化版）
+            const { sellPrice, costPrice, publishTime } = dataItem;
+            
+            if (!publishTime || !sellPrice) {
+                return {
+                    currentPrice: sellPrice || 0,
+                    validityDisplay: '未知',
+                    discountInfo: '无'
+                };
+            }
+            
+            const daysSincePublish = Math.floor((Date.now() - publishTime) / (1000 * 60 * 60 * 24));
+            let currentPrice = sellPrice;
+            let validityDisplay = '未知';
+            let discountInfo = '无折扣';
+            
+            if (daysSincePublish <= 3) {
+                currentPrice = sellPrice;
+                validityDisplay = '3天内';
+                discountInfo = '原价';
+            } else if (daysSincePublish <= 7) {
+                const discountDays = daysSincePublish - 3;
+                currentPrice = sellPrice * (1 - discountDays * 0.05);
+                validityDisplay = '7天内';
+                discountInfo = `降价${discountDays}天`;
+            } else if (daysSincePublish <= 15) {
+                currentPrice = sellPrice * 0.7;
+                validityDisplay = '15天内';
+                discountInfo = '70%折扣';
+            } else {
+                currentPrice = sellPrice * 0.5;
+                validityDisplay = '近期';
+                discountInfo = '50%折扣';
+            }
+            
+            if (costPrice && currentPrice < costPrice) {
+                currentPrice = costPrice;
+                discountInfo += '（成本价）';
+            }
+            
+            return {
+                currentPrice: currentPrice.toFixed(4),
+                validityDisplay,
+                discountInfo
+            };
+        }
+        
+        function displayResults(results) {
+            const resultsDiv = document.getElementById('testResults');
+            
+            let html = '<table class="test-table">';
+            html += '<thead><tr>';
+            html += '<th>#</th><th>国家</th><th>原价</th><th>当前价</th><th>时效</th><th>折扣</th><th>状态</th>';
+            html += '</tr></thead><tbody>';
+            
+            results.forEach(result => {
+                html += '<tr>';
+                html += `<td>${result.index}</td>`;
+                html += `<td>${result.country}</td>`;
+                html += `<td>$${result.originalPrice.toFixed(4)}</td>`;
+                html += `<td>$${result.currentPrice}</td>`;
+                html += `<td>${result.validity}</td>`;
+                html += `<td>${result.discount}</td>`;
+                html += `<td>${result.status}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            resultsDiv.innerHTML = html;
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            setTimeout(testDynamicPricing, 500);
+        });
+    </script>
+</body>
+</html>

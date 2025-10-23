@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源中心数据同步修复验证</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .status-item:last-child {
+            border-bottom: none;
+        }
+        .label {
+            color: #666;
+        }
+        .value {
+            font-weight: bold;
+        }
+        .success {
+            color: #67c23a;
+        }
+        .error {
+            color: #f56c6c;
+        }
+        .warning {
+            color: #e6a23c;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .data-table th {
+            background: #f5f7fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .data-table tr:hover {
+            background: #f5f7fa;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        .code-block pre {
+            margin: 0;
+            font-size: 12px;
+            color: #333;
+        }
+        .message {
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+        }
+        .message-success {
+            background: #f0f9ff;
+            color: #0284c7;
+            border-left: 4px solid #0284c7;
+        }
+        .message-error {
+            background: #fee;
+            color: #c33;
+            border-left: 4px solid #f56c6c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 资源中心数据同步修复验证</h1>
+            <p class="subtitle">验证资源中心能否正确从数据库API获取已发布数据</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 问题诊断</div>
+            <div class="status-item">
+                <span class="label">问题描述</span>
+                <span class="value">资源中心无法同步数据列表已发布数据</span>
+            </div>
+            <div class="status-item">
+                <span class="label">错误提示</span>
+                <span class="value error">数据库API返回空数据，降级到localStorage</span>
+            </div>
+            <div class="status-item">
+                <span class="label">根本原因</span>
+                <span class="value warning">API响应结构解析错误</span>
+            </div>
+            <div class="status-item">
+                <span class="label">修复方案</span>
+                <span class="value success">修正response.data层级解析逻辑</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🔍 API 测试</div>
+            <div class="status-item">
+                <span class="label">API 地址</span>
+                <span class="value" id="apiUrl">http://localhost:3000/api/data-library/published</span>
+            </div>
+            <div class="status-item">
+                <span class="label">连接状态</span>
+                <span class="value" id="apiStatus">未测试</span>
+            </div>
+            <div class="status-item">
+                <span class="label">返回数据量</span>
+                <span class="value" id="dataCount">-</span>
+            </div>
+            <button class="btn btn-primary" onclick="testAPI()">测试 API</button>
+            <div id="apiMessage"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 数据列表</div>
+            <div id="dataTableContainer"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🛠️ 修复详情</div>
+            <div class="status-item">
+                <span class="label">修改文件</span>
+                <span class="value">/src/views/resource/center.vue</span>
+            </div>
+            <div class="status-item">
+                <span class="label">修改位置</span>
+                <span class="value">getPublishedDataFromAPI() 方法</span>
+            </div>
+            <div class="code-block">
+                <pre>// 修改前（错误）:
+if (response.data.success && response.data.data) {
+  const dataList = response.data.data.map(...)
+  this.total = response.data.total
+}
+
+// 修改后（正确）:
+if (response.success && response.data && response.data.length > 0) {
+  const dataList = response.data.map(...)
+  this.total = response.total
+}</pre>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">✅ 验证步骤</div>
+            <ol style="padding-left: 20px; line-height: 2;">
+                <li>点击上方"测试 API"按钮，验证后端返回数据</li>
+                <li>访问资源中心页面: <a href="http://localhost:9528/#/resource/center" target="_blank">http://localhost:9528/#/resource/center</a></li>
+                <li>打开浏览器控制台（F12），查看日志</li>
+                <li>确认显示"✅ 数据库API返回数据: X 条"</li>
+                <li>确认数据列表正常显示</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        async function testAPI() {
+            const apiUrl = 'http://localhost:3000/api/data-library/published?page=1&limit=20';
+            const messageDiv = document.getElementById('apiMessage');
+            
+            try {
+                messageDiv.innerHTML = '<div class="message message-success">🔄 正在测试 API...</div>';
+                
+                const response = await fetch(apiUrl);
+                const result = await response.json();
+                
+                console.log('API 响应:', result);
+                
+                if (result.success && result.data) {
+                    const count = result.data.length;
+                    document.getElementById('apiStatus').innerHTML = '<span class="success">✅ 连接成功</span>';
+                    document.getElementById('dataCount').innerHTML = `<span class="success">${count} 条</span>`;
+                    
+                    messageDiv.innerHTML = `<div class="message message-success">✅ API 测试成功！返回 ${count} 条数据</div>`;
+                    
+                    // 显示数据表格
+                    displayDataTable(result.data);
+                } else {
+                    throw new Error('API 返回数据格式错误');
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML = '<span class="error">❌ 连接失败</span>';
+                messageDiv.innerHTML = `<div class="message message-error">❌ API 测试失败: ${error.message}</div>`;
+                console.error('测试失败:', error);
+            }
+        }
+        
+        function displayDataTable(data) {
+            const container = document.getElementById('dataTableContainer');
+            
+            if (!data || data.length === 0) {
+                container.innerHTML = '<p>无数据</p>';
+                return;
+            }
+            
+            let html = '<table class="data-table">';
+            html += '<thead><tr>';
+            html += '<th>ID</th><th>国家</th><th>数据类型</th><th>时效</th><th>数量</th><th>价格</th><th>状态</th>';
+            html += '</tr></thead><tbody>';
+            
+            data.forEach(item => {
+                html += '<tr>';
+                html += `<td>${item.id}</td>`;
+                html += `<td>${item.country_name || item.country}</td>`;
+                html += `<td>${item.data_type}</td>`;
+                html += `<td>${item.validity_name || item.validity}</td>`;
+                html += `<td>${item.available_quantity.toLocaleString()}</td>`;
+                html += `<td>$${item.sell_price}</td>`;
+                html += `<td><span class="success">${item.status}</span></td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            setTimeout(testAPI, 500);
+        });
+    </script>
+</body>
+</html>

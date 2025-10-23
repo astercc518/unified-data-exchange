@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>定价管理同步测试</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 6px;
+    }
+    
+    .section h2 {
+      color: #409eff;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+    
+    .step {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-left: 3px solid #409eff;
+    }
+    
+    .step-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 10px;
+    }
+    
+    button {
+      background: #409eff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    
+    button:hover {
+      background: #66b1ff;
+    }
+    
+    button.success {
+      background: #67c23a;
+    }
+    
+    button.warning {
+      background: #e6a23c;
+    }
+    
+    button.danger {
+      background: #f56c6c;
+    }
+    
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      background: #ecf5ff;
+      border-radius: 4px;
+      border-left: 3px solid #409eff;
+    }
+    
+    .result.success {
+      background: #f0f9ff;
+      border-left-color: #67c23a;
+    }
+    
+    .result.error {
+      background: #fef0f0;
+      border-left-color: #f56c6c;
+    }
+    
+    .data-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: white;
+      border: 1px solid #eee;
+      border-radius: 4px;
+    }
+    
+    .data-item strong {
+      color: #409eff;
+    }
+    
+    .price {
+      color: #67c23a;
+      font-weight: bold;
+    }
+    
+    .count {
+      color: #e6a23c;
+      font-weight: bold;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    th, td {
+      border: 1px solid #eee;
+      padding: 10px;
+      text-align: left;
+    }
+    
+    th {
+      background: #f5f7fa;
+      color: #333;
+      font-weight: bold;
+    }
+    
+    .highlight {
+      background: #fff9e6;
+      padding: 2px 6px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 定价管理同步测试</h1>
+    <p class="description">
+      本测试用于验证定价管理功能是否能够正确同步更新资源中心的数据价格。
+      包括：初始化测试数据、查看当前数据、修改定价、验证同步结果等步骤。
+    </p>
+
+    <!-- 第一步：初始化测试数据 -->
+    <div class="section">
+      <h2>步骤1：初始化测试数据</h2>
+      <div class="step">
+        <div class="step-title">创建模拟数据到资源中心</div>
+        <button onclick="initTestData()">初始化测试数据</button>
+        <button class="warning" onclick="clearAllData()">清空所有数据</button>
+        <div id="init-result"></div>
+      </div>
+    </div>
+
+    <!-- 第二步：查看当前数据 -->
+    <div class="section">
+      <h2>步骤2：查看当前资源中心数据</h2>
+      <div class="step">
+        <div class="step-title">显示当前所有数据及其价格</div>
+        <button onclick="viewCurrentData()">查看当前数据</button>
+        <div id="view-result"></div>
+      </div>
+    </div>
+
+    <!-- 第三步：模拟定价更新 -->
+    <div class="section">
+      <h2>步骤3：模拟定价管理修改价格</h2>
+      <div class="step">
+        <div class="step-title">批量更新指定国家和时效的数据价格</div>
+        <div style="margin-bottom: 10px;">
+          <label>
+            国家：
+            <select id="country-select">
+              <option value="孟加拉国">孟加拉国 (BD)</option>
+              <option value="印度">印度 (IN)</option>
+              <option value="泰国">泰国 (TH)</option>
+            </select>
+          </label>
+          <label style="margin-left: 15px;">
+            时效：
+            <select id="validity-select">
+              <option value="3">3天内</option>
+              <option value="30">30天内</option>
+              <option value="30+">30天以上</option>
+            </select>
+          </label>
+        </div>
+        <div style="margin-bottom: 10px;">
+          <label>
+            新成本价：
+            <input type="number" id="new-cost-price" value="0.035" step="0.001" style="width: 100px;">
+            U/条
+          </label>
+          <label style="margin-left: 15px;">
+            新销售价：
+            <input type="number" id="new-sell-price" value="0.045" step="0.001" style="width: 100px;">
+            U/条
+          </label>
+        </div>
+        <button class="success" onclick="updatePricing()">执行定价更新</button>
+        <div id="update-result"></div>
+      </div>
+    </div>
+
+    <!-- 第四步：验证同步结果 -->
+    <div class="section">
+      <h2>步骤4：验证数据同步结果</h2>
+      <div class="step">
+        <div class="step-title">检查资源中心数据价格是否已更新</div>
+        <button onclick="verifySync()">验证同步结果</button>
+        <div id="verify-result"></div>
+      </div>
+    </div>
+
+    <!-- 第五步：查看定价历史 -->
+    <div class="section">
+      <h2>步骤5：查看定价历史记录</h2>
+      <div class="step">
+        <div class="step-title">显示所有定价变更记录</div>
+        <button onclick="viewPricingHistory()">查看定价历史</button>
+        <div id="history-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化测试数据
+    function initTestData() {
+      const testData = [
+        {
+          id: 1,
+          country: '孟加拉国',
+          countryCode: 'BD',
+          validity: '3',
+          source: 'Grameenphone官方',
+          dataType: '手机号码',
+          availableQuantity: 500000,
+          operators: [
+            { name: 'Grameenphone', count: 150000 },
+            { name: 'Robi', count: 150000 },
+            { name: 'Banglalink', count: 100000 },
+            { name: 'Teletalk', count: 100000 }
+          ],
+          sellPrice: 0.05,
+          costPrice: 0.04,
+          uploadTime: Date.now(),
+          status: 'available'
+        },
+        {
+          id: 2,
+          country: '孟加拉国',
+          countryCode: 'BD',
+          validity: '30',
+          source: '第三方采集',
+          dataType: '用户资料',
+          availableQuantity: 800000,
+          operators: [
+            { name: 'Grameenphone', count: 200000 },
+            { name: 'Robi', count: 200000 },
+            { name: 'Banglalink', count: 200000 },
+            { name: 'Teletalk', count: 200000 }
+          ],
+          sellPrice: 0.04,
+          costPrice: 0.03,
+          uploadTime: Date.now(),
+          status: 'available'
+        },
+        {
+          id: 3,
+          country: '孟加拉国',
+          countryCode: 'BD',
+          validity: '30+',
+          source: '合作伙伴',
+          dataType: '电话号码',
+          availableQuantity: 1200000,
+          operators: [
+            { name: 'Grameenphone', count: 300000 },
+            { name: 'Robi', count: 300000 },
+            { name: 'Banglalink', count: 300000 },
+            { name: 'Teletalk', count: 300000 }
+          ],
+          sellPrice: 0.03,
+          costPrice: 0.02,
+          uploadTime: Date.now(),
+          status: 'available'
+        },
+        {
+          id: 4,
+          country: '印度',
+          countryCode: 'IN',
+          validity: '3',
+          source: 'Airtel官方',
+          dataType: '手机号码',
+          availableQuantity: 600000,
+          operators: [
+            { name: 'Airtel', count: 200000 },
+            { name: 'Jio', count: 200000 },
+            { name: 'Vi', count: 150000 },
+            { name: 'BSNL', count: 50000 }
+          ],
+          sellPrice: 0.05,
+          costPrice: 0.04,
+          uploadTime: Date.now(),
+          status: 'available'
+        },
+        {
+          id: 5,
+          country: '印度',
+          countryCode: 'IN',
+          validity: '30',
+          source: '第三方采集',
+          dataType: '用户资料',
+          availableQuantity: 900000,
+          operators: [
+            { name: 'Airtel', count: 300000 },
+            { name: 'Jio', count: 300000 },
+            { name: 'Vi', count: 200000 },
+            { name: 'BSNL', count: 100000 }
+          ],
+          sellPrice: 0.04,
+          costPrice: 0.03,
+          uploadTime: Date.now(),
+          status: 'available'
+        }
+      ];
+
+      localStorage.setItem('dataList', JSON.stringify(testData));
+
+      const resultDiv = document.getElementById('init-result');
+      resultDiv.className = 'result success';
+      resultDiv.innerHTML = `
+        <strong>✅ 初始化成功！</strong><br>
+        已创建 ${testData.length} 条测试数据到资源中心。<br>
+        包括：孟加拉国（3条）、印度（2条）的不同时效数据。
+      `;
+    }
+
+    // 清空所有数据
+    function clearAllData() {
+      if (confirm('确定要清空所有数据吗？这将删除资源中心和定价历史的所有数据。')) {
+        localStorage.removeItem('dataList');
+        localStorage.removeItem('pricingHistory');
+        
+        const resultDiv = document.getElementById('init-result');
+        resultDiv.className = 'result';
+        resultDiv.innerHTML = '<strong>🗑️ 已清空所有数据</strong>';
+      }
+    }
+
+    // 查看当前数据
+    function viewCurrentData() {
+      const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+      
+      const resultDiv = document.getElementById('view-result');
+      
+      if (dataList.length === 0) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>⚠️ 暂无数据，请先初始化测试数据</strong>';
+        return;
+      }
+
+      let html = '<strong>📊 当前资源中心数据：</strong><br>';
+      html += '<table>';
+      html += '<tr><th>ID</th><th>国家</th><th>时效</th><th>数据类型</th><th>数据量</th><th>成本价</th><th>销售价</th><th>来源</th></tr>';
+      
+      dataList.forEach(item => {
+        html += `<tr>
+          <td>${item.id}</td>
+          <td>${item.country} (${item.countryCode})</td>
+          <td>${getValidityText(item.validity)}</td>
+          <td>${item.dataType}</td>
+          <td class="count">${item.availableQuantity.toLocaleString()}</td>
+          <td class="price">${item.costPrice} U/条</td>
+          <td class="price">${item.sellPrice} U/条</td>
+          <td>${item.source}</td>
+        </tr>`;
+      });
+      
+      html += '</table>';
+      
+      resultDiv.className = 'result success';
+      resultDiv.innerHTML = html;
+    }
+
+    // 模拟定价更新
+    function updatePricing() {
+      const country = document.getElementById('country-select').value;
+      const validity = document.getElementById('validity-select').value;
+      const newCostPrice = parseFloat(document.getElementById('new-cost-price').value);
+      const newSellPrice = parseFloat(document.getElementById('new-sell-price').value);
+
+      // 模拟定价管理页面的更新逻辑
+      const result = updateResourceCenterPricing({
+        country: country,
+        validity: validity,
+        costPrice: newCostPrice,
+        sellPrice: newSellPrice
+      });
+
+      const resultDiv = document.getElementById('update-result');
+      
+      if (result.success) {
+        resultDiv.className = 'result success';
+        resultDiv.innerHTML = `
+          <strong>✅ 定价更新成功！</strong><br>
+          更新条件：<span class="highlight">${country}</span> - <span class="highlight">${getValidityText(validity)}</span><br>
+          新成本价：<span class="price">${newCostPrice} U/条</span><br>
+          新销售价：<span class="price">${newSellPrice} U/条</span><br>
+          利润率：<span class="price">${((newSellPrice - newCostPrice) / newCostPrice * 100).toFixed(1)}%</span><br>
+          <strong>已更新 <span class="count">${result.count}</span> 条数据</strong>
+        `;
+
+        // 保存定价历史
+        savePricingHistory({
+          changeTime: new Date(),
+          country: country,
+          validity: validity,
+          oldCostPrice: result.oldPrices[0]?.costPrice || 0,
+          newCostPrice: newCostPrice,
+          oldSellPrice: result.oldPrices[0]?.sellPrice || 0,
+          newSellPrice: newSellPrice,
+          operator: '测试用户',
+          remark: `批量更新定价，影响 ${result.count} 条数据`
+        });
+      } else {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>❌ 未找到匹配的数据</strong>';
+      }
+    }
+
+    // 更新资源中心定价（模拟定价管理页面的逻辑）
+    function updateResourceCenterPricing(pricingRow) {
+      try {
+        const savedDataList = localStorage.getItem('dataList');
+        if (!savedDataList) {
+          return { success: true, count: 0 };
+        }
+
+        let dataList = JSON.parse(savedDataList);
+        let updateCount = 0;
+        const oldPrices = [];
+
+        const countryCode = getCountryCodeByName(pricingRow.country);
+
+        dataList = dataList.map(item => {
+          const countryMatch = item.countryCode === countryCode || item.country === pricingRow.country;
+          const validityMatch = item.validity === pricingRow.validity;
+
+          if (countryMatch && validityMatch) {
+            oldPrices.push({
+              costPrice: item.costPrice,
+              sellPrice: item.sellPrice
+            });
+            item.costPrice = pricingRow.costPrice;
+            item.sellPrice = pricingRow.sellPrice;
+            item.updateTime = Date.now();
+            updateCount++;
+          }
+
+          return item;
+        });
+
+        localStorage.setItem('dataList', JSON.stringify(dataList));
+
+        return { success: true, count: updateCount, oldPrices: oldPrices };
+      } catch (error) {
+        console.error('更新失败:', error);
+        return { success: false, count: 0 };
+      }
+    }
+
+    // 验证同步结果
+    function verifySync() {
+      const country = document.getElementById('country-select').value;
+      const validity = document.getElementById('validity-select').value;
+      const expectedCostPrice = parseFloat(document.getElementById('new-cost-price').value);
+      const expectedSellPrice = parseFloat(document.getElementById('new-sell-price').value);
+
+      const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+      const countryCode = getCountryCodeByName(country);
+      
+      const matchedData = dataList.filter(item => {
+        const countryMatch = item.countryCode === countryCode || item.country === country;
+        const validityMatch = item.validity === validity;
+        return countryMatch && validityMatch;
+      });
+
+      const resultDiv = document.getElementById('verify-result');
+      
+      if (matchedData.length === 0) {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>❌ 未找到匹配的数据</strong>';
+        return;
+      }
+
+      const allCorrect = matchedData.every(item => 
+        item.costPrice === expectedCostPrice && 
+        item.sellPrice === expectedSellPrice
+      );
+
+      if (allCorrect) {
+        let html = '<strong>✅ 同步验证通过！</strong><br>';
+        html += `找到 ${matchedData.length} 条匹配数据，价格已全部更新：<br><br>`;
+        
+        matchedData.forEach(item => {
+          html += `<div class="data-item">
+            <strong>ID ${item.id}</strong> - ${item.country} - ${getValidityText(item.validity)} - ${item.dataType}<br>
+            成本价：<span class="price">${item.costPrice} U/条</span> | 
+            销售价：<span class="price">${item.sellPrice} U/条</span> | 
+            数据量：<span class="count">${item.availableQuantity.toLocaleString()}</span>
+          </div>`;
+        });
+        
+        resultDiv.className = 'result success';
+        resultDiv.innerHTML = html;
+      } else {
+        resultDiv.className = 'result error';
+        resultDiv.innerHTML = '<strong>❌ 价格未正确更新，请检查</strong>';
+      }
+    }
+
+    // 查看定价历史
+    function viewPricingHistory() {
+      const history = JSON.parse(localStorage.getItem('pricingHistory') || '[]');
+      
+      const resultDiv = document.getElementById('history-result');
+      
+      if (history.length === 0) {
+        resultDiv.className = 'result';
+        resultDiv.innerHTML = '<strong>📝 暂无定价历史记录</strong>';
+        return;
+      }
+
+      let html = '<strong>📝 定价历史记录：</strong><br>';
+      html += '<table>';
+      html += '<tr><th>时间</th><th>国家</th><th>时效</th><th>成本价变更</th><th>销售价变更</th><th>操作人</th><th>备注</th></tr>';
+      
+      history.forEach(item => {
+        const changeTime = new Date(item.changeTime).toLocaleString();
+        html += `<tr>
+          <td>${changeTime}</td>
+          <td>${item.country}</td>
+          <td>${getValidityText(item.validity)}</td>
+          <td>${item.oldCostPrice} → ${item.newCostPrice}</td>
+          <td>${item.oldSellPrice} → ${item.newSellPrice}</td>
+          <td>${item.operator}</td>
+          <td>${item.remark}</td>
+        </tr>`;
+      });
+      
+      html += '</table>';
+      
+      resultDiv.className = 'result success';
+      resultDiv.innerHTML = html;
+    }
+
+    // 保存定价历史
+    function savePricingHistory(historyItem) {
+      const history = JSON.parse(localStorage.getItem('pricingHistory') || '[]');
+      history.unshift(historyItem);
+      localStorage.setItem('pricingHistory', JSON.stringify(history));
+    }
+
+    // 辅助函数
+    function getCountryCodeByName(countryName) {
+      const countryMap = {
+        '孟加拉国': 'BD',
+        '印度': 'IN',
+        '泰国': 'TH',
+        '越南': 'VN',
+        '印度尼西亚': 'ID',
+        '菲律宾': 'PH',
+        '巴基斯坦': 'PK',
+        '缅甸': 'MM',
+        '马来西亚': 'MY',
+        '新加坡': 'SG'
+      };
+      return countryMap[countryName] || countryName;
+    }
+
+    function getValidityText(validity) {
+      const validityMap = {
+        '3': '3天内',
+        '30': '30天内',
+        '30+': '30天以上'
+      };
+      return validityMap[validity] || validity;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图像验证码功能测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #409eff;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #409eff;
+        }
+
+        .demo-box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .captcha-demo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .captcha-demo input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .captcha-demo img {
+            height: 40px;
+            cursor: pointer;
+            border-radius: 4px;
+            border: 1px solid #dcdfe6;
+            transition: all 0.3s;
+        }
+
+        .captcha-demo img:hover {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: #409eff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+
+        .btn-success {
+            background: #67c23a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #85ce61;
+        }
+
+        .btn-warning {
+            background: #e6a23c;
+            color: white;
+        }
+
+        .btn-info {
+            background: #909399;
+            color: white;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #409eff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #67c23a;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff7e6;
+            border-left: 4px solid #e6a23c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #409eff;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #67c23a;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            margin-right: 10px;
+            color: #67c23a;
+            font-weight: bold;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+
+        .result.show {
+            display: block;
+        }
+
+        .result.success {
+            background: #e8f5e9;
+            color: #67c23a;
+            border: 1px solid #67c23a;
+        }
+
+        .result.error {
+            background: #fef0f0;
+            color: #f56c6c;
+            border: 1px solid #f56c6c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 图像验证码功能测试</h1>
+        <div class="subtitle">登录界面图像验证码功能演示与测试</div>
+
+        <!-- 功能说明 -->
+        <div class="section">
+            <div class="section-title">✨ 功能特性</div>
+            <ul class="feature-list">
+                <li>随机生成4位字母数字组合验证码</li>
+                <li>验证码图片包含干扰线和干扰点，提高安全性</li>
+                <li>文字随机颜色、大小、角度和位置，防止机器识别</li>
+                <li>点击验证码图片可刷新</li>
+                <li>验证码不区分大小写</li>
+                <li>登录失败或验证失败后自动刷新验证码</li>
+                <li>支持中英文双语提示</li>
+            </ul>
+        </div>
+
+        <!-- 在线演示 -->
+        <div class="section">
+            <div class="section-title">🎮 在线演示</div>
+            <div class="demo-box">
+                <h4 style="margin-bottom: 20px;">验证码测试</h4>
+                <div class="captcha-demo">
+                    <input type="text" id="captchaInput" placeholder="请输入验证码" maxlength="4">
+                    <img id="captchaImage" alt="验证码" title="点击刷新">
+                    <button class="btn btn-primary" onclick="refreshCaptcha()">刷新</button>
+                    <button class="btn btn-success" onclick="verifyCaptcha()">验证</button>
+                </div>
+                <div id="result" class="result"></div>
+                <div class="info-box">
+                    <strong>💡 提示:</strong> 验证码不区分大小写，点击图片或刷新按钮可以更换验证码
+                </div>
+            </div>
+        </div>
+
+        <!-- 实现原理 -->
+        <div class="section">
+            <div class="section-title">⚙️ 实现原理</div>
+            
+            <h4 style="margin-top: 20px;">1. 验证码生成</h4>
+            <div class="code-block">
+<pre>// 生成随机验证码文本
+function generateCaptchaText(length = 4) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let text = ''
+  for (let i = 0; i < length; i++) {
+    text += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return text
+}</pre>
+            </div>
+
+            <h4 style="margin-top: 20px;">2. Canvas绘制</h4>
+            <div class="code-block">
+<pre>// 绘制验证码图片
+function drawCaptcha(text, width = 120, height = 40) {
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  
+  // 1. 绘制背景
+  // 2. 绘制干扰线
+  // 3. 绘制干扰点
+  // 4. 绘制验证码文字（随机颜色、大小、角度）
+  
+  return canvas.toDataURL('image/png')
+}</pre>
+            </div>
+
+            <h4 style="margin-top: 20px;">3. 验证逻辑</h4>
+            <div class="code-block">
+<pre>// 验证验证码（不区分大小写）
+function verifyCaptcha(input, correct) {
+  return input.toUpperCase() === correct.toUpperCase()
+}</pre>
+            </div>
+        </div>
+
+        <!-- 使用说明 -->
+        <div class="section">
+            <div class="section-title">📖 使用说明</div>
+            
+            <h4>在登录页面中的集成</h4>
+            <div class="info-box">
+                <strong>文件位置:</strong>
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li><code>/src/utils/captcha.js</code> - 验证码生成工具</li>
+                    <li><code>/src/views/login/index.vue</code> - 登录页面</li>
+                    <li><code>/src/views/login/lang.js</code> - 多语言配置</li>
+                    <li><code>/src/icons/svg/validCode.svg</code> - 验证码图标</li>
+                </ul>
+            </div>
+
+            <h4 style="margin-top: 20px;">登录表单结构</h4>
+            <div class="code-block">
+<pre>&lt;el-form-item prop="captcha"&gt;
+  &lt;span class="svg-container"&gt;
+    &lt;svg-icon icon-class="validCode" /&gt;
+  &lt;/span&gt;
+  &lt;el-input
+    v-model="loginForm.captcha"
+    placeholder="请输入验证码"
+    style="width: 60%;"
+  /&gt;
+  &lt;div class="captcha-image" @click="refreshCaptcha"&gt;
+    &lt;img :src="captchaImage" alt="验证码"&gt;
+  &lt;/div&gt;
+&lt;/el-form-item&gt;</pre>
+            </div>
+        </div>
+
+        <!-- 测试步骤 -->
+        <div class="section">
+            <div class="section-title">🧪 测试步骤</div>
+            
+            <h4>步骤1: 启动项目</h4>
+            <div class="code-block">
+<pre>cd /home/vue-element-admin
+npm run dev</pre>
+            </div>
+
+            <h4 style="margin-top: 20px;">步骤2: 访问登录页面</h4>
+            <div class="info-box">
+                访问: <a href="http://localhost:9528/#/login" target="_blank">http://localhost:9528/#/login</a>
+            </div>
+
+            <h4 style="margin-top: 20px;">步骤3: 测试验证码功能</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>测试项</th>
+                        <th>操作</th>
+                        <th>预期结果</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>验证码显示</strong></td>
+                        <td>打开登录页面</td>
+                        <td>自动显示验证码图片</td>
+                    </tr>
+                    <tr>
+                        <td><strong>刷新验证码</strong></td>
+                        <td>点击验证码图片</td>
+                        <td>验证码图片更换，控制台显示新验证码</td>
+                    </tr>
+                    <tr>
+                        <td><strong>不输入验证码</strong></td>
+                        <td>点击登录</td>
+                        <td>提示"请输入验证码"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>输入错误验证码</strong></td>
+                        <td>输入错误的验证码并登录</td>
+                        <td>提示"验证码错误"，验证码自动刷新</td>
+                    </tr>
+                    <tr>
+                        <td><strong>输入正确验证码</strong></td>
+                        <td>输入正确的验证码并登录</td>
+                        <td>验证通过，进入系统（用户名密码正确的情况下）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>大小写不敏感</strong></td>
+                        <td>输入小写验证码</td>
+                        <td>验证通过</td>
+                    </tr>
+                    <tr>
+                        <td><strong>多语言支持</strong></td>
+                        <td>切换语言</td>
+                        <td>验证码提示文字随语言切换</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 安全特性 -->
+        <div class="section">
+            <div class="section-title">🛡️ 安全特性</div>
+            <ul class="feature-list">
+                <li>排除易混淆字符（I, O, 0, 1），提高用户体验</li>
+                <li>随机文字颜色、大小、位置和旋转角度，防止OCR识别</li>
+                <li>添加干扰线和干扰点，增加机器识别难度</li>
+                <li>每次登录失败后自动刷新验证码</li>
+                <li>验证码仅在前端验证（如需更高安全性，建议后端验证）</li>
+            </ul>
+        </div>
+
+        <!-- API文档 -->
+        <div class="section">
+            <div class="section-title">📚 API文档</div>
+            
+            <h4>验证码工具函数</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>函数名</th>
+                        <th>参数</th>
+                        <th>返回值</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>generateCaptchaText</code></td>
+                        <td>length (默认4)</td>
+                        <td>string</td>
+                        <td>生成随机验证码文本</td>
+                    </tr>
+                    <tr>
+                        <td><code>drawCaptcha</code></td>
+                        <td>text, width, height</td>
+                        <td>string (base64)</td>
+                        <td>绘制验证码图片</td>
+                    </tr>
+                    <tr>
+                        <td><code>createCaptcha</code></td>
+                        <td>length, width, height</td>
+                        <td>object {text, image}</td>
+                        <td>创建验证码对象</td>
+                    </tr>
+                    <tr>
+                        <td><code>verifyCaptcha</code></td>
+                        <td>input, correct</td>
+                        <td>boolean</td>
+                        <td>验证验证码</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 常见问题 -->
+        <div class="section">
+            <div class="section-title">❓ 常见问题</div>
+            
+            <h4>Q: 验证码看不清怎么办？</h4>
+            <div class="success-box">
+                <strong>A:</strong> 点击验证码图片即可刷新，获取新的验证码
+            </div>
+
+            <h4 style="margin-top: 15px;">Q: 验证码区分大小写吗？</h4>
+            <div class="success-box">
+                <strong>A:</strong> 不区分，输入大写或小写都可以通过验证
+            </div>
+
+            <h4 style="margin-top: 15px;">Q: 如何查看当前验证码的正确答案？</h4>
+            <div class="success-box">
+                <strong>A:</strong> 打开浏览器开发者工具(F12)，在Console中可以看到验证码刷新时的日志输出
+            </div>
+
+            <h4 style="margin-top: 15px;">Q: 如何自定义验证码长度和样式？</h4>
+            <div class="success-box">
+                <strong>A:</strong> 在 <code>login/index.vue</code> 的 <code>refreshCaptcha</code> 方法中修改 <code>createCaptcha(4, 120, 40)</code> 的参数
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+            <p style="color: #666;">✅ 图像验证码功能已完成，请按照测试步骤验证功能！</p>
+            <p style="color: #999; font-size: 12px; margin-top: 10px;">项目启动后访问登录页面即可看到验证码</p>
+        </div>
+    </div>
+
+    <script>
+        let currentCaptcha = { text: '', image: '' }
+
+        // 生成随机验证码文本
+        function generateCaptchaText(length = 4) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+            let text = ''
+            for (let i = 0; i < length; i++) {
+                text += chars.charAt(Math.floor(Math.random() * chars.length))
+            }
+            return text
+        }
+
+        // 生成随机颜色
+        function randomColor(min, max) {
+            const r = randomNum(min, max)
+            const g = randomNum(min, max)
+            const b = randomNum(min, max)
+            return `rgb(${r},${g},${b})`
+        }
+
+        // 生成随机数
+        function randomNum(min, max) {
+            return Math.floor(Math.random() * (max - min) + min)
+        }
+
+        // 绘制验证码
+        function drawCaptcha(text, width = 120, height = 40) {
+            const canvas = document.createElement('canvas')
+            canvas.width = width
+            canvas.height = height
+            const ctx = canvas.getContext('2d')
+
+            // 绘制背景
+            ctx.fillStyle = randomColor(180, 240)
+            ctx.fillRect(0, 0, width, height)
+
+            // 绘制干扰线
+            for (let i = 0; i < 8; i++) {
+                ctx.strokeStyle = randomColor(40, 180)
+                ctx.beginPath()
+                ctx.moveTo(randomNum(0, width), randomNum(0, height))
+                ctx.lineTo(randomNum(0, width), randomNum(0, height))
+                ctx.stroke()
+            }
+
+            // 绘制干扰点
+            for (let i = 0; i < 100; i++) {
+                ctx.fillStyle = randomColor(0, 255)
+                ctx.beginPath()
+                ctx.arc(randomNum(0, width), randomNum(0, height), 1, 0, 2 * Math.PI)
+                ctx.fill()
+            }
+
+            // 绘制验证码文字
+            for (let i = 0; i < text.length; i++) {
+                const fontSize = randomNum(20, 28)
+                ctx.font = `${fontSize}px Arial`
+                ctx.fillStyle = randomColor(50, 160)
+                ctx.textBaseline = 'middle'
+                
+                const x = (width / text.length) * i + randomNum(10, 15)
+                const y = height / 2 + randomNum(-5, 5)
+                const angle = randomNum(-15, 15) * Math.PI / 180
+                
+                ctx.save()
+                ctx.translate(x, y)
+                ctx.rotate(angle)
+                ctx.fillText(text[i], 0, 0)
+                ctx.restore()
+            }
+
+            return canvas.toDataURL('image/png')
+        }
+
+        // 刷新验证码
+        function refreshCaptcha() {
+            const text = generateCaptchaText(4)
+            const image = drawCaptcha(text, 120, 40)
+            
+            currentCaptcha = { text, image }
+            
+            document.getElementById('captchaImage').src = image
+            document.getElementById('captchaInput').value = ''
+            document.getElementById('result').classList.remove('show')
+            
+            console.log('🔐 验证码已刷新:', text)
+        }
+
+        // 验证验证码
+        function verifyCaptcha() {
+            const input = document.getElementById('captchaInput').value
+            const result = document.getElementById('result')
+            
+            if (!input) {
+                result.textContent = '❌ 请输入验证码'
+                result.className = 'result error show'
+                return
+            }
+            
+            if (input.toUpperCase() === currentCaptcha.text.toUpperCase()) {
+                result.textContent = '✅ 验证码正确！'
+                result.className = 'result success show'
+            } else {
+                result.textContent = `❌ 验证码错误！正确答案是: ${currentCaptcha.text}`
+                result.className = 'result error show'
+                setTimeout(refreshCaptcha, 1500)
+            }
+        }
+
+        // 页面加载时生成验证码
+        window.onload = function() {
+            refreshCaptcha()
+        }
+
+        // 回车验证
+        document.getElementById('captchaInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyCaptcha()
+            }
+        })
+    </script>
+</body>
+</html>

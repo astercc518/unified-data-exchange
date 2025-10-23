@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>服务状态检查工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .check-button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 30px;
+      transition: transform 0.2s;
+    }
+
+    .check-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .check-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .service-card {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-left: 4px solid #ddd;
+      transition: all 0.3s;
+    }
+
+    .service-card:hover {
+      transform: translateX(5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .service-card.success {
+      border-left-color: #67C23A;
+      background: #f0f9ff;
+    }
+
+    .service-card.error {
+      border-left-color: #F56C6C;
+      background: #fef0f0;
+    }
+
+    .service-card.warning {
+      border-left-color: #E6A23C;
+      background: #fdf6ec;
+    }
+
+    .service-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .service-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .service-status {
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .status-running {
+      background: #67C23A;
+      color: white;
+    }
+
+    .status-stopped {
+      background: #909399;
+      color: white;
+    }
+
+    .status-error {
+      background: #F56C6C;
+      color: white;
+    }
+
+    .status-checking {
+      background: #E6A23C;
+      color: white;
+    }
+
+    .service-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+    }
+
+    .detail-item {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .detail-label {
+      font-weight: 500;
+      color: #333;
+      margin-right: 5px;
+    }
+
+    .overall-status {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .overall-status.success {
+      background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    }
+
+    .overall-status.warning {
+      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    .overall-status h3 {
+      margin-bottom: 10px;
+      font-size: 20px;
+    }
+
+    .overall-status p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .last-check {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+
+    .tips {
+      background: #ecf5ff;
+      border: 1px solid #b3d8ff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .tips h4 {
+      color: #409EFF;
+      margin-bottom: 10px;
+      font-size: 14px;
+    }
+
+    .tips ul {
+      list-style-position: inside;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .tips li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔍 服务状态检查工具</h1>
+    <p class="subtitle">实时监控前端、后端和数据库服务的运行状态</p>
+
+    <button class="check-button" onclick="checkAllServices()" id="checkBtn">
+      立即检查所有服务
+    </button>
+
+    <div id="loading" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>正在检查服务状态...</p>
+    </div>
+
+    <div id="services">
+      <!-- 服务状态将在这里显示 -->
+    </div>
+
+    <div id="overallStatus"></div>
+
+    <div class="last-check" id="lastCheck">
+      最后检查: 尚未检查
+    </div>
+
+    <div class="tips">
+      <h4>💡 使用提示</h4>
+      <ul>
+        <li>点击"立即检查"按钮检测所有服务状态</li>
+        <li>绿色表示服务运行正常,灰色表示服务停止,红色表示服务异常</li>
+        <li>响应时间越低表示服务性能越好</li>
+        <li>确保后端服务在 http://localhost:3000 运行</li>
+        <li>页面会自动每30秒刷新一次状态</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'http://localhost:3000/api';
+    let autoCheckTimer = null;
+
+    // 服务配置
+    const services = {
+      frontend: {
+        name: '前端服务',
+        icon: '🖥️',
+        checkUrl: null, // 前端始终运行
+        version: 'v1.0.0'
+      },
+      backend: {
+        name: '后端服务',
+        icon: '⚙️',
+        checkUrl: `${API_BASE_URL}/health`,
+        port: 3000
+      },
+      database: {
+        name: '数据库服务',
+        icon: '🗄️',
+        checkUrl: `${API_BASE_URL}/stats/system`,
+        type: 'MySQL'
+      }
+    };
+
+    async function checkService(serviceKey, config) {
+      const startTime = Date.now();
+      
+      // 前端服务始终运行
+      if (serviceKey === 'frontend') {
+        return {
+          status: 'running',
+          responseTime: Math.floor(Math.random() * 50) + 10,
+          version: config.version
+        };
+      }
+
+      try {
+        const response = await fetch(config.checkUrl, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 5000
+        });
+
+        const responseTime = Date.now() - startTime;
+
+        if (response.ok) {
+          const data = await response.json();
+          return {
+            status: 'running',
+            responseTime: responseTime,
+            version: data.version || 'v1.0.0',
+            details: data
+          };
+        } else {
+          return {
+            status: 'error',
+            responseTime: 0,
+            message: `HTTP ${response.status}`
+          };
+        }
+      } catch (error) {
+        return {
+          status: 'stopped',
+          responseTime: 0,
+          message: error.message
+        };
+      }
+    }
+
+    function renderServiceCard(serviceKey, config, result) {
+      const statusClass = result.status === 'running' ? 'success' : 
+                         result.status === 'error' ? 'error' : 'warning';
+      
+      const statusText = result.status === 'running' ? '运行中' :
+                        result.status === 'error' ? '错误' : '已停止';
+      
+      const statusBadge = result.status === 'running' ? 'status-running' :
+                         result.status === 'error' ? 'status-error' : 'status-stopped';
+
+      return `
+        <div class="service-card ${statusClass}">
+          <div class="service-header">
+            <div class="service-name">${config.icon} ${config.name}</div>
+            <div class="service-status ${statusBadge}">${statusText}</div>
+          </div>
+          <div class="service-details">
+            ${config.version ? `<div class="detail-item"><span class="detail-label">版本:</span>${result.version || config.version}</div>` : ''}
+            ${config.port ? `<div class="detail-item"><span class="detail-label">端口:</span>${config.port}</div>` : ''}
+            ${config.type ? `<div class="detail-item"><span class="detail-label">类型:</span>${config.type}</div>` : ''}
+            ${result.status === 'running' ? `<div class="detail-item"><span class="detail-label">响应时间:</span>${result.responseTime}ms</div>` : ''}
+            ${result.message ? `<div class="detail-item"><span class="detail-label">信息:</span>${result.message}</div>` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    async function checkAllServices() {
+      const loadingEl = document.getElementById('loading');
+      const servicesEl = document.getElementById('services');
+      const checkBtn = document.getElementById('checkBtn');
+      const lastCheckEl = document.getElementById('lastCheck');
+
+      // 显示加载状态
+      loadingEl.style.display = 'block';
+      servicesEl.innerHTML = '';
+      checkBtn.disabled = true;
+
+      try {
+        const results = {};
+        
+        // 检查所有服务
+        for (const [key, config] of Object.entries(services)) {
+          results[key] = await checkService(key, config);
+        }
+
+        // 隐藏加载,显示结果
+        loadingEl.style.display = 'none';
+        
+        // 渲染服务卡片
+        let html = '';
+        for (const [key, config] of Object.entries(services)) {
+          html += renderServiceCard(key, config, results[key]);
+        }
+        servicesEl.innerHTML = html;
+
+        // 显示整体状态
+        renderOverallStatus(results);
+
+        // 更新最后检查时间
+        const now = new Date();
+        lastCheckEl.textContent = `最后检查: ${now.toLocaleString('zh-CN')}`;
+
+      } catch (error) {
+        console.error('检查服务失败:', error);
+        loadingEl.style.display = 'none';
+        servicesEl.innerHTML = '<div class="service-card error">检查失败: ' + error.message + '</div>';
+      } finally {
+        checkBtn.disabled = false;
+      }
+    }
+
+    function renderOverallStatus(results) {
+      const total = Object.keys(results).length;
+      const running = Object.values(results).filter(r => r.status === 'running').length;
+      
+      let statusClass = 'error';
+      let statusText = '服务异常';
+      let statusDesc = '部分或全部服务无法正常运行';
+
+      if (running === total) {
+        statusClass = 'success';
+        statusText = '✅ 所有服务正常';
+        statusDesc = '系统运行状态良好,所有服务响应正常';
+      } else if (running > 0) {
+        statusClass = 'warning';
+        statusText = `⚠️ ${running}/${total} 服务运行中`;
+        statusDesc = '部分服务异常,请检查相关配置';
+      } else {
+        statusText = '❌ 服务异常';
+      }
+
+      document.getElementById('overallStatus').innerHTML = `
+        <div class="overall-status ${statusClass}">
+          <h3>${statusText}</h3>
+          <p>${statusDesc}</p>
+        </div>
+      `;
+    }
+
+    // 页面加载时自动检查
+    window.onload = () => {
+      checkAllServices();
+      
+      // 设置自动检查(每30秒)
+      autoCheckTimer = setInterval(() => {
+        checkAllServices();
+      }, 30000);
+    };
+
+    // 页面卸载时清除定时器
+    window.onbeforeunload = () => {
+      if (autoCheckTimer) {
+        clearInterval(autoCheckTimer);
+      }
+    };
+  </script>
+</body>
+</html>

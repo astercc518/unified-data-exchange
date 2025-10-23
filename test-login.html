@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录诊断工具</title>
+</head>
+<body>
+    <h1>登录诊断工具</h1>
+    <div id="result"></div>
+    <button onclick="initAndTest()">初始化并测试登录</button>
+    
+    <script>
+        function initAndTest() {
+            let log = '<h2>诊断日志：</h2>';
+            
+            // 1. 初始化admin账号
+            const adminUser = {
+                id: 1,
+                customerName: '系统管理员',
+                loginAccount: 'admin',
+                loginPassword: '111111',
+                email: 'admin@system.com',
+                status: 1,
+                accountBalance: 10000,
+                createdAt: new Date().toISOString()
+            };
+            
+            let userList = [];
+            const savedUsers = localStorage.getItem('userList');
+            if (savedUsers) {
+                userList = JSON.parse(savedUsers);
+            }
+            
+            const existingIndex = userList.findIndex(u => u.loginAccount === 'admin');
+            if (existingIndex >= 0) {
+                userList[existingIndex] = adminUser;
+                log += '<p>✅ 更新现有admin账号</p>';
+            } else {
+                userList.push(adminUser);
+                log += '<p>✅ 创建新admin账号</p>';
+            }
+            
+            localStorage.setItem('userList', JSON.stringify(userList));
+            log += '<p>✅ 账号已保存到localStorage</p>';
+            
+            // 2. 验证数据
+            const savedData = localStorage.getItem('userList');
+            log += '<p>📦 localStorage数据：<pre>' + savedData + '</pre></p>';
+            
+            // 3. 模拟登录验证
+            const users = JSON.parse(savedData);
+            const user = users.find(u => 
+                u.loginAccount === 'admin' && 
+                u.loginPassword === '111111' && 
+                u.status === 1
+            );
+            
+            if (user) {
+                log += '<p>✅ 登录验证成功！</p>';
+                log += '<p>用户信息：<pre>' + JSON.stringify(user, null, 2) + '</pre></p>';
+                
+                // 生成token
+                const token = `customer-${user.id}-${Date.now()}`;
+                log += '<p>🔑 Token: ' + token + '</p>';
+                
+                // 保存当前用户信息
+                const userInfo = {
+                    id: user.id,
+                    name: user.customerName,
+                    loginAccount: user.loginAccount,
+                    email: user.email,
+                    type: 'customer',
+                    roles: ['customer']
+                };
+                localStorage.setItem('currentUser', JSON.stringify(userInfo));
+                localStorage.setItem('vue_admin_token', token);
+                
+                log += '<p>✅ 用户信息已保存</p>';
+                log += '<p>✅ Token已保存</p>';
+                log += '<p style="color: green; font-size: 20px;">�� 登录流程测试成功！</p>';
+                log += '<p><a href="http://localhost:9528" target="_blank">点击前往登录页</a></p>';
+            } else {
+                log += '<p style="color: red;">❌ 登录验证失败！</p>';
+            }
+            
+            document.getElementById('result').innerHTML = log;
+        }
+    </script>
+</body>
+</html>

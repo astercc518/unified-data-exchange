@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>测试创建用户API</title>
+</head>
+<body>
+  <h1>测试创建用户API</h1>
+  <button onclick="testCreateUser()">点击测试创建用户</button>
+  <pre id="result"></pre>
+
+  <script>
+    async function testCreateUser() {
+      const resultEl = document.getElementById('result');
+      resultEl.textContent = '正在测试...\n';
+
+      try {
+        // 先登录获取token
+        resultEl.textContent += '1. 正在登录admin账号...\n';
+        const loginRes = await fetch('http://localhost:3000/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            username: 'admin',
+            password: 'admin123'
+          })
+        });
+
+        const loginData = await loginRes.json();
+        console.log('登录响应:', loginData);
+        resultEl.textContent += `登录响应: ${JSON.stringify(loginData, null, 2)}\n\n`;
+
+        if (!loginData.success || !loginData.token) {
+          resultEl.textContent += '❌ 登录失败!\n';
+          return;
+        }
+
+        const token = loginData.token;
+        resultEl.textContent += `✅ 登录成功，Token: ${token}\n\n`;
+
+        // 创建用户数据
+        const userData = {
+          loginAccount: 'test_' + Date.now(),
+          loginPassword: 'test123456',
+          customerName: '测试客户_' + Date.now(),
+          email: 'test' + Date.now() + '@test.com',
+          agentId: '4',
+          agentName: '测试代理',
+          salePriceRate: 1.0,
+          accountBalance: 0,
+          overdraftAmount: 0,
+          status: 1,
+          remark: '测试创建'
+        };
+
+        resultEl.textContent += `2. 准备创建用户...\n`;
+        resultEl.textContent += `用户数据: ${JSON.stringify(userData, null, 2)}\n\n`;
+
+        // 调用创建用户API
+        resultEl.textContent += `3. 正在调用API...\n`;
+        const createRes = await fetch('http://localhost:3000/api/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(userData)
+        });
+
+        const createData = await createRes.json();
+        console.log('创建响应:', createData);
+        resultEl.textContent += `\n创建响应 (状态码: ${createRes.status}):\n`;
+        resultEl.textContent += JSON.stringify(createData, null, 2) + '\n';
+
+        if (createData.success) {
+          resultEl.textContent += '\n✅ 创建用户成功!\n';
+        } else {
+          resultEl.textContent += '\n❌ 创建用户失败!\n';
+        }
+
+      } catch (error) {
+        console.error('测试失败:', error);
+        resultEl.textContent += `\n❌ 错误: ${error.message}\n`;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库功能测试</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            color: #409EFF;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #909399;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            background: #f5f7fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-section h3 {
+            color: #303133;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #409EFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #66b1ff;
+        }
+        .result {
+            background: #2d3a4b;
+            color: #67C23A;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            color: #67C23A;
+        }
+        .error {
+            color: #F56C6C;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 数据库功能测试</h1>
+        <p class="subtitle">测试 JSON 文件数据库的各项功能</p>
+        
+        <div class="test-section">
+            <h3>1. 连接测试</h3>
+            <button onclick="testConnection()">测试数据库连接</button>
+            <div id="connection-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 读取数据</h3>
+            <button onclick="getUsers()">获取用户列表</button>
+            <button onclick="getAgents()">获取代理列表</button>
+            <div id="read-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 创建数据</h3>
+            <button onclick="createTestUser()">创建测试用户</button>
+            <div id="create-result" class="result" style="display:none;"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. 持久化测试</h3>
+            <button onclick="checkPersistence()">验证数据持久化</button>
+            <div id="persist-result" class="result" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('connection-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在测试连接...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/migrate/test-connection`);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ 连接成功！</div>
+                    <div>数据库类型: ${data.database}</div>
+                    <div>存储位置: ${data.storage}</div>
+                    <div>数据表: ${data.tables.join(', ')}</div>
+                    <div>统计信息:</div>
+                    <pre>${JSON.stringify(data.statistics, null, 2)}</pre>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 连接失败: ${error.message}</div>`;
+            }
+        }
+
+        async function getUsers() {
+            const resultDiv = document.getElementById('read-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在读取用户数据...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/users`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 读取成功！共 ${data.total} 个用户</div>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 读取失败</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
+            }
+        }
+
+        async function getAgents() {
+            const resultDiv = document.getElementById('read-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在读取代理数据...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/agents`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 读取成功！共 ${data.total} 个代理</div>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 读取失败</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
+            }
+        }
+
+        async function createTestUser() {
+            const resultDiv = document.getElementById('create-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在创建测试用户...';
+            
+            const testUser = {
+                login_account: 'test' + Date.now(),
+                login_password: '123456',
+                customer_name: '测试用户',
+                email: 'test@example.com',
+                account_balance: 1000,
+                status: 1
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 创建成功！</div>
+                        <div>用户 ID: ${data.data.id}</div>
+                        <div>用户名: ${data.data.login_account}</div>
+                        <pre>${JSON.stringify(data.data, null, 2)}</pre>
+                        <div class="success" style="margin-top: 10px;">
+                        💾 数据已保存到文件: /backend/data/users.json
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 创建失败</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 请求失败: ${error.message}</div>`;
+            }
+        }
+
+        async function checkPersistence() {
+            const resultDiv = document.getElementById('persist-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '正在验证数据持久化...';
+            
+            try {
+                // 第1步：创建测试数据
+                const testUser = {
+                    login_account: 'persist_test_' + Date.now(),
+                    login_password: '123456',
+                    customer_name: '持久化测试用户',
+                    email: 'persist@example.com',
+                    account_balance: 5000,
+                    status: 1
+                };
+                
+                const createResponse = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testUser)
+                });
+                
+                const createData = await createResponse.json();
+                const userId = createData.data.id;
+                
+                // 第2步：读取数据验证
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                const readResponse = await fetch(`${API_BASE}/api/users`);
+                const readData = await readResponse.json();
+                
+                const foundUser = readData.data.find(u => u.id === userId);
+                
+                if (foundUser) {
+                    resultDiv.innerHTML = `
+                        <div class="success">✅ 持久化测试通过！</div>
+                        <div>步骤1: 创建测试用户 ✅</div>
+                        <div>步骤2: 数据已保存到文件 ✅</div>
+                        <div>步骤3: 重新读取成功 ✅</div>
+                        <div style="margin-top: 10px;">创建的用户:</div>
+                        <pre>${JSON.stringify(foundUser, null, 2)}</pre>
+                        <div class="success" style="margin-top: 10px;">
+                        💡 提示：即使重启后端服务，这条数据仍然会保留在文件中！
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 持久化测试失败：无法读取刚创建的数据</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 测试失败: ${error.message}</div>`;
+            }
+        }
+
+        // 页面加载时自动测试连接
+        window.onload = function() {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

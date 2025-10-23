@@ -1,12 +1,22 @@
 import Cookies from 'js-cookie'
 
+// Element UI 语言包
+let enLang, zhLang
+try {
+  enLang = require('element-ui/lib/locale/lang/en').default
+  zhLang = require('element-ui/lib/locale/lang/zh-CN').default
+} catch (e) {
+  console.warn('Element UI locale not found')
+}
+
 const state = {
   sidebar: {
     opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true,
     withoutAnimation: false
   },
   device: 'desktop',
-  size: Cookies.get('size') || 'medium'
+  size: Cookies.get('size') || 'medium',
+  language: Cookies.get('language') || 'zh'
 }
 
 const mutations = {
@@ -30,6 +40,10 @@ const mutations = {
   SET_SIZE: (state, size) => {
     state.size = size
     Cookies.set('size', size)
+  },
+  SET_LANGUAGE: (state, language) => {
+    state.language = language
+    Cookies.set('language', language)
   }
 }
 
@@ -45,6 +59,28 @@ const actions = {
   },
   setSize({ commit }, size) {
     commit('SET_SIZE', size)
+  },
+  setLanguage({ commit }, language) {
+    commit('SET_LANGUAGE', language)
+
+    // 动态切换 Element UI 语言
+    if (typeof window !== 'undefined') {
+      const Vue = require('vue').default
+      const Element = require('element-ui').default
+
+      const localeMap = {
+        'en': enLang,
+        'zh': zhLang
+      }
+
+      const locale = localeMap[language] || zhLang
+
+      // 重新配置 Element UI
+      Vue.use(Element, {
+        size: Cookies.get('size') || 'medium',
+        locale: locale
+      })
+    }
   }
 }
 

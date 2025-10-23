@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录测试工具</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .test-group h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .result.success {
+            border-left-color: #52c41a;
+            background: #f6ffed;
+        }
+        .result.error {
+            border-left-color: #ff4d4f;
+            background: #fff2f0;
+        }
+        .log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log-entry {
+            padding: 4px 0;
+        }
+        .log-entry.success { color: #4ec9b0; }
+        .log-entry.error { color: #f48771; }
+        .log-entry.info { color: #569cd6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 登录测试工具</h1>
+        
+        <div class="test-group">
+            <h3>1. 后端直连测试</h3>
+            <button onclick="testBackendDirect()">测试后端 API (3000端口)</button>
+            <div id="backend-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-group">
+            <h3>2. 前端代理测试</h3>
+            <button onclick="testFrontendProxy()">测试前端代理 (/dev-api)</button>
+            <div id="proxy-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-group">
+            <h3>3. 完整登录流程测试</h3>
+            <button onclick="testFullLogin()">完整登录测试 (admin/111111)</button>
+            <div id="login-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="test-group">
+            <h3>4. 服务状态检查</h3>
+            <button onclick="checkServices()">检查所有服务</button>
+            <div id="services-result" class="result" style="display:none;"></div>
+        </div>
+
+        <div class="log" id="console"></div>
+    </div>
+
+    <script>
+        const console_log = [];
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const colorClass = type === 'error' ? 'error' : type === 'success' ? 'success' : 'info';
+            console_log.push(`<div class="log-entry ${colorClass}">[${timestamp}] ${message}</div>`);
+            document.getElementById('console').innerHTML = console_log.join('');
+            document.getElementById('console').scrollTop = document.getElementById('console').scrollHeight;
+            console.log(message);
+        }
+
+        async function testBackendDirect() {
+            log('测试后端直连...', 'info');
+            const resultDiv = document.getElementById('backend-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: '111111' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 后端直连成功！\n\n${JSON.stringify(data, null, 2)}`;
+                    log('✅ 后端直连测试通过', 'success');
+                } else {
+                    throw new Error(data.message || '登录失败');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 后端直连失败：${error.message}`;
+                log(`❌ 后端直连测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFrontendProxy() {
+            log('测试前端代理...', 'info');
+            const resultDiv = document.getElementById('proxy-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+
+            try {
+                const response = await fetch('/dev-api/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: '111111' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 代理转发成功！\n\n${JSON.stringify(data, null, 2)}`;
+                    log('✅ 前端代理测试通过', 'success');
+                } else {
+                    throw new Error(data.message || '登录失败');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 代理转发失败：${error.message}`;
+                log(`❌ 前端代理测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFullLogin() {
+            log('测试完整登录流程...', 'info');
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '测试中...';
+            resultDiv.className = 'result';
+
+            try {
+                // 使用相对路径，依赖代理
+                const response = await fetch('/dev-api/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: '111111'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.success && data.data && data.data.token) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 登录成功！
+
+Token: ${data.data.token}
+用户: ${data.data.userInfo.name}
+类型: ${data.data.userInfo.type}
+
+完整响应:
+${JSON.stringify(data, null, 2)}`;
+                    log('✅ 完整登录流程测试通过', 'success');
+                    log(`Token: ${data.data.token}`, 'success');
+                } else {
+                    throw new Error(data.message || '登录响应格式错误');
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ 登录失败：
+
+${error.message}
+
+可能的原因:
+1. 网络超时
+2. 代理配置错误
+3. 后端服务未启动
+4. CORS 问题`;
+                log(`❌ 完整登录流程测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkServices() {
+            log('检查所有服务状态...', 'info');
+            const resultDiv = document.getElementById('services-result');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = '检查中...';
+            resultDiv.className = 'result';
+
+            let results = [];
+
+            // 检查后端健康
+            try {
+                const response = await fetch('http://localhost:3000/health');
+                const data = await response.json();
+                results.push(`✅ 后端服务: 正常 (运行时间: ${Math.floor(data.uptime/60)}分钟)`);
+                log('✅ 后端服务正常', 'success');
+            } catch (error) {
+                results.push(`❌ 后端服务: 异常 (${error.message})`);
+                log('❌ 后端服务异常', 'error');
+            }
+
+            // 检查前端
+            try {
+                const response = await fetch('/');
+                if (response.ok) {
+                    results.push(`✅ 前端服务: 正常`);
+                    log('✅ 前端服务正常', 'success');
+                }
+            } catch (error) {
+                results.push(`❌ 前端服务: 异常 (${error.message})`);
+                log('❌ 前端服务异常', 'error');
+            }
+
+            // 检查代理
+            try {
+                const response = await fetch('/dev-api/health');
+                const data = await response.json();
+                results.push(`✅ 代理转发: 正常`);
+                log('✅ 代理转发正常', 'success');
+            } catch (error) {
+                results.push(`❌ 代理转发: 异常 (${error.message})`);
+                log('❌ 代理转发异常', 'error');
+            }
+
+            resultDiv.textContent = results.join('\n');
+            resultDiv.className = results.some(r => r.includes('❌')) ? 'result error' : 'result success';
+        }
+
+        // 页面加载时自动检查
+        window.onload = function() {
+            log('🚀 登录测试工具已就绪', 'info');
+            log('请点击按钮开始测试', 'info');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动态定价业务逻辑测试工具</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #303133;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .description {
+            text-align: center;
+            color: #606266;
+            margin-bottom: 30px;
+            font-size: 16px;
+            background: #f0f9ff;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #409eff;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            border: 1px solid #ebeef5;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .section h2 {
+            background: #f8f9fa;
+            margin: 0;
+            padding: 15px 20px;
+            color: #303133;
+            border-bottom: 1px solid #ebeef5;
+            font-size: 18px;
+        }
+        
+        .step {
+            padding: 20px;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            color: #409eff;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        button {
+            background: #409eff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #337ecc;
+        }
+        
+        button.success {
+            background: #67c23a;
+        }
+        
+        button.warning {
+            background: #e6a23c;
+        }
+        
+        button.danger {
+            background: #f56c6c;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+            font-family: 'Monaco', 'Menlo', monospace;
+        }
+        
+        .result.success {
+            background: #f0f9ff;
+            border-color: #b3d8ff;
+            color: #409eff;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        th, td {
+            border: 1px solid #ebeef5;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        
+        th {
+            background: #f5f7fa;
+            color: #303133;
+            font-weight: 600;
+        }
+        
+        .price {
+            color: #f56c6c;
+            font-weight: bold;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: white;
+        }
+        
+        .tag.success {
+            background: #67c23a;
+        }
+        
+        .tag.warning {
+            background: #e6a23c;
+        }
+        
+        .tag.info {
+            background: #909399;
+        }
+        
+        .tag.danger {
+            background: #f56c6c;
+        }
+        
+        .input-group {
+            margin: 10px 0;
+        }
+        
+        .input-group label {
+            display: inline-block;
+            width: 120px;
+            font-weight: 500;
+            color: #606266;
+        }
+        
+        .input-group input, .input-group select {
+            padding: 8px 12px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            background: #fff9e6;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #e6a23c;
+            font-weight: bold;
+        }
+        
+        .test-scenario {
+            background: #f0f9ff;
+            border: 1px solid #b3d8ff;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        .scenario-title {
+            font-weight: bold;
+            color: #409eff;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 动态定价业务逻辑测试工具</h1>
+        <div class="description">
+            本测试工具用于验证复杂的动态定价业务逻辑，包括时效性计算、每日降价5%规则、阶段性降价规则等。
+            支持模拟不同发布时间的数据，验证价格计算的准确性。
+        </div>
+
+        <!-- 第一步：业务逻辑说明 -->
+        <div class="section">
+            <h2>步骤1：业务逻辑说明</h2>
+            <div class="step">
+                <div class="step-title">动态定价规则</div>
+                <div class="test-scenario">
+                    <div class="scenario-title">📋 定价规则详解</div>
+                    <p><strong>1. 3天内数据：</strong>原价销售</p>
+                    <p><strong>2. 3-7天数据：</strong>每天降价5%，公式为：原价 × (1 - 5% × (当前天数 - 3))</p>
+                    <p><strong>3. 7-15天数据：</strong>固定销售价的70%</p>
+                    <p><strong>4. 15-30天数据：</strong>固定销售价的60%</p>
+                    <p><strong>5. 30天以上：</strong>固定销售价的50%</p>
+                </div>
+                <div class="test-scenario">
+                    <div class="scenario-title">🏷️ 时效显示变化</div>
+                    <p><strong>3天内 →</strong> 显示"3天内"</p>
+                    <p><strong>4-7天 →</strong> 显示"7天内"</p>
+                    <p><strong>8-15天 →</strong> 显示"15天内"</p>
+                    <p><strong>16-30天 →</strong> 显示"30天内"</p>
+                    <p><strong>30天以上 →</strong> 显示"近期"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第二步：创建测试数据 -->
+        <div class="section">
+            <h2>步骤2：创建测试数据</h2>
+            <div class="step">
+                <div class="step-title">根据用户业务场景创建测试数据</div>
+                <p>模拟管理员今天上传以下3份数据：</p>
+                <ul>
+                    <li><strong>印度数据：</strong>3天内，10W条，成本0.01，卖价0.03</li>
+                    <li><strong>美国数据：</strong>30天内，50W条，成本0.01，卖价0.03</li>
+                    <li><strong>巴西数据：</strong>30天以上，1000W条，成本0.005，卖价0.008</li>
+                </ul>
+                <button onclick="createTestData()">创建业务场景测试数据</button>
+                <button class="warning" onclick="clearAllData()">清空所有数据</button>
+                <div id="test-data-result"></div>
+            </div>
+        </div>
+
+        <!-- 第三步：验证动态定价计算 -->
+        <div class="section">
+            <h2>步骤3：验证动态定价计算</h2>
+            <div class="step">
+                <div class="step-title">测试不同时间点的价格计算</div>
+                <div class="input-group">
+                    <label>选择数据：</label>
+                    <select id="data-select">
+                        <option value="0">印度 - 3天内数据</option>
+                        <option value="1">美国 - 30天内数据</option>
+                        <option value="2">巴西 - 30天以上数据</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>模拟天数：</label>
+                    <input type="number" id="simulate-days" value="6" min="0" max="60" />
+                    <small>（从发布时间开始计算的天数）</small>
+                </div>
+                <button onclick="testPricingCalculation()">计算指定时间点的价格</button>
+                <button onclick="showPricingTrend()">显示价格趋势</button>
+                <div id="pricing-result"></div>
+            </div>
+        </div>
+
+        <!-- 第四步：验证资源中心同步 -->
+        <div class="section">
+            <h2>步骤4：验证资源中心同步</h2>
+            <div class="step">
+                <div class="step-title">检查资源中心是否正确显示动态价格</div>
+                <button onclick="checkResourceCenterData()">检查资源中心数据</button>
+                <button onclick="simulateTimePassage()">模拟时间流逝（+1天）</button>
+                <div id="resource-sync-result"></div>
+            </div>
+        </div>
+
+        <!-- 第五步：验证定价管理功能 -->
+        <div class="section">
+            <h2>步骤5：验证定价管理功能</h2>
+            <div class="step">
+                <div class="step-title">测试自定义定价修改和同步</div>
+                <div class="input-group">
+                    <label>选择数据：</label>
+                    <select id="pricing-data-select">
+                        <option value="印度">印度数据</option>
+                        <option value="美国">美国数据</option>
+                        <option value="巴西">巴西数据</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>新销售价：</label>
+                    <input type="number" id="new-price" value="0.025" step="0.001" min="0" />
+                    <span>U/条</span>
+                </div>
+                <button onclick="testCustomPricing()">测试自定义定价</button>
+                <button onclick="resetToDynamicPricing()">恢复动态定价</button>
+                <div id="pricing-management-result"></div>
+            </div>
+        </div>
+
+        <!-- 第六步：综合验证 -->
+        <div class="section">
+            <h2>步骤6：综合验证</h2>
+            <div class="step">
+                <div class="step-title">验证完整的业务流程</div>
+                <button class="success" onclick="runFullTest()">运行完整测试</button>
+                <div id="full-test-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 动态定价计算函数
+        function calculateCurrentPrice(dataItem, currentTime = Date.now()) {
+            const { sellPrice, costPrice, publishTime } = dataItem;
+            
+            if (!publishTime || !sellPrice) {
+                return {
+                    currentPrice: sellPrice || 0,
+                    validityDisplay: '未知',
+                    discountInfo: '无',
+                    daysSincePublish: 0
+                };
+            }
+
+            const daysSincePublish = Math.floor((currentTime - publishTime) / (1000 * 60 * 60 * 24));
+            
+            let currentPrice = sellPrice;
+            let validityDisplay = '未知';
+            let discountInfo = '无折扣';
+
+            if (daysSincePublish <= 3) {
+                currentPrice = sellPrice;
+                validityDisplay = '3天内';
+                discountInfo = '原价';
+            } else if (daysSincePublish <= 7) {
+                const discountDays = daysSincePublish - 3;
+                const discountRate = discountDays * 0.05;
+                currentPrice = sellPrice * (1 - discountRate);
+                validityDisplay = '7天内';
+                discountInfo = `每天降价5%，已降价${discountDays}天`;
+            } else if (daysSincePublish <= 15) {
+                currentPrice = sellPrice * 0.7;
+                validityDisplay = '15天内';
+                discountInfo = '固定70%折扣';
+            } else if (daysSincePublish <= 30) {
+                currentPrice = sellPrice * 0.6;
+                validityDisplay = '30天内';
+                discountInfo = '固定60%折扣';
+            } else {
+                currentPrice = sellPrice * 0.5;
+                validityDisplay = '近期';
+                discountInfo = '固定50%折扣';
+            }
+
+            if (currentPrice < costPrice) {
+                currentPrice = costPrice;
+                discountInfo += '（已限制为成本价）';
+            }
+
+            return {
+                currentPrice: Number(currentPrice.toFixed(4)),
+                validityDisplay,
+                discountInfo,
+                daysSincePublish,
+                originalPrice: sellPrice,
+                discountPercent: ((sellPrice - currentPrice) / sellPrice * 100).toFixed(1)
+            };
+        }
+
+        function getTagClass(validityDisplay) {
+            if (validityDisplay === '3天内') return 'success';
+            if (validityDisplay === '7天内') return 'warning';
+            if (validityDisplay === '15天内') return 'info';
+            if (validityDisplay === '30天内') return 'warning';
+            if (validityDisplay === '近期') return 'danger';
+            return 'info';
+        }
+
+        function createTestData() {
+            const now = Date.now();
+            const testData = [
+                {
+                    id: 1,
+                    country: '印度',
+                    countryCode: 'IN',
+                    dataType: '手机号码',
+                    validity: '3',
+                    source: '官方渠道',
+                    availableQuantity: 100000,
+                    sellPrice: 0.03,
+                    costPrice: 0.01,
+                    remark: '3天内印度10W条数据',
+                    publishTime: now,
+                    uploadTime: now,
+                    status: 'available',
+                    operators: [
+                        { name: 'Airtel', count: 40000 },
+                        { name: 'Jio', count: 35000 },
+                        { name: 'Vi', count: 25000 }
+                    ]
+                },
+                {
+                    id: 2,
+                    country: '美国',
+                    countryCode: 'US',
+                    dataType: '手机号码',
+                    validity: '30',
+                    source: '合作伙伴',
+                    availableQuantity: 500000,
+                    sellPrice: 0.03,
+                    costPrice: 0.01,
+                    remark: '30天内美国50W条数据',
+                    publishTime: now,
+                    uploadTime: now,
+                    status: 'available'
+                },
+                {
+                    id: 3,
+                    country: '巴西',
+                    countryCode: 'BR',
+                    dataType: '手机号码',
+                    validity: '30+',
+                    source: '第三方采集',
+                    availableQuantity: 10000000,
+                    sellPrice: 0.008,
+                    costPrice: 0.005,
+                    remark: '30天以上巴西1000W条数据',
+                    publishTime: now,
+                    uploadTime: now,
+                    status: 'available'
+                }
+            ];
+
+            localStorage.setItem('dataList', JSON.stringify(testData));
+            
+            const resultDiv = document.getElementById('test-data-result');
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = `
+                <strong>✅ 测试数据创建成功！</strong><br>
+                已创建 ${testData.length} 条测试数据<br>
+                发布时间：${new Date(now).toLocaleString()}
+            `;
+        }
+
+        function clearAllData() {
+            localStorage.removeItem('dataList');
+            document.getElementById('test-data-result').innerHTML = '<strong>⚠️ 所有数据已清空</strong>';
+        }
+
+        function testPricingCalculation() {
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            const selectedIndex = document.getElementById('data-select').value;
+            const simulateDays = parseInt(document.getElementById('simulate-days').value);
+            
+            if (dataList.length === 0) {
+                document.getElementById('pricing-result').innerHTML = '<strong>❌ 请先创建测试数据</strong>';
+                return;
+            }
+            
+            const selectedData = dataList[selectedIndex];
+            const simulateTime = selectedData.publishTime + (simulateDays * 24 * 60 * 60 * 1000);
+            const pricingResult = calculateCurrentPrice(selectedData, simulateTime);
+            
+            document.getElementById('pricing-result').innerHTML = `
+                <strong>💰 定价计算结果</strong><br>
+                <table>
+                    <tr><th>数据信息</th><td>${selectedData.country} - ${selectedData.availableQuantity.toLocaleString()}条</td></tr>
+                    <tr><th>原始价格</th><td class="price">${selectedData.sellPrice} U/条</td></tr>
+                    <tr><th>发布天数</th><td class="highlight">${pricingResult.daysSincePublish} 天</td></tr>
+                    <tr><th>时效显示</th><td><span class="tag ${getTagClass(pricingResult.validityDisplay)}">${pricingResult.validityDisplay}</span></td></tr>
+                    <tr><th>当前价格</th><td class="price">${pricingResult.currentPrice} U/条</td></tr>
+                    <tr><th>折扣信息</th><td>${pricingResult.discountInfo}</td></tr>
+                    <tr><th>降价幅度</th><td>${pricingResult.discountPercent}%</td></tr>
+                </table>
+            `;
+        }
+
+        function showPricingTrend() {
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            const selectedIndex = document.getElementById('data-select').value;
+            
+            if (dataList.length === 0) return;
+            
+            const selectedData = dataList[selectedIndex];
+            let trendHtml = `<strong>📈 ${selectedData.country}数据价格趋势</strong><br><table>
+                <tr><th>天数</th><th>时效显示</th><th>销售价格</th><th>折扣信息</th></tr>`;
+            
+            const keyDays = [0, 3, 6, 7, 10, 15, 20, 30, 45, 60];
+            keyDays.forEach(day => {
+                const simulateTime = selectedData.publishTime + (day * 24 * 60 * 60 * 1000);
+                const result = calculateCurrentPrice(selectedData, simulateTime);
+                trendHtml += `
+                    <tr>
+                        <td>${day}天</td>
+                        <td><span class="tag ${getTagClass(result.validityDisplay)}">${result.validityDisplay}</span></td>
+                        <td class="price">${result.currentPrice} U/条</td>
+                        <td>${result.discountInfo}</td>
+                    </tr>
+                `;
+            });
+            
+            trendHtml += '</table>';
+            document.getElementById('pricing-result').innerHTML = trendHtml;
+        }
+
+        function checkResourceCenterData() {
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            
+            if (dataList.length === 0) {
+                document.getElementById('resource-sync-result').innerHTML = '<strong>❌ 资源中心无数据</strong>';
+                return;
+            }
+
+            const updatedData = dataList.map(item => {
+                const pricingResult = calculateCurrentPrice(item);
+                return {
+                    ...item,
+                    currentSellPrice: pricingResult.currentPrice,
+                    validityDisplay: pricingResult.validityDisplay,
+                    discountInfo: pricingResult.discountInfo
+                };
+            });
+
+            let html = '<strong>🏪 资源中心数据同步检查</strong><br><table>';
+            html += '<tr><th>国家</th><th>原始时效</th><th>当前时效</th><th>原始价格</th><th>当前价格</th><th>折扣信息</th></tr>';
+            
+            updatedData.forEach(item => {
+                const originalValidity = { '3': '3天内', '30': '30天内', '30+': '30天以上' }[item.validity];
+                html += `<tr>
+                    <td>${item.country}</td>
+                    <td><span class="tag info">${originalValidity}</span></td>
+                    <td><span class="tag ${getTagClass(item.validityDisplay)}">${item.validityDisplay}</span></td>
+                    <td class="price">${item.sellPrice}</td>
+                    <td class="price">${item.currentSellPrice}</td>
+                    <td>${item.discountInfo}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            document.getElementById('resource-sync-result').innerHTML = html;
+        }
+
+        function simulateTimePassage() {
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            
+            if (dataList.length === 0) return;
+
+            const updatedData = dataList.map(item => ({
+                ...item,
+                publishTime: item.publishTime - (24 * 60 * 60 * 1000)
+            }));
+
+            localStorage.setItem('dataList', JSON.stringify(updatedData));
+            document.getElementById('resource-sync-result').innerHTML = '<strong>⏰ 已模拟时间流逝+1天</strong>';
+        }
+
+        function testCustomPricing() {
+            const country = document.getElementById('pricing-data-select').value;
+            const newPrice = parseFloat(document.getElementById('new-price').value);
+            
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            let updateCount = 0;
+            
+            const updatedData = dataList.map(item => {
+                if (item.country === country) {
+                    updateCount++;
+                    return { ...item, sellPrice: newPrice, customPricing: true };
+                }
+                return item;
+            });
+
+            localStorage.setItem('dataList', JSON.stringify(updatedData));
+            
+            document.getElementById('pricing-management-result').innerHTML = `
+                <strong>🎯 自定义定价测试</strong><br>
+                已将 <strong>${country}</strong> 的销售价格修改为 <span class="price">${newPrice} U/条</span><br>
+                影响数据条数：${updateCount}
+            `;
+        }
+
+        function resetToDynamicPricing() {
+            const country = document.getElementById('pricing-data-select').value;
+            
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            let updateCount = 0;
+            
+            const updatedData = dataList.map(item => {
+                if (item.country === country && item.customPricing) {
+                    updateCount++;
+                    const { customPricing, ...resetItem } = item;
+                    return resetItem;
+                }
+                return item;
+            });
+
+            localStorage.setItem('dataList', JSON.stringify(updatedData));
+            
+            document.getElementById('pricing-management-result').innerHTML = `
+                <strong>🔄 恢复动态定价</strong><br>
+                已将 <strong>${country}</strong> 恢复为动态定价模式<br>
+                影响数据条数：${updateCount}
+            `;
+        }
+
+        function runFullTest() {
+            let html = '<strong>🚀 完整测试报告</strong><br><br>';
+            
+            const dataList = JSON.parse(localStorage.getItem('dataList') || '[]');
+            
+            // 测试业务场景数据
+            html += '<strong>Test 1: 业务场景验证</strong><br>';
+            if (dataList.length < 3) {
+                html += '❌ 测试数据不足<br><br>';
+            } else {
+                html += '✅ 业务场景数据完整<br><br>';
+            }
+            
+            // 测试第6天价格计算
+            html += '<strong>Test 2: 第6天价格计算验证</strong><br>';
+            if (dataList.length > 0) {
+                const indiaData = dataList[0];
+                const day6Time = indiaData.publishTime + (6 * 24 * 60 * 60 * 1000);
+                const day6Result = calculateCurrentPrice(indiaData, day6Time);
+                const expected = 0.03 * (1 - 0.05 * 3); // 0.03 * (100% - 15%) = 0.0255
+                
+                html += `计算结果: ${day6Result.currentPrice} U/条<br>`;
+                html += `预期结果: ${expected.toFixed(4)} U/条<br>`;
+                html += `验证: ${Math.abs(day6Result.currentPrice - expected) < 0.0001 ? '✅ 通过' : '❌ 失败'}<br><br>`;
+            }
+            
+            // 测试时效显示变化
+            html += '<strong>Test 3: 时效显示变化验证</strong><br>';
+            if (dataList.length > 0) {
+                const testData = dataList[0];
+                const testDays = [2, 5, 10, 20, 40];
+                testDays.forEach(day => {
+                    const testTime = testData.publishTime + (day * 24 * 60 * 60 * 1000);
+                    const result = calculateCurrentPrice(testData, testTime);
+                    html += `第${day}天: ${result.validityDisplay}<br>`;
+                });
+            }
+            
+            html += '<br><strong>测试完成！</strong>';
+            document.getElementById('full-test-result').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

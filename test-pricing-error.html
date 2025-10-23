@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>动态定价错误诊断</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+      border-bottom: 2px solid #409eff;
+      padding-bottom: 10px;
+    }
+    button {
+      background: #409eff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    button:hover {
+      background: #66b1ff;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .success {
+      background: #f0f9ff;
+      border-left: 4px solid #67c23a;
+      color: #67c23a;
+    }
+    .error {
+      background: #fef0f0;
+      border-left: 4px solid #f56c6c;
+      color: #f56c6c;
+    }
+    .warning {
+      background: #fdf6ec;
+      border-left: 4px solid #e6a23c;
+      color: #e6a23c;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 动态定价错误诊断工具</h1>
+
+  <div class="test-section">
+    <h2>测试1: 检查API数据</h2>
+    <button onclick="testAPIData()">开始测试</button>
+    <div id="api-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>测试2: 测试动态定价计算</h2>
+    <button onclick="testPricingCalculation()">开始测试</button>
+    <div id="pricing-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>测试3: 检查数据字段</h2>
+    <button onclick="testDataFields()">开始测试</button>
+    <div id="fields-result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>测试4: 模拟完整流程</h2>
+    <button onclick="testFullProcess()">开始测试</button>
+    <div id="full-result"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    // 动态定价计算函数（从dynamicPricing.js复制）
+    function calculateCurrentPrice(dataItem, currentTime = Date.now()) {
+      if (!dataItem || typeof dataItem !== 'object') {
+        console.warn('⚠️ calculateCurrentPrice: 无效的 dataItem', dataItem)
+        return {
+          currentPrice: 0,
+          validityDisplay: '未知',
+          discountInfo: '无',
+          daysSincePublish: 0,
+          originalPrice: 0,
+          discountPercent: '0'
+        }
+      }
+      
+      const { sellPrice, costPrice, publishTime } = dataItem
+
+      if (!publishTime || !sellPrice) {
+        return {
+          currentPrice: sellPrice || 0,
+          validityDisplay: '未知',
+          discountInfo: '无',
+          daysSincePublish: 0,
+          originalPrice: sellPrice || 0,
+          discountPercent: '0'
+        }
+      }
+      
+      try {
+        const daysSincePublish = Math.floor((currentTime - publishTime) / (1000 * 60 * 60 * 24))
+
+        let currentPrice = sellPrice
+        let validityDisplay = '未知'
+        let discountInfo = '无折扣'
+        let totalDiscountRate = 0
+
+        if (daysSincePublish <= 3) {
+          currentPrice = sellPrice
+          validityDisplay = '3天内'
+          discountInfo = '原价'
+          totalDiscountRate = 0
+        } else if (daysSincePublish <= 7) {
+          const discountDays = daysSincePublish - 3
+          totalDiscountRate = discountDays * 0.05
+          currentPrice = sellPrice * (1 - totalDiscountRate)
+          validityDisplay = '7天内'
+          discountInfo = `第${daysSincePublish}天，每天降5%，已降${(totalDiscountRate * 100).toFixed(0)}%`
+        } else if (daysSincePublish <= 15) {
+          const firstPeriodDiscount = 4 * 0.05
+          const discountDays = daysSincePublish - 7
+          const secondPeriodDiscount = discountDays * 0.02
+          totalDiscountRate = firstPeriodDiscount + secondPeriodDiscount
+          currentPrice = sellPrice * (1 - totalDiscountRate)
+          validityDisplay = '15天内'
+          discountInfo = `第${daysSincePublish}天，已降${(totalDiscountRate * 100).toFixed(0)}%`
+        } else if (daysSincePublish <= 30) {
+          const firstPeriodDiscount = 4 * 0.05
+          const secondPeriodDiscount = 8 * 0.02
+          const discountDays = daysSincePublish - 15
+          const thirdPeriodDiscount = discountDays * 0.01
+          totalDiscountRate = firstPeriodDiscount + secondPeriodDiscount + thirdPeriodDiscount
+          currentPrice = sellPrice * (1 - totalDiscountRate)
+          validityDisplay = '30天内'
+          discountInfo = `第${daysSincePublish}天，已降${(totalDiscountRate * 100).toFixed(0)}%`
+        } else {
+          totalDiscountRate = 0.50
+          currentPrice = sellPrice * 0.5
+          validityDisplay = '近期'
+          discountInfo = `第${daysSincePublish}天，已达最大降价50%`
+        }
+
+        const maxDiscountPrice = sellPrice * 0.5
+        if (currentPrice < maxDiscountPrice) {
+          currentPrice = maxDiscountPrice
+          totalDiscountRate = 0.50
+        }
+
+        if (costPrice && currentPrice < costPrice) {
+          currentPrice = costPrice
+          totalDiscountRate = (sellPrice - costPrice) / sellPrice
+        }
+
+        return {
+          currentPrice: Number(currentPrice.toFixed(4)),
+          validityDisplay,
+          discountInfo,
+          daysSincePublish,
+          originalPrice: sellPrice,
+          discountPercent: (totalDiscountRate * 100).toFixed(1)
+        }
+      } catch (error) {
+        console.error('❌ calculateCurrentPrice 计算出错:', error, dataItem)
+        return {
+          currentPrice: sellPrice || 0,
+          validityDisplay: '错误',
+          discountInfo: '计算失败',
+          daysSincePublish: 0,
+          originalPrice: sellPrice || 0,
+          discountPercent: '0'
+        }
+      }
+    }
+
+    // 测试1: 检查API数据
+    async function testAPIData() {
+      const resultDiv = document.getElementById('api-result');
+      resultDiv.innerHTML = '<div class="result warning">⏳ 正在获取API数据...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const data = await response.json();
+
+        let html = '<div class="result success">';
+        html += `✅ API响应成功\n\n`;
+        html += `数据条数: ${data.data?.length || 0}\n`;
+        
+        if (data.data && data.data.length > 0) {
+          const item = data.data[0];
+          html += `\n第一条数据:\n`;
+          html += `<pre>${JSON.stringify(item, null, 2)}</pre>`;
+        }
+        
+        html += '</div>';
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ 测试失败\n${error.message}\n${error.stack}</div>`;
+      }
+    }
+
+    // 测试2: 测试动态定价计算
+    async function testPricingCalculation() {
+      const resultDiv = document.getElementById('pricing-result');
+      resultDiv.innerHTML = '<div class="result warning">⏳ 正在测试定价计算...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const data = await response.json();
+
+        if (!data.data || data.data.length === 0) {
+          throw new Error('API未返回数据');
+        }
+
+        const item = data.data[0];
+        
+        // 转换数据格式
+        const convertedItem = {
+          sellPrice: parseFloat(item.sell_price),
+          costPrice: parseFloat(item.cost_price),
+          publishTime: item.publish_time
+        };
+
+        console.log('转换后的数据:', convertedItem);
+
+        // 计算定价
+        const pricingInfo = calculateCurrentPrice(convertedItem);
+
+        let html = '<div class="result success">';
+        html += `✅ 定价计算成功\n\n`;
+        html += `输入数据:\n`;
+        html += `<pre>${JSON.stringify(convertedItem, null, 2)}</pre>\n`;
+        html += `\n计算结果:\n`;
+        html += `<pre>${JSON.stringify(pricingInfo, null, 2)}</pre>`;
+        html += '</div>';
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ 测试失败\n${error.message}\n${error.stack}</div>`;
+      }
+    }
+
+    // 测试3: 检查数据字段
+    async function testDataFields() {
+      const resultDiv = document.getElementById('fields-result');
+      resultDiv.innerHTML = '<div class="result warning">⏳ 正在检查数据字段...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const data = await response.json();
+
+        if (!data.data || data.data.length === 0) {
+          throw new Error('API未返回数据');
+        }
+
+        const item = data.data[0];
+
+        let html = '<div class="result ';
+        
+        // 检查必需字段
+        const hasPrice = item.sell_price !== undefined && item.sell_price !== null;
+        const hasTime = item.publish_time !== undefined && item.publish_time !== null;
+        
+        if (hasPrice && hasTime) {
+          html += 'success">';
+          html += `✅ 数据字段完整\n\n`;
+        } else {
+          html += 'error">';
+          html += `❌ 数据字段缺失\n\n`;
+        }
+
+        html += `字段检查:\n`;
+        html += `- sell_price: ${item.sell_price} ${hasPrice ? '✅' : '❌'}\n`;
+        html += `- cost_price: ${item.cost_price}\n`;
+        html += `- publish_time: ${item.publish_time} ${hasTime ? '✅' : '❌'}\n`;
+        html += `- 发布时间: ${new Date(item.publish_time).toLocaleString()}\n`;
+        html += `- 发布天数: ${Math.floor((Date.now() - item.publish_time) / (1000 * 60 * 60 * 24))}天\n`;
+
+        html += `\n完整数据:\n<pre>${JSON.stringify(item, null, 2)}</pre>`;
+        html += '</div>';
+        
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error">❌ 测试失败\n${error.message}\n${error.stack}</div>`;
+      }
+    }
+
+    // 测试4: 模拟完整流程
+    async function testFullProcess() {
+      const resultDiv = document.getElementById('full-result');
+      resultDiv.innerHTML = '<div class="result warning">⏳ 正在模拟完整流程...</div>';
+
+      try {
+        // 1. 获取API数据
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const apiData = await response.json();
+
+        if (!apiData.data || apiData.data.length === 0) {
+          throw new Error('API未返回数据');
+        }
+
+        // 2. 转换数据格式（模拟center.vue的转换逻辑）
+        const dataList = apiData.data.map(item => ({
+          id: item.id,
+          country: item.country_name || item.country,
+          countryCode: item.country,
+          sellPrice: parseFloat(item.sell_price) || 0,
+          costPrice: parseFloat(item.cost_price) || 0,
+          publishTime: item.publish_time,
+          availableQuantity: item.available_quantity
+        }));
+
+        console.log('转换后的数据列表:', dataList);
+
+        // 3. 应用动态定价
+        const pricedDataList = dataList.map(item => {
+          const pricingInfo = calculateCurrentPrice(item);
+          return {
+            ...item,
+            currentSellPrice: pricingInfo.currentPrice,
+            validityDisplay: pricingInfo.validityDisplay,
+            discountInfo: pricingInfo.discountInfo,
+            originalSellPrice: item.sellPrice
+          };
+        });
+
+        console.log('定价后的数据列表:', pricedDataList);
+
+        // 4. 显示第一条数据的定价示例
+        const sample = pricedDataList[0];
+        const displayData = {
+          '原始价格': sample.originalSellPrice || sample.sellPrice,
+          '当前价格': sample.currentSellPrice,
+          '时效显示': sample.validityDisplay,
+          '折扣信息': sample.discountInfo
+        };
+
+        console.log('💰 动态定价示例:', displayData);
+
+        let html = '<div class="result success">';
+        html += `✅ 完整流程测试成功\n\n`;
+        html += `处理流程:\n`;
+        html += `1. API返回 ${apiData.data.length} 条数据 ✅\n`;
+        html += `2. 数据转换完成 ${dataList.length} 条 ✅\n`;
+        html += `3. 动态定价完成 ${pricedDataList.length} 条 ✅\n\n`;
+        html += `💰 动态定价示例:\n`;
+        html += `<pre>${JSON.stringify(displayData, null, 2)}</pre>\n\n`;
+        html += `完整数据:\n`;
+        html += `<pre>${JSON.stringify(sample, null, 2)}</pre>`;
+        html += '</div>';
+        
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        let html = '<div class="result error">';
+        html += `❌ 测试失败\n\n`;
+        html += `错误信息: ${error.message}\n\n`;
+        html += `错误堆栈:\n<pre>${error.stack}</pre>`;
+        html += '</div>';
+        resultDiv.innerHTML = html;
+      }
+    }
+  </script>
+</body>
+</html>

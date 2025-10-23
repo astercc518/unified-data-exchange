@@ -1,10 +1,13 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, getInfo, logout } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
   token: getToken(),
+  id: '',
+  type: '',
   name: '',
+  loginAccount: '',
   avatar: '',
   introduction: '',
   roles: []
@@ -14,11 +17,20 @@ const mutations = {
   SET_TOKEN: (state, token) => {
     state.token = token
   },
+  SET_ID: (state, id) => {
+    state.id = id
+  },
+  SET_TYPE: (state, type) => {
+    state.type = type
+  },
   SET_INTRODUCTION: (state, introduction) => {
     state.introduction = introduction
   },
   SET_NAME: (state, name) => {
     state.name = name
+  },
+  SET_LOGIN_ACCOUNT: (state, loginAccount) => {
+    state.loginAccount = loginAccount
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
@@ -33,20 +45,43 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
+      console.log('🔄 开始登录验证，使用数据库模式...')
+
+      // 直接使用后端数据库登录API
+      login({ username: username.trim(), password: password })
+        .then(response => {
+          const { data } = response
+
+          if (data && data.token) {
+            commit('SET_TOKEN', data.token)
+            setToken(data.token)
+            console.log('✅ 数据库登录成功')
+            resolve()
+          } else {
+            reject(new Error('登录响应数据异常'))
+          }
+        })
+        .catch(error => {
+          console.error('❌ 数据库登录失败:', error.message)
+
+          // 检查是否是网络超时错误
+          if (error.message && error.message.includes('timeout')) {
+            reject(new Error('登录请求超时，请检查网络连接或后端服务是否正常运行'))
+          } else if (error.message && error.message.includes('Network Error')) {
+            reject(new Error('网络错误，无法连接到后端服务'))
+          } else {
+            reject(new Error('用户名或密码错误'))
+          }
+        })
     })
   },
 
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
+      console.log('🔄 从数据库获取用户信息...')
+
+      // 直接从后端数据库获取用户信息
       getInfo(state.token).then(response => {
         const { data } = response
 
@@ -54,7 +89,7 @@ const actions = {
           reject('Verification failed, please Login again.')
         }
 
-        const { roles, name, avatar, introduction } = data
+        const { roles, id, type, name, loginAccount, avatar, introduction } = data
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
@@ -62,12 +97,18 @@ const actions = {
         }
 
         commit('SET_ROLES', roles)
+        commit('SET_ID', id)
+        commit('SET_TYPE', type)
         commit('SET_NAME', name)
+        commit('SET_LOGIN_ACCOUNT', loginAccount || name)
         commit('SET_AVATAR', avatar)
         commit('SET_INTRODUCTION', introduction)
+
+        console.log('✅ 数据库用户信息加载成功')
         resolve(data)
-      }).catch(error => {
-        reject(error)
+      }).catch(err => {
+        console.error('❌ 获取用户信息失败:', err)
+        reject(err)
       })
     })
   },
@@ -75,6 +116,8 @@ const actions = {
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
+      console.log('🔄 执行数据库登出操作...')
+
       logout(state.token).then(() => {
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
@@ -82,12 +125,19 @@ const actions = {
         resetRouter()
 
         // reset visited views and cached views
-        // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
         dispatch('tagsView/delAllViews', null, { root: true })
 
+        console.log('✅ 数据库登出成功')
         resolve()
-      }).catch(error => {
-        reject(error)
+      }).catch(err => {
+        // 即使后端登出失败，也要清理本地状态
+        console.warn('登出失败:', err.message || err)
+        commit('SET_TOKEN', '')
+        commit('SET_ROLES', [])
+        removeToken()
+        resetRouter()
+        dispatch('tagsView/delAllViews', null, { root: true })
+        resolve()
       })
     })
   },

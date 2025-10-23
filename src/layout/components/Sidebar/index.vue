@@ -29,7 +29,8 @@ export default {
   computed: {
     ...mapGetters([
       'permission_routes',
-      'sidebar'
+      'sidebar',
+      'language' // 添加语言状态
     ]),
     activeMenu() {
       const route = this.$route
@@ -48,6 +49,12 @@ export default {
     },
     isCollapse() {
       return !this.sidebar.opened
+    }
+  },
+  watch: {
+    // 监听语言变化，强制重新渲染
+    language() {
+      this.$forceUpdate()
     }
   }
 }

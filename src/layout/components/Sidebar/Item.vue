@@ -1,4 +1,7 @@
 <script>
+import { t } from '@/lang'
+import store from '@/store'
+
 export default {
   name: 'MenuItem',
   functional: true,
@@ -25,7 +28,11 @@ export default {
     }
 
     if (title) {
-      vnodes.push(<span slot='title'>{(title)}</span>)
+      // 获取当前语言
+      const currentLang = store.getters.language || 'zh'
+      // 如果是国际化key（包含点号），则翻译；否则直接显示
+      const displayTitle = title.includes('.') ? t(title, currentLang) : title
+      vnodes.push(<span slot='title'>{displayTitle}</span>)
     }
     return vnodes
   }

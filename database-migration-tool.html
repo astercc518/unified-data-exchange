@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库迁移工具 - 一键导入</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+                'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .step {
+            background: #f5f7fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 5px solid #409EFF;
+        }
+        
+        .step h2 {
+            color: #303133;
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .step-number {
+            background: #409EFF;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+        
+        .status-pending {
+            background: #f4f4f5;
+            color: #909399;
+        }
+        
+        .status-success {
+            background: #f0f9ff;
+            color: #67C23A;
+        }
+        
+        .status-error {
+            background: #fef0f0;
+            color: #F56C6C;
+        }
+        
+        .status-running {
+            background: #fdf6ec;
+            color: #E6A23C;
+        }
+        
+        button {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px 5px;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary {
+            background: #409EFF;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #67C23A;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #E6A23C;
+            color: white;
+        }
+        
+        .log-container {
+            background: #2d3a4b;
+            color: #67C23A;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #409EFF;
+            padding-left: 10px;
+        }
+        
+        .log-success {
+            border-left-color: #67C23A;
+            color: #67C23A;
+        }
+        
+        .log-error {
+            border-left-color: #F56C6C;
+            color: #F56C6C;
+        }
+        
+        .log-warning {
+            border-left-color: #E6A23C;
+            color: #E6A23C;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e4e7ed;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #909399;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card .value {
+            color: #303133;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .alert-success {
+            background: #f0f9ff;
+            border-left: 4px solid #67C23A;
+            color: #67C23A;
+        }
+        
+        .alert-error {
+            background: #fef0f0;
+            border-left: 4px solid #F56C6C;
+            color: #F56C6C;
+        }
+        
+        .alert-warning {
+            background: #fdf6ec;
+            border-left: 4px solid #E6A23C;
+            color: #E6A23C;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .progress-bar {
+            background: #e4e7ed;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #409EFF, #67C23A);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 数据库迁移工具</h1>
+            <p>一键将 localStorage 数据迁移到数据库</p>
+        </div>
+        
+        <div class="content">
+            <div id="alertBox" class="alert"></div>
+            
+            <!-- 步骤1：检查后端服务 -->
+            <div class="step">
+                <h2>
+                    <span class="step-number">1</span>
+                    检查后端服务
+                    <span class="status status-pending" id="status1">待检查</span>
+                </h2>
+                <p style="color: #606266; margin-bottom: 15px;">
+                    验证后端服务是否正常运行
+                </p>
+                <button class="btn-primary" onclick="checkBackendService()">
+                    🔍 检查服务状态
+                </button>
+                <div id="serviceInfo"></div>
+            </div>
+            
+            <!-- 步骤2：读取本地数据 -->
+            <div class="step">
+                <h2>
+                    <span class="step-number">2</span>
+                    读取 localStorage 数据
+                    <span class="status status-pending" id="status2">待读取</span>
+                </h2>
+                <p style="color: #606266; margin-bottom: 15px;">
+                    从浏览器本地存储读取所有数据
+                </p>
+                <button class="btn-primary" onclick="loadLocalData()" id="btnLoadData" disabled>
+                    📖 读取本地数据
+                </button>
+                <div class="stats-grid" id="localDataStats" style="display: none;">
+                    <div class="stat-card">
+                        <h3>客户数据</h3>
+                        <div class="value" id="userCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>代理数据</h3>
+                        <div class="value" id="agentCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>数据库</h3>
+                        <div class="value" id="dataLibraryCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>订单数据</h3>
+                        <div class="value" id="orderCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>充值记录</h3>
+                        <div class="value" id="rechargeCount">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 步骤3：迁移数据 -->
+            <div class="step">
+                <h2>
+                    <span class="step-number">3</span>
+                    迁移数据到数据库
+                    <span class="status status-pending" id="status3">待迁移</span>
+                </h2>
+                <p style="color: #606266; margin-bottom: 15px;">
+                    将所有数据批量导入到数据库
+                </p>
+                <button class="btn-success" onclick="migrateData()" id="btnMigrate" disabled>
+                    🚀 一键迁移数据
+                </button>
+                <div class="progress-bar" id="progressBar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="migrationResult"></div>
+            </div>
+            
+            <!-- 步骤4：切换模式 -->
+            <div class="step">
+                <h2>
+                    <span class="step-number">4</span>
+                    切换到数据库模式
+                    <span class="status status-pending" id="status4">待切换</span>
+                </h2>
+                <p style="color: #606266; margin-bottom: 15px;">
+                    修改前端配置，启用数据库存储模式
+                </p>
+                <button class="btn-warning" onclick="switchToDatabase()" id="btnSwitch" disabled>
+                    🔄 切换到数据库模式
+                </button>
+                <div id="switchResult"></div>
+            </div>
+            
+            <!-- 日志 -->
+            <div class="step">
+                <h2>
+                    <span class="step-number">📝</span>
+                    操作日志
+                </h2>
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry">等待操作...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let localData = {};
+        let backendAvailable = false;
+        
+        // 添加日志
+        function addLog(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const time = new Date().toLocaleTimeString('zh-CN');
+            const logClass = type === 'success' ? 'log-success' : (type === 'error' ? 'log-error' : (type === 'warning' ? 'log-warning' : ''));
+            
+            if (logContainer.children.length === 1 && logContainer.children[0].textContent === '等待操作...') {
+                logContainer.innerHTML = '';
+            }
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${logClass}`;
+            logEntry.textContent = `[${time}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // 更新状态
+        function updateStatus(step, status, text) {
+            const statusEl = document.getElementById(`status${step}`);
+            statusEl.className = `status status-${status}`;
+            statusEl.textContent = text;
+        }
+        
+        // 显示提示
+        function showAlert(type, message) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type} show`;
+            alertBox.innerHTML = `<strong>${message}</strong>`;
+            setTimeout(() => alertBox.classList.remove('show'), 5000);
+        }
+        
+        // 步骤1：检查后端服务
+        async function checkBackendService() {
+            addLog('正在检查后端服务...', 'info');
+            updateStatus(1, 'running', '检查中...');
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/migrate/test-connection');
+                const data = await response.json();
+                
+                if (data.success) {
+                    addLog('✅ 后端服务连接成功', 'success');
+                    addLog(`数据库类型: ${data.database}`, 'info');
+                    addLog(`可用数据表: ${data.tables.join(', ')}`, 'info');
+                    
+                    updateStatus(1, 'success', '服务正常');
+                    backendAvailable = true;
+                    
+                    document.getElementById('btnLoadData').disabled = false;
+                    
+                    const serviceInfo = document.getElementById('serviceInfo');
+                    serviceInfo.innerHTML = `
+                        <div class="stats-grid" style="margin-top: 15px;">
+                            <div class="stat-card">
+                                <h3>服务状态</h3>
+                                <div class="value" style="color: #67C23A; font-size: 18px;">运行中</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>数据库类型</h3>
+                                <div class="value" style="color: #409EFF; font-size: 18px;">${data.database}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    showAlert('success', '✅ 后端服务连接成功！');
+                } else {
+                    throw new Error(data.message || '服务连接失败');
+                }
+            } catch (error) {
+                addLog(`❌ 后端服务连接失败: ${error.message}`, 'error');
+                updateStatus(1, 'error', '连接失败');
+                showAlert('error', `❌ 后端服务不可用: ${error.message}`);
+            }
+        }
+        
+        // 步骤2：读取本地数据
+        function loadLocalData() {
+            addLog('正在读取 localStorage 数据...', 'info');
+            updateStatus(2, 'running', '读取中...');
+            
+            try {
+                localData = {
+                    userList: JSON.parse(localStorage.getItem('userList') || '[]'),
+                    agentList: JSON.parse(localStorage.getItem('agentList') || '[]'),
+                    dataLibrary: JSON.parse(localStorage.getItem('dataLibrary') || '[]'),
+                    orderList: JSON.parse(localStorage.getItem('orderList') || '[]'),
+                    rechargeRecords: JSON.parse(localStorage.getItem('rechargeRecords') || '[]')
+                };
+                
+                addLog(`客户数据: ${localData.userList.length} 条`, 'success');
+                addLog(`代理数据: ${localData.agentList.length} 条`, 'success');
+                addLog(`数据库: ${localData.dataLibrary.length} 条`, 'success');
+                addLog(`订单数据: ${localData.orderList.length} 条`, 'success');
+                addLog(`充值记录: ${localData.rechargeRecords.length} 条`, 'success');
+                
+                document.getElementById('userCount').textContent = localData.userList.length;
+                document.getElementById('agentCount').textContent = localData.agentList.length;
+                document.getElementById('dataLibraryCount').textContent = localData.dataLibrary.length;
+                document.getElementById('orderCount').textContent = localData.orderList.length;
+                document.getElementById('rechargeCount').textContent = localData.rechargeRecords.length;
+                
+                document.getElementById('localDataStats').style.display = 'grid';
+                
+                const totalRecords = Object.values(localData).reduce((sum, arr) => sum + arr.length, 0);
+                
+                if (totalRecords > 0) {
+                    updateStatus(2, 'success', `已读取 ${totalRecords} 条`);
+                    document.getElementById('btnMigrate').disabled = false;
+                    showAlert('success', `✅ 成功读取 ${totalRecords} 条数据！`);
+                } else {
+                    updateStatus(2, 'warning', '无数据');
+                    showAlert('warning', '⚠️ 未找到需要迁移的数据');
+                }
+            } catch (error) {
+                addLog(`❌ 读取数据失败: ${error.message}`, 'error');
+                updateStatus(2, 'error', '读取失败');
+                showAlert('error', `❌ 读取失败: ${error.message}`);
+            }
+        }
+        
+        // 步骤3：迁移数据
+        async function migrateData() {
+            addLog('开始迁移数据到数据库...', 'info');
+            updateStatus(3, 'running', '迁移中...');
+            
+            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('progressFill').style.width = '0%';
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/migrate/from-localstorage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(localData)
+                });
+                
+                const result = await response.json();
+                
+                // 更新进度条
+                document.getElementById('progressFill').style.width = '100%';
+                
+                if (result.success) {
+                    addLog('✅ 数据迁移成功！', 'success');
+                    addLog(`总共迁移 ${result.totalRecords} 条记录`, 'success');
+                    
+                    updateStatus(3, 'success', '迁移完成');
+                    document.getElementById('btnSwitch').disabled = false;
+                    
+                    const migrationResult = document.getElementById('migrationResult');
+                    migrationResult.innerHTML = `
+                        <div class="stats-grid" style="margin-top: 15px;">
+                            <div class="stat-card">
+                                <h3>总记录数</h3>
+                                <div class="value" style="color: #67C23A;">${result.totalRecords}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>客户</h3>
+                                <div class="value">${result.statistics.users.success}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>代理</h3>
+                                <div class="value">${result.statistics.agents.success}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>数据</h3>
+                                <div class="value">${result.statistics.dataLibrary.success}</div>
+                            </div>
+                            <div class="stat-card">
+                                <h3>订单</h3>
+                                <div class="value">${result.statistics.orders.success}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    showAlert('success', `🎉 成功迁移 ${result.totalRecords} 条数据到数据库！`);
+                } else {
+                    throw new Error(result.error || '迁移失败');
+                }
+            } catch (error) {
+                addLog(`❌ 数据迁移失败: ${error.message}`, 'error');
+                updateStatus(3, 'error', '迁移失败');
+                showAlert('error', `❌ 迁移失败: ${error.message}`);
+            }
+        }
+        
+        // 步骤4：切换到数据库模式
+        function switchToDatabase() {
+            addLog('准备切换到数据库模式...', 'info');
+            updateStatus(4, 'running', '处理中...');
+            
+            const switchResult = document.getElementById('switchResult');
+            switchResult.innerHTML = `
+                <div style="background: #fdf6ec; border: 1px solid #f5dab1; border-radius: 8px; padding: 20px; margin-top: 20px;">
+                    <h3 style="color: #E6A23C; margin-bottom: 15px;">⚠️ 手动切换步骤</h3>
+                    <p style="color: #606266; line-height: 1.8;">
+                        由于安全限制，需要手动完成以下步骤：<br><br>
+                        
+                        <strong>1. 修改前端配置文件：</strong><br>
+                        &nbsp;&nbsp;&nbsp;文件路径: <code>/home/vue-element-admin/.env.development</code><br>
+                        &nbsp;&nbsp;&nbsp;将 <code>VUE_APP_USE_DATABASE = false</code><br>
+                        &nbsp;&nbsp;&nbsp;改为 <code>VUE_APP_USE_DATABASE = true</code><br><br>
+                        
+                        <strong>2. 重启前端服务：</strong><br>
+                        &nbsp;&nbsp;&nbsp;停止当前服务，然后运行 <code>npm run dev</code><br><br>
+                        
+                        <strong>3. 刷新浏览器：</strong><br>
+                        &nbsp;&nbsp;&nbsp;重新打开 <a href="http://localhost:9528" target="_blank">http://localhost:9528</a><br><br>
+                        
+                        ✅ 完成后，系统将使用数据库存储数据！
+                    </p>
+                </div>
+            `;
+            
+            addLog('✅ 切换步骤已生成，请按照提示操作', 'success');
+            updateStatus(4, 'warning', '需手动操作');
+            showAlert('warning', '⚠️ 请按照提示手动完成配置切换');
+        }
+        
+        // 页面加载时自动检查服务
+        window.onload = function() {
+            addLog('数据库迁移工具已加载', 'info');
+            addLog('请点击"检查服务状态"开始', 'info');
+        };
+    </script>
+</body>
+</html>

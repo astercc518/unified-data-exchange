@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户登录调试工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; color: white; margin-bottom: 30px; }
+    .header h1 { font-size: 32px; margin-bottom: 10px; }
+    .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #333; border-left: 4px solid #667eea; padding-left: 12px; }
+    .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+    .search-box input { flex: 1; padding: 12px 16px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; }
+    .search-box button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    .user-info { background: #f8f9fa; border-radius: 8px; padding: 20px; margin-top: 20px; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+    .info-item { display: flex; padding: 10px; background: white; border-radius: 6px; }
+    .info-label { font-weight: 600; color: #666; min-width: 100px; }
+    .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; }
+    .status-active { background: #d4edda; color: #155724; }
+    .status-inactive { background: #f8d7da; color: #721c24; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: #f8f9fa; font-weight: 600; }
+    .action-btn { padding: 6px 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 5px; }
+    .alert { padding: 15px 20px; border-radius: 8px; margin: 20px 0; }
+    .alert-success { background: #d4edda; border-left: 4px solid #28a745; color: #155724; }
+    .alert-danger { background: #f8d7da; border-left: 4px solid #dc3545; color: #721c24; }
+    .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+    .form-group input { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; color: #e83e8c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 用户登录调试工具</h1>
+      <p>帮助您检查和调试用户登录问题</p>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">🔍 搜索用户</h2>
+      <div class="search-box">
+        <input type="text" id="searchUsername" placeholder="输入登录账号，如: KL01880V01" />
+        <button onclick="searchUser()">搜索</button>
+        <button onclick="showAllUsers()" style="background: #28a745;">显示客户</button>
+      </div>
+      <div id="searchResult"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">🧪 测试登录</h2>
+      <div class="form-group">
+        <label>登录账号</label>
+        <input type="text" id="testUsername" value="KL01880V01" />
+      </div>
+      <div class="form-group">
+        <label>登录密码</label>
+        <input type="password" id="testPassword" value="123456" />
+      </div>
+      <button class="action-btn" onclick="testLogin()">测试登录</button>
+      <div id="loginResult"></div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">👥 用户列表</h2>
+      <div id="userList"></div>
+    </div>
+  </div>
+
+  <script>
+    function searchUser() {
+      const username = document.getElementById('searchUsername').value.trim();
+      const users = JSON.parse(localStorage.getItem('userList') || '[]');
+      const user = users.find(u => u.loginAccount === username);
+      
+      const resultDiv = document.getElementById('searchResult');
+      if (user) {
+        resultDiv.innerHTML = `
+          <div class="user-info">
+            <h3>✅ 找到客户: ${user.customerName}</h3>
+            <div class="info-grid">
+              <div class="info-item"><span class="info-label">登录账号:</span><code>${user.loginAccount}</code></div>
+              <div class="info-item"><span class="info-label">登录密码:</span><code>${user.loginPassword}</code></div>
+              <div class="info-item"><span class="info-label">状态:</span>
+                <span class="status-badge ${user.status === 1 ? 'status-active' : 'status-inactive'}">
+                  ${user.status === 1 ? '激活' : '停用'}
+                </span>
+              </div>
+            </div>
+            ${user.status !== 1 ? '<div class="alert alert-warning">⚠️ 用户状态为"停用"，无法登录</div>' : '<div class="alert alert-success">✅ 可以登录</div>'}
+          </div>
+        `;
+      } else {
+        resultDiv.innerHTML = '<div class="alert alert-danger">❌ 未找到用户</div>';
+      }
+    }
+
+    function showAllUsers() {
+      const users = JSON.parse(localStorage.getItem('userList') || '[]');
+      const html = users.length ? `
+        <table>
+          <tr><th>客户名称</th><th>登录账号</th><th>密码</th><th>状态</th><th>操作</th></tr>
+          ${users.map(u => `
+            <tr>
+              <td>${u.customerName}</td>
+              <td><code>${u.loginAccount}</code></td>
+              <td><code>${u.loginPassword}</code></td>
+              <td><span class="status-badge ${u.status === 1 ? 'status-active' : 'status-inactive'}">${u.status === 1 ? '激活' : '停用'}</span></td>
+              <td><button class="action-btn" onclick="fillLogin('${u.loginAccount}','${u.loginPassword}')">测试</button></td>
+            </tr>
+          `).join('')}
+        </table>
+      ` : '<div class="alert alert-warning">暂无客户数据</div>';
+      document.getElementById('userList').innerHTML = html;
+    }
+
+    function fillLogin(username, password) {
+      document.getElementById('testUsername').value = username;
+      document.getElementById('testPassword').value = password;
+    }
+
+    function testLogin() {
+      const username = document.getElementById('testUsername').value.trim();
+      const password = document.getElementById('testPassword').value;
+      const users = JSON.parse(localStorage.getItem('userList') || '[]');
+      const user = users.find(u => u.loginAccount === username && u.loginPassword === password && u.status === 1);
+      
+      const resultDiv = document.getElementById('loginResult');
+      if (user) {
+        resultDiv.innerHTML = '<div class="alert alert-success">✅ 登录成功！可以在登录页面使用此账号密码登录。</div>';
+      } else {
+        const exists = users.find(u => u.loginAccount === username);
+        if (exists) {
+          if (exists.loginPassword !== password) {
+            resultDiv.innerHTML = `<div class="alert alert-danger">❌ 密码错误！正确密码: <code>${exists.loginPassword}</code></div>`;
+          } else {
+            resultDiv.innerHTML = '<div class="alert alert-danger">❌ 账户未激活</div>';
+          }
+        } else {
+          resultDiv.innerHTML = '<div class="alert alert-danger">❌ 账号不存在</div>';
+        }
+      }
+    }
+
+    window.onload = () => showAllUsers();
+  </script>
+</body>
+</html>

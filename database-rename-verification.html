@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库更名验证</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        .section h3 {
+            color: #409eff;
+            margin-top: 0;
+            border-bottom: 2px solid #409eff;
+            padding-bottom: 10px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary { background: #409eff; color: white; }
+        .btn-success { background: #67c23a; color: white; }
+        .btn-warning { background: #e6a23c; color: white; }
+        .btn:hover { opacity: 0.8; }
+        
+        .change-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .change-list li {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-left: 4px solid #67c23a;
+            border-radius: 4px;
+        }
+        
+        .change-list li::before {
+            content: "✅";
+            margin-right: 10px;
+        }
+        
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .before, .after {
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .before {
+            background: #fef0f0;
+            border-left: 4px solid #f56c6c;
+        }
+        
+        .after {
+            background: #f0f9ff;
+            border-left: 4px solid #67c23a;
+        }
+        
+        .navigation-links {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .navigation-links a {
+            display: inline-block;
+            padding: 12px 24px;
+            margin: 0 10px;
+            background: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .navigation-links a:hover {
+            background: #66b1ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 数据库更名验证</h1>
+        <p>验证"数据库"功能已成功更名为"数据列表"</p>
+        
+        <!-- 更名概览 -->
+        <div class="section">
+            <h3>📋 更名概览</h3>
+            <div class="before-after">
+                <div class="before">
+                    <h4>🔴 更名前</h4>
+                    <ul>
+                        <li>菜单显示：数据库</li>
+                        <li>页面标题：数据库</li>
+                        <li>英文翻译：Data Library</li>
+                        <li>功能描述：数据库功能</li>
+                    </ul>
+                </div>
+                <div class="after">
+                    <h4>🟢 更名后</h4>
+                    <ul>
+                        <li>菜单显示：数据列表</li>
+                        <li>页面标题：数据列表</li>
+                        <li>英文翻译：Data List</li>
+                        <li>功能描述：数据列表功能</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 修改文件列表 -->
+        <div class="section">
+            <h3>📝 已修改的文件</h3>
+            <ul class="change-list">
+                <li><strong>/src/lang/index.js</strong> - 中文导航菜单：dataLibrary: '数据列表'</li>
+                <li><strong>/src/lang/index.js</strong> - 中文数据模块：library: '数据列表'</li>
+                <li><strong>/src/lang/index.js</strong> - 英文导航菜单：dataLibrary: 'Data List'</li>
+                <li><strong>/src/lang/index.js</strong> - 英文数据模块：library: 'Data List'</li>
+                <li><strong>/data-library-test.html</strong> - 测试页面标题和相关文本</li>
+            </ul>
+        </div>
+
+        <!-- 验证项目 -->
+        <div class="section">
+            <h3>🔍 验证项目</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div>
+                    <h4>导航菜单验证</h4>
+                    <ul>
+                        <li>左侧导航菜单显示"数据列表"</li>
+                        <li>面包屑导航显示正确</li>
+                        <li>页面标题显示"数据列表"</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="checkNavigation()">验证导航</button>
+                </div>
+                
+                <div>
+                    <h4>多语言验证</h4>
+                    <ul>
+                        <li>中文界面显示"数据列表"</li>
+                        <li>英文界面显示"Data List"</li>
+                        <li>语言切换功能正常</li>
+                    </ul>
+                    <button class="btn btn-success" onclick="checkLanguage()">验证多语言</button>
+                </div>
+                
+                <div>
+                    <h4>功能完整性验证</h4>
+                    <ul>
+                        <li>页面功能保持不变</li>
+                        <li>所有操作正常工作</li>
+                        <li>路由访问正常</li>
+                    </ul>
+                    <button class="btn btn-warning" onclick="checkFunctionality()">验证功能</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 测试步骤 -->
+        <div class="section">
+            <h3>📋 验证步骤</h3>
+            <ol style="line-height: 1.8;">
+                <li><strong>访问系统</strong>：点击下方"访问系统"按钮进入管理后台</li>
+                <li><strong>检查导航菜单</strong>：在左侧导航中查看"数据管理"下是否显示"数据列表"</li>
+                <li><strong>访问页面</strong>：点击"数据列表"菜单项，进入页面</li>
+                <li><strong>检查页面标题</strong>：确认页面顶部标题显示为"已上传数据列表"</li>
+                <li><strong>验证功能</strong>：测试页面的增删改查功能是否正常</li>
+                <li><strong>语言切换</strong>：如果支持多语言，测试切换到英文是否显示"Data List"</li>
+            </ol>
+        </div>
+
+        <!-- 预期结果 -->
+        <div class="section">
+            <h3>🎯 预期结果</h3>
+            <ul style="line-height: 1.8;">
+                <li>✅ 左侧导航菜单显示"数据列表"而不是"数据库"</li>
+                <li>✅ 页面标题和面包屑正确显示"数据列表"</li>
+                <li>✅ 英文界面显示"Data List"</li>
+                <li>✅ 所有原有功能保持正常工作</li>
+                <li>✅ 路由地址保持不变（/data/library）</li>
+                <li>✅ 测试页面文本已同步更新</li>
+            </ul>
+        </div>
+
+        <!-- 导航链接 -->
+        <div class="navigation-links">
+            <a href="http://localhost:9529/#/login" target="_blank">访问系统</a>
+            <a href="http://localhost:9529/#/data/library" target="_blank">数据列表</a>
+            <a href="/data-library-test.html" target="_blank">功能测试</a>
+        </div>
+    </div>
+
+    <script>
+        function checkNavigation() {
+            alert('🧭 导航验证\n\n请检查：\n1. 左侧导航菜单是否显示"数据列表"\n2. 点击菜单后页面标题是否正确\n3. 面包屑导航是否显示"数据管理 / 数据列表"');
+        }
+
+        function checkLanguage() {
+            alert('🌐 多语言验证\n\n请检查：\n1. 中文界面显示"数据列表"\n2. 如支持英文，切换后显示"Data List"\n3. 语言切换后菜单文本正确更新');
+        }
+
+        function checkFunctionality() {
+            alert('⚙️ 功能验证\n\n请确认：\n1. 页面加载正常，数据显示正确\n2. 增删改查功能正常工作\n3. 筛选和排序功能正常\n4. 定价功能正常\n5. 所有对话框和表单正常');
+        }
+
+        // 页面加载时自动检查
+        window.onload = function() {
+            console.log('✅ 数据库更名验证页面已加载');
+            console.log('🔄 更名内容：数据库 -> 数据列表');
+            console.log('🌐 英文更名：Data Library -> Data List');
+        };
+    </script>
+</body>
+</html>

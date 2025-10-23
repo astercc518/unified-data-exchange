@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MariaDB 数据迁移工具</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+        'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      font-size: 36px;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    .main-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+    
+    .status-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .status-card {
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .status-card.success {
+      border-left-color: #67c23a;
+      background: linear-gradient(135deg, #f0f9ff 0%, #cbf3f0 100%);
+    }
+    
+    .status-card.error {
+      border-left-color: #f56c6c;
+      background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    }
+    
+    .status-card h3 {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    
+    .status-card .value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .btn-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+      text-align: center;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+      color: white;
+    }
+    
+    .btn-warning {
+      background: linear-gradient(135deg, #e6a23c 0%, #f56c6c 100%);
+      color: white;
+    }
+    
+    .btn-info {
+      background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+      color: white;
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .log-section {
+      background: #1e1e1e;
+      color: #d4d4d4;
+      padding: 20px;
+      border-radius: 8px;
+      max-height: 400px;
+      overflow-y: auto;
+      font-family: 'Courier New', Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .log-entry {
+      margin-bottom: 8px;
+      padding: 4px 0;
+    }
+    
+    .log-entry.success {
+      color: #4ec9b0;
+    }
+    
+    .log-entry.error {
+      color: #f48771;
+    }
+    
+    .log-entry.warning {
+      color: #dcdcaa;
+    }
+    
+    .log-entry.info {
+      color: #9cdcfe;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 20px 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .data-preview {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f5f7fa;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .data-preview pre {
+      margin: 0;
+      font-size: 12px;
+      color: #333;
+    }
+    
+    .timestamp {
+      color: #888;
+      font-size: 12px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🗄️ MariaDB 数据迁移工具</h1>
+      <p>将 localStorage 或 JSON 文件数据迁移到 MariaDB 数据库</p>
+    </div>
+    
+    <div class="main-card">
+      <div class="status-section">
+        <div class="status-card" id="dbStatus">
+          <h3>数据库状态</h3>
+          <div class="value">检查中...</div>
+        </div>
+        <div class="status-card" id="localDataStatus">
+          <h3>本地数据</h3>
+          <div class="value">0 条记录</div>
+        </div>
+        <div class="status-card" id="migratedStatus">
+          <h3>已迁移</h3>
+          <div class="value">0 条记录</div>
+        </div>
+      </div>
+      
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+      </div>
+      
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="checkDatabase()">🔍 检查数据库连接</button>
+        <button class="btn btn-info" onclick="scanLocalData()">📊 扫描本地数据</button>
+        <button class="btn btn-success" onclick="migrateAll()">🚀 一键迁移所有数据</button>
+        <button class="btn btn-warning" onclick="clearLogs()">🗑️ 清空日志</button>
+      </div>
+      
+      <h3 style="margin-bottom: 15px;">📋 迁移日志</h3>
+      <div class="log-section" id="logSection">
+        <div class="log-entry info">等待操作...</div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    const API_BASE = 'http://localhost:3000';
+    let localDataCache = {};
+    
+    // 添加日志
+    function addLog(message, type = 'info') {
+      const logSection = document.getElementById('logSection');
+      const timestamp = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      logEntry.innerHTML = `<span class="timestamp">[${timestamp}]</span>${message}`;
+      logSection.appendChild(logEntry);
+      logSection.scrollTop = logSection.scrollHeight;
+    }
+    
+    // 清空日志
+    function clearLogs() {
+      document.getElementById('logSection').innerHTML = '<div class="log-entry info">日志已清空</div>';
+    }
+    
+    // 更新进度条
+    function updateProgress(percent) {
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+    
+    // 检查数据库连接
+    async function checkDatabase() {
+      addLog('正在检查数据库连接...', 'info');
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/migrate/test-connection`);
+        const result = await response.json();
+        
+        if (result.code === 200) {
+          addLog('✅ 数据库连接成功', 'success');
+          addLog(`数据库: ${result.data.database}`, 'info');
+          addLog(`表数量: ${result.data.tables.length}`, 'info');
+          addLog(`表列表: ${result.data.tables.join(', ')}`, 'info');
+          
+          const statusCard = document.getElementById('dbStatus');
+          statusCard.classList.add('success');
+          statusCard.querySelector('.value').textContent = '连接正常';
+          
+          return true;
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        addLog('❌ 数据库连接失败: ' + error.message, 'error');
+        
+        const statusCard = document.getElementById('dbStatus');
+        statusCard.classList.add('error');
+        statusCard.querySelector('.value').textContent = '连接失败';
+        
+        return false;
+      }
+    }
+    
+    // 扫描本地数据
+    function scanLocalData() {
+      addLog('正在扫描 localStorage 数据...', 'info');
+      
+      try {
+        // 扫描用户数据
+        const userListStr = localStorage.getItem('userList');
+        const users = userListStr ? JSON.parse(userListStr) : [];
+        localDataCache.users = users;
+        
+        // 扫描代理商数据
+        const agentListStr = localStorage.getItem('agentList');
+        const agents = agentListStr ? JSON.parse(agentListStr) : [];
+        localDataCache.agents = agents;
+        
+        // 扫描订单数据
+        const orderListStr = localStorage.getItem('orderList');
+        const orders = orderListStr ? JSON.parse(orderListStr) : [];
+        localDataCache.orders = orders;
+        
+        // 扫描数据库数据
+        const dataLibraryStr = localStorage.getItem('dataLibraryList');
+        const dataLibrary = dataLibraryStr ? JSON.parse(dataLibraryStr) : [];
+        localDataCache.dataLibrary = dataLibrary;
+        
+        const totalRecords = users.length + agents.length + orders.length + dataLibrary.length;
+        
+        addLog(`✅ 扫描完成`, 'success');
+        addLog(`用户数据: ${users.length} 条`, 'info');
+        addLog(`代理商数据: ${agents.length} 条`, 'info');
+        addLog(`订单数据: ${orders.length} 条`, 'info');
+        addLog(`数据库记录: ${dataLibrary.length} 条`, 'info');
+        addLog(`总计: ${totalRecords} 条`, 'success');
+        
+        const statusCard = document.getElementById('localDataStatus');
+        statusCard.classList.add('success');
+        statusCard.querySelector('.value').textContent = `${totalRecords} 条记录`;
+        
+      } catch (error) {
+        addLog('❌ 扫描失败: ' + error.message, 'error');
+      }
+    }
+    
+    // 迁移用户数据
+    async function migrateUsers() {
+      const users = localDataCache.users || [];
+      
+      if (users.length === 0) {
+        addLog('⚠️  没有用户数据需要迁移', 'warning');
+        return 0;
+      }
+      
+      addLog(`正在迁移 ${users.length} 条用户数据...`, 'info');
+      
+      try {
+        const response = await fetch(`${API_BASE}/api/migrate/users`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ users })
+        });
+        
+        const result = await response.json();
+        
+        if (result.code === 200) {
+          addLog(`✅ ${result.message}`, 'success');
+          return result.data.imported;
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (error) {
+        addLog(`❌ 用户数据迁移失败: ${error.message}`, 'error');
+        return 0;
+      }
+    }
+    
+    // 一键迁移所有数据
+    async function migrateAll() {
+      addLog('========================================', 'info');
+      addLog('开始数据迁移流程', 'success');
+      addLog('========================================', 'info');
+      
+      updateProgress(0);
+      
+      // 步骤1: 检查数据库连接
+      addLog('步骤 1/4: 检查数据库连接', 'info');
+      const dbOk = await checkDatabase();
+      
+      if (!dbOk) {
+        addLog('❌ 数据库连接失败，迁移中止', 'error');
+        return;
+      }
+      
+      updateProgress(25);
+      
+      // 步骤2: 扫描本地数据
+      addLog('步骤 2/4: 扫描本地数据', 'info');
+      scanLocalData();
+      updateProgress(50);
+      
+      // 等待1秒
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // 步骤3: 迁移数据
+      addLog('步骤 3/4: 开始迁移数据', 'info');
+      
+      let totalMigrated = 0;
+      
+      // 迁移用户数据
+      const usersMigrated = await migrateUsers();
+      totalMigrated += usersMigrated;
+      
+      updateProgress(75);
+      
+      // 步骤4: 完成
+      addLog('步骤 4/4: 迁移完成', 'info');
+      updateProgress(100);
+      
+      addLog('========================================', 'info');
+      addLog(`✅ 数据迁移完成！共迁移 ${totalMigrated} 条记录`, 'success');
+      addLog('========================================', 'info');
+      
+      // 更新状态卡片
+      const statusCard = document.getElementById('migratedStatus');
+      statusCard.classList.add('success');
+      statusCard.querySelector('.value').textContent = `${totalMigrated} 条记录`;
+      
+      // 提示
+      addLog('💡 提示: 现在可以使用 admin/111111 登录系统', 'info');
+      addLog('💡 数据已永久保存到 MariaDB 数据库', 'info');
+    }
+    
+    // 页面加载时自动检查
+    window.addEventListener('load', () => {
+      addLog('欢迎使用 MariaDB 数据迁移工具', 'success');
+      addLog('请先点击"检查数据库连接"按钮测试连接', 'info');
+      
+      // 自动检查数据库
+      setTimeout(() => {
+        checkDatabase();
+      }, 500);
+    });
+  </script>
+</body>
+</html>

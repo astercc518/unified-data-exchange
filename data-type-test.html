@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据上传数据类型功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #409eff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .feature-section {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+        .feature-section h2 {
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #409eff;
+            padding-bottom: 8px;
+        }
+        .data-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .data-type-card {
+            background: white;
+            border: 1px solid #e4e7ed;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .data-type-card:hover {
+            border-color: #409eff;
+            box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+        }
+        .data-type-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #409eff;
+        }
+        .data-type-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .data-type-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        .form-layout {
+            background-color: #f0f9ff;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #409eff;
+            margin: 20px 0;
+        }
+        .form-layout h3 {
+            color: #409eff;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .form-field {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+        .form-field label {
+            display: inline-block;
+            width: 80px;
+            font-weight: bold;
+            color: #333;
+        }
+        .form-field select {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        .navigation-links {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .navigation-links a {
+            display: inline-block;
+            margin: 0 10px;
+            padding: 12px 24px;
+            background-color: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+        .navigation-links a:hover {
+            background-color: #66b1ff;
+        }
+        .test-checklist {
+            background-color: #fff5f5;
+            border: 1px solid #fec5c5;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .test-checklist h3 {
+            color: #e53e3e;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .test-checklist ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .test-checklist li {
+            margin-bottom: 8px;
+            padding-left: 25px;
+            position: relative;
+        }
+        .test-checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            color: #666;
+            font-size: 16px;
+        }
+        .workflow {
+            background-color: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .workflow h3 {
+            color: #38a169;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .workflow ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        .workflow li {
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 数据上传数据类型功能测试</h1>
+        
+        <div class="feature-section">
+            <h2>✨ 新增功能特性</h2>
+            <ul>
+                <li>📋 <strong>数据类型分类</strong>：新增数据类型字段，支持8种常见数据类型</li>
+                <li>🔍 <strong>精确分类</strong>：帮助用户明确上传数据的具体类型</li>
+                <li>📊 <strong>统计分析</strong>：便于后期数据统计和分析</li>
+                <li>🎯 <strong>业务优化</strong>：优化数据分类规范，提升管理效率</li>
+                <li>✅ <strong>表单验证</strong>：必填字段验证，确保数据完整性</li>
+            </ul>
+        </div>
+
+        <div class="feature-section">
+            <h2>🗂️ 支持的数据类型</h2>
+            <div class="data-type-grid">
+                <div class="data-type-card">
+                    <div class="data-type-icon">📱</div>
+                    <div class="data-type-name">手机号码</div>
+                    <div class="data-type-desc">移动电话号码数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">📧</div>
+                    <div class="data-type-name">邮箱地址</div>
+                    <div class="data-type-desc">电子邮件地址数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">☎️</div>
+                    <div class="data-type-name">电话号码</div>
+                    <div class="data-type-desc">固定电话号码数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">👤</div>
+                    <div class="data-type-name">用户资料</div>
+                    <div class="data-type-desc">用户个人信息数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">🌐</div>
+                    <div class="data-type-name">社交账号</div>
+                    <div class="data-type-desc">社交媒体账号数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">🏢</div>
+                    <div class="data-type-name">企业信息</div>
+                    <div class="data-type-desc">企业相关信息数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">🆔</div>
+                    <div class="data-type-name">身份信息</div>
+                    <div class="data-type-desc">身份认证相关数据</div>
+                </div>
+                <div class="data-type-card">
+                    <div class="data-type-icon">📄</div>
+                    <div class="data-type-name">其他类型</div>
+                    <div class="data-type-desc">其他类型的数据</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-layout">
+            <h3>📝 表单布局调整</h3>
+            <p>在基本信息部分，数据类型字段位置安排如下：</p>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>国家：</label>
+                    <select>
+                        <option>选择国家（可搜索国家名或国码）</option>
+                        <option>孟加拉国 (Bangladesh) [BD]</option>
+                        <option>印度 (India) [IN]</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>数据类型：</label>
+                    <select>
+                        <option>请选择数据类型</option>
+                        <option>手机号码</option>
+                        <option>邮箱地址</option>
+                        <option>电话号码</option>
+                        <option>用户资料</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>时效性：</label>
+                    <select>
+                        <option>选择时效</option>
+                        <option>3天内</option>
+                        <option>30天内</option>
+                        <option>30天以上</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>数据来源：</label>
+                    <select>
+                        <option>请输入数据来源</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="workflow">
+            <h3>🔄 数据分类工作流程</h3>
+            <ol>
+                <li><strong>选择国家</strong>：从全球190+国家中选择数据来源国</li>
+                <li><strong>选择数据类型</strong>：明确数据的具体类型（新增步骤）</li>
+                <li><strong>选择时效性</strong>：确定数据的有效期（3天内/30天内/30天以上）</li>
+                <li><strong>输入数据来源</strong>：说明数据的获取渠道</li>
+                <li><strong>设置价格</strong>：配置成本价和销售价</li>
+                <li><strong>上传文件</strong>：上传TXT格式的数据文件</li>
+                <li><strong>系统归类</strong>：根据时效性和国家自动分类存储</li>
+            </ol>
+        </div>
+
+        <div class="feature-section">
+            <h2>📋 上传记录表格更新</h2>
+            <p>最近上传记录表格新增"数据类型"列，显示位置在"国家"和"时效"之间：</p>
+            <table border="1" cellpadding="8" cellspacing="0" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                <thead style="background-color: #f5f7fa;">
+                    <tr>
+                        <th>文件名</th>
+                        <th>国家</th>
+                        <th style="background-color: #e6f7ff; color: #0066cc;">数据类型</th>
+                        <th>时效</th>
+                        <th>数据来源</th>
+                        <th>数量</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>bangladesh_phones_20231201.txt</td>
+                        <td>孟加拉国</td>
+                        <td style="background-color: #e6f7ff; font-weight: bold;">手机号码</td>
+                        <td>3天内</td>
+                        <td>移动运营商</td>
+                        <td>50,000</td>
+                        <td><span style="color: green;">成功</span></td>
+                    </tr>
+                    <tr>
+                        <td>india_data_20231130.txt</td>
+                        <td>印度</td>
+                        <td style="background-color: #e6f7ff; font-weight: bold;">用户资料</td>
+                        <td>30天内</td>
+                        <td>第三方采集</td>
+                        <td>80,000</td>
+                        <td><span style="color: orange;">处理中</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="test-checklist">
+            <h3>🧪 功能测试清单</h3>
+            <ul>
+                <li>数据类型下拉框正常显示所有8种类型</li>
+                <li>数据类型字段为必填项，未选择时显示验证提示</li>
+                <li>选择数据类型后表单数据正确更新</li>
+                <li>表单提交时数据类型信息正确保存</li>
+                <li>上传记录表格显示数据类型列</li>
+                <li>上传记录中数据类型显示正确的中文名称</li>
+                <li>数据类型与其他字段联动正常</li>
+                <li>表单重置功能包含数据类型字段</li>
+                <li>国际化支持中英文切换</li>
+                <li>数据分类规范符合项目要求</li>
+                <li>新增字段不影响现有功能</li>
+                <li>样式布局协调美观</li>
+            </ul>
+        </div>
+
+        <div class="navigation-links">
+            <a href="http://localhost:9533/#/login" target="_blank">登录系统</a>
+            <a href="http://localhost:9533/#/data/upload" target="_blank">数据上传页面</a>
+            <a href="http://localhost:8080/system-test.html" target="_blank">系统测试中心</a>
+            <a href="http://localhost:8080/country-selector-test.html" target="_blank">国家选择器测试</a>
+        </div>
+
+        <div class="feature-section">
+            <h2>🎯 业务价值</h2>
+            <ul>
+                <li><strong>精确分类</strong>：明确数据类型，便于后续处理和使用</li>
+                <li><strong>统计分析</strong>：支持按数据类型进行统计和分析</li>
+                <li><strong>质量控制</strong>：提升数据管理的规范性和准确性</li>
+                <li><strong>用户体验</strong>：简化数据分类流程，提高操作效率</li>
+                <li><strong>数据治理</strong>：建立完善的数据分类体系</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

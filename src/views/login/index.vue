@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">{{ $t('login.title') }}</h3>
       </div>
 
       <el-form-item prop="username">
@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          :placeholder="$t('login.usernamePlaceholder')"
           name="username"
           type="text"
           tabindex="1"
@@ -21,7 +21,7 @@
         />
       </el-form-item>
 
-      <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+      <el-tooltip v-model="capsTooltip" :content="$t('login.capsLock')" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
@@ -31,7 +31,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            :placeholder="$t('login.passwordPlaceholder')"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -45,52 +45,65 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-      <div style="position:relative">
-        <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
+      <!-- 图像验证码 -->
+      <el-form-item prop="captcha">
+        <span class="svg-container">
+          <svg-icon icon-class="validCode" />
+        </span>
+        <el-input
+          ref="captcha"
+          v-model="loginForm.captcha"
+          :placeholder="$t('login.captchaPlaceholder')"
+          name="captcha"
+          type="text"
+          tabindex="3"
+          autocomplete="off"
+          style="width: 60%;"
+          @keyup.enter.native="handleLogin"
+        />
+        <div class="captcha-image" @click="refreshCaptcha">
+          <img :src="captchaImage" alt="验证码">
         </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div>
+      </el-form-item>
 
-        <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">{{ $t('login.login') }}</el-button>
+
+      <!-- 语言选择器移到登录按钮下方 -->
+      <div class="lang-select-bottom">
+        <lang-select @language-change="handleLanguageChange" />
       </div>
     </el-form>
-
-    <el-dialog title="Or connect with" :visible.sync="showDialog">
-      Can not be simulated on local, so please combine you own business simulation! ! !
-      <br>
-      <br>
-      <br>
-      <social-sign />
-    </el-dialog>
   </div>
 </template>
 
 <script>
 import { validUsername } from '@/utils/validate'
-import SocialSign from './components/SocialSignin'
+import LangSelect from '@/components/LangSelect'
+import { createCaptcha, verifyCaptcha } from '@/utils/captcha'
 
 export default {
   name: 'Login',
-  components: { SocialSign },
+  components: { LangSelect },
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error(this.$t('login.usernameError')))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error(this.$t('login.passwordError')))
+      } else {
+        callback()
+      }
+    }
+    const validateCaptcha = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error(this.$t('login.captchaRequired')))
+      } else if (!verifyCaptcha(value, this.captchaText)) {
+        callback(new Error(this.$t('login.captchaError')))
       } else {
         callback()
       }
@@ -98,16 +111,19 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '111111',
+        captcha: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        captcha: [{ required: true, trigger: 'blur', validator: validateCaptcha }]
       },
+      captchaText: '',
+      captchaImage: '',
       passwordType: 'password',
       capsTooltip: false,
       loading: false,
-      showDialog: false,
       redirect: undefined,
       otherQuery: {}
     }
@@ -126,6 +142,7 @@ export default {
   },
   created() {
     // window.addEventListener('storage', this.afterQRScan)
+    this.refreshCaptcha()
   },
   mounted() {
     if (this.loginForm.username === '') {
@@ -138,6 +155,46 @@ export default {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    handleLanguageChange(lang) {
+      // 语言切换后重新设置验证规则
+      this.updateValidationRules()
+    },
+    updateValidationRules() {
+      const validateUsername = (rule, value, callback) => {
+        if (!validUsername(value)) {
+          callback(new Error(this.$t('login.usernameError')))
+        } else {
+          callback()
+        }
+      }
+      const validatePassword = (rule, value, callback) => {
+        if (value.length < 6) {
+          callback(new Error(this.$t('login.passwordError')))
+        } else {
+          callback()
+        }
+      }
+      const validateCaptcha = (rule, value, callback) => {
+        if (!value) {
+          callback(new Error(this.$t('login.captchaRequired')))
+        } else if (!verifyCaptcha(value, this.captchaText)) {
+          callback(new Error(this.$t('login.captchaError')))
+        } else {
+          callback()
+        }
+      }
+      this.loginRules = {
+        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        captcha: [{ required: true, trigger: 'blur', validator: validateCaptcha }]
+      }
+    },
+    refreshCaptcha() {
+      const captcha = createCaptcha(4, 120, 40)
+      this.captchaText = captcha.text
+      this.captchaImage = captcha.image
+      console.log('🔐 验证码已刷新:', this.captchaText)
+    },
     checkCapslock(e) {
       const { key } = e
       this.capsTooltip = key && key.length === 1 && (key >= 'A' && key <= 'Z')
@@ -162,10 +219,16 @@ export default {
               this.loading = false
             })
             .catch(() => {
+              // 登录失败后刷新验证码
+              this.refreshCaptcha()
+              this.loginForm.captcha = ''
               this.loading = false
             })
         } else {
           console.log('error submit!!')
+          // 验证失败后刷新验证码
+          this.refreshCaptcha()
+          this.loginForm.captcha = ''
           return false
         }
       })
@@ -257,6 +320,12 @@ $light_gray:#eee;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
+  position: relative;
+
+  .lang-select-bottom {
+    text-align: center;
+    margin-bottom: 30px;
+  }
 
   .login-form {
     position: relative;
@@ -307,6 +376,28 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+
+  .captcha-image {
+    position: absolute;
+    right: 10px;
+    top: 4px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 4px;
+    overflow: hidden;
+    transition: all 0.3s;
+
+    &:hover {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+
+    img {
+      height: 100%;
+      display: block;
+      border-radius: 4px;
+    }
   }
 
   .thirdparty-button {

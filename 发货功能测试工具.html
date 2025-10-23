@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发货功能测试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 8px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #409eff;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #409eff;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #409eff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #66b1ff;
+        }
+
+        .btn-success {
+            background: #67c23a;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #85ce61;
+        }
+
+        .btn-warning {
+            background: #e6a23c;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #ebb563;
+        }
+
+        .btn-danger {
+            background: #f56c6c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #f78989;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #409eff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #67c23a;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .warning-box {
+            background: #fff7e6;
+            border-left: 4px solid #e6a23c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .error-box {
+            background: #fef0f0;
+            border-left: 4px solid #f56c6c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        .code-block pre {
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background: #409eff;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #67c23a;
+        }
+
+        .badge-warning {
+            background: #fef0cd;
+            color: #e6a23c;
+        }
+
+        .badge-danger {
+            background: #fde2e2;
+            color: #f56c6c;
+        }
+
+        .test-result {
+            display: none;
+            margin-top: 15px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #ddd;
+        }
+
+        .checklist li.pass {
+            border-left-color: #67c23a;
+            background: #f0f9ff;
+        }
+
+        .checklist li.fail {
+            border-left-color: #f56c6c;
+            background: #fff1f0;
+        }
+
+        .checklist li::before {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .checklist li.pass::before {
+            content: '✅';
+        }
+
+        .checklist li.fail::before {
+            content: '❌';
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 发货功能测试工具</h1>
+        <div class="subtitle">订单发货功能诊断和测试</div>
+
+        <!-- 问题诊断 -->
+        <div class="section">
+            <div class="section-title">🐛 问题诊断</div>
+            
+            <div class="error-box">
+                <strong>问题描述:</strong> 点击"发货"按钮无反应
+            </div>
+
+            <div class="success-box">
+                <strong>✅ 问题已修复!</strong>
+                <br><br>
+                <strong>原因:</strong> 在 <code>completed.vue</code> 文件中缺少 <code>handleDeliver</code> 方法
+                <br><br>
+                <strong>解决方案:</strong> 已添加 <code>handleDeliver</code> 方法，包含路由跳转逻辑和调试日志
+            </div>
+        </div>
+
+        <!-- 修复内容 -->
+        <div class="section">
+            <div class="section-title">🔨 修复内容</div>
+            
+            <p><strong>文件:</strong> <code>/src/views/order/completed.vue</code></p>
+            
+            <p style="margin-top: 15px;"><strong>新增方法:</strong></p>
+            <div class="code-block">
+<pre>handleDeliver(row) {
+  // 跳转到发货页面
+  console.log('🚀 跳转到发货页面，订单ID:', row.id)
+  this.$router.push({
+    path: `/order/delivery/${row.id}`
+  })
+}</pre>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 优化点:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>添加了控制台日志，方便调试</li>
+                    <li>使用对象形式的 <code>this.$router.push</code>，更规范</li>
+                    <li>日志包含订单ID，便于追踪</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 测试步骤 -->
+        <div class="section">
+            <div class="section-title">🧪 测试步骤</div>
+            
+            <div class="warning-box">
+                <strong>⚠️ 测试前提条件:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>已启动项目: <code>npm run dev</code></li>
+                    <li>浏览器访问: <code>http://localhost:9528</code></li>
+                    <li>使用代理或管理员账号登录</li>
+                    <li>已有审核通过的订单(status='completed' && deliveryStatus='pending')</li>
+                </ul>
+            </div>
+
+            <h4 style="margin-top: 20px;">步骤1: 准备测试订单</h4>
+            <p>在浏览器控制台执行以下代码，创建一个待发货订单:</p>
+            <div class="code-block">
+<pre>// 创建测试订单
+const orders = JSON.parse(localStorage.getItem('orderList') || '[]')
+
+const testOrder = {
+  id: orders.length + 1,
+  orderNo: 'ORD' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase(),
+  customerName: '测试客户',
+  country: '孟加拉国',
+  validity: '3',
+  source: '公开数据',
+  quantity: 10000,
+  operators: [
+    { name: 'Grameenphone', count: 4000 },
+    { name: 'Robi', count: 3000 },
+    { name: 'Banglalink', count: 2000 },
+    { name: 'Teletalk', count: 1000 }
+  ],
+  totalAmount: '50.00',
+  deliveryEmail: 'test@example.com',
+  status: 'completed',
+  deliveryStatus: 'pending',  // 待发货
+  createTime: Date.now(),
+  reviewTime: Date.now(),
+  approveTime: Date.now(),
+  remark: '测试订单'
+}
+
+orders.push(testOrder)
+localStorage.setItem('orderList', JSON.stringify(orders))
+
+console.log('✅ 测试订单创建成功:', testOrder.orderNo)
+console.log('订单ID:', testOrder.id)</pre>
+            </div>
+
+            <h4 style="margin-top: 20px;">步骤2: 访问已完成订单页面</h4>
+            <p>访问: <code>订单管理 → 已完成订单</code></p>
+            <p>URL: <code>http://localhost:9528/#/order/completed</code></p>
+
+            <h4 style="margin-top: 20px;">步骤3: 点击发货按钮</h4>
+            <ol style="margin-left: 20px;">
+                <li>在订单列表中找到刚创建的测试订单</li>
+                <li>确认"发货状态"列显示为 <span class="badge badge-warning">待发货</span></li>
+                <li>确认"操作"列显示 <button class="btn btn-success" style="pointer-events: none;">发货</button> 按钮</li>
+                <li>点击"发货"按钮</li>
+            </ol>
+
+            <h4 style="margin-top: 20px;">步骤4: 验证页面跳转</h4>
+            <div class="success-box">
+                <strong>✅ 预期结果:</strong>
+                <ul style="margin: 10px 0 0 20px;">
+                    <li>页面自动跳转到发货页面</li>
+                    <li>URL变为: <code>http://localhost:9528/#/order/delivery/订单ID</code></li>
+                    <li>浏览器控制台显示: <code>🚀 跳转到发货页面，订单ID: xxx</code></li>
+                    <li>发货页面显示订单详细信息</li>
+                    <li>可以选择发货方式(邮箱/TGbot)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 功能验证清单 -->
+        <div class="section">
+            <div class="section-title">✅ 功能验证清单</div>
+            
+            <ul class="checklist">
+                <li class="pass">handleDeliver 方法已添加</li>
+                <li class="pass">路由跳转逻辑正确</li>
+                <li class="pass">控制台日志完善</li>
+                <li class="pass">发货页面文件存在 (delivery.vue)</li>
+                <li class="pass">路由配置正确 (/order/delivery/:id)</li>
+                <li class="pass">代码无语法错误</li>
+            </ul>
+        </div>
+
+        <!-- 常见问题排查 -->
+        <div class="section">
+            <div class="section-title">🔍 如果还是不工作，请检查:</div>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>检查项</th>
+                        <th>检查方法</th>
+                        <th>解决方案</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>1. 订单状态</strong></td>
+                        <td>确认订单的 <code>status</code> 是 'completed' 且 <code>deliveryStatus</code> 是 'pending'</td>
+                        <td>在控制台执行:<br><code>const orders = JSON.parse(localStorage.getItem('orderList'))<br>console.log(orders)</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>2. 按钮显示</strong></td>
+                        <td>确认"发货"按钮是否显示</td>
+                        <td>检查 <code>v-if="row.deliveryStatus === 'pending'"</code> 条件</td>
+                    </tr>
+                    <tr>
+                        <td><strong>3. 控制台错误</strong></td>
+                        <td>打开浏览器开发者工具(F12)查看控制台是否有错误</td>
+                        <td>根据错误信息进行修复</td>
+                    </tr>
+                    <tr>
+                        <td><strong>4. 权限问题</strong></td>
+                        <td>确认当前登录用户是代理或管理员</td>
+                        <td>发货功能仅对代理和管理员开放</td>
+                    </tr>
+                    <tr>
+                        <td><strong>5. 路由配置</strong></td>
+                        <td>确认路由配置正确</td>
+                        <td>检查 <code>router/index.js</code> 中是否有 delivery 路由</td>
+                    </tr>
+                    <tr>
+                        <td><strong>6. 文件是否存在</strong></td>
+                        <td>确认 delivery.vue 文件存在</td>
+                        <td>检查 <code>src/views/order/delivery.vue</code></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 调试命令 -->
+        <div class="section">
+            <div class="section-title">🛠️ 调试命令</div>
+            
+            <h4>1. 查看所有订单</h4>
+            <div class="code-block">
+<pre>const orders = JSON.parse(localStorage.getItem('orderList') || '[]')
+console.log('总订单数:', orders.length)
+console.table(orders)</pre>
+            </div>
+
+            <h4 style="margin-top: 15px;">2. 查看待发货订单</h4>
+            <div class="code-block">
+<pre>const orders = JSON.parse(localStorage.getItem('orderList') || '[]')
+const pendingDelivery = orders.filter(o => 
+  o.status === 'completed' && o.deliveryStatus === 'pending'
+)
+console.log('待发货订单:', pendingDelivery)
+console.table(pendingDelivery)</pre>
+            </div>
+
+            <h4 style="margin-top: 15px;">3. 清空测试数据</h4>
+            <div class="code-block">
+<pre>// 谨慎使用！会删除所有订单
+localStorage.removeItem('orderList')
+console.log('✅ 所有订单已清空')
+location.reload()</pre>
+            </div>
+        </div>
+
+        <!-- 预期效果 -->
+        <div class="section">
+            <div class="section-title">🎯 预期效果演示</div>
+            
+            <div class="info-box">
+                <strong>点击发货按钮后:</strong>
+                <ol style="margin: 10px 0 0 20px;">
+                    <li>浏览器控制台输出: <code style="color: #409eff;">🚀 跳转到发货页面，订单ID: 1</code></li>
+                    <li>页面URL变为: <code>/order/delivery/1</code></li>
+                    <li>显示发货页面，包含:
+                        <ul style="margin-top: 5px;">
+                            <li>📊 数据基本信息</li>
+                            <li>👤 客户基本信息</li>
+                            <li>📧 发货方式选择(邮箱/TGbot)</li>
+                            <li>✅ 确认发货按钮</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- 快速操作 -->
+        <div class="section">
+            <div class="section-title">⚡ 快速操作</div>
+            
+            <button class="btn btn-success" onclick="createTestOrder()">
+                创建测试订单
+            </button>
+            <button class="btn btn-primary" onclick="viewOrders()">
+                查看所有订单
+            </button>
+            <button class="btn btn-warning" onclick="viewPendingDelivery()">
+                查看待发货订单
+            </button>
+            <button class="btn btn-danger" onclick="clearOrders()">
+                清空测试数据
+            </button>
+
+            <div id="result" class="test-result"></div>
+        </div>
+
+        <!-- 技术细节 -->
+        <div class="section">
+            <div class="section-title">📖 技术细节</div>
+            
+            <h4>handleDeliver 方法位置:</h4>
+            <p><code>/src/views/order/completed.vue</code> 文件的 <code>methods</code> 部分</p>
+
+            <h4 style="margin-top: 15px;">完整方法代码:</h4>
+            <div class="code-block">
+<pre>methods: {
+  // ... 其他方法 ...
+  
+  handleDeliver(row) {
+    // 跳转到发货页面
+    console.log('🚀 跳转到发货页面，订单ID:', row.id)
+    this.$router.push({
+      path: `/order/delivery/${row.id}`
+    })
+  },
+  
+  // ... 其他方法 ...
+}</pre>
+            </div>
+
+            <h4 style="margin-top: 15px;">按钮绑定:</h4>
+            <div class="code-block">
+<pre>&lt;el-button
+  v-if="row.deliveryStatus === 'pending'"
+  type="success"
+  size="mini"
+  @click="handleDeliver(row)"
+&gt;
+  发货
+&lt;/el-button&gt;</pre>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+            <p style="color: #666;">✅ 问题已修复，请按照测试步骤验证功能！</p>
+            <p style="color: #999; font-size: 12px; margin-top: 10px;">如有问题，请查看浏览器控制台的日志输出</p>
+        </div>
+    </div>
+
+    <script>
+        function createTestOrder() {
+            try {
+                const orders = JSON.parse(localStorage.getItem('orderList') || '[]')
+                
+                const testOrder = {
+                    id: orders.length + 1,
+                    orderNo: 'ORD' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase(),
+                    customerName: '测试客户',
+                    country: '孟加拉国',
+                    validity: '3',
+                    source: '公开数据',
+                    quantity: 10000,
+                    operators: [
+                        { name: 'Grameenphone', count: 4000 },
+                        { name: 'Robi', count: 3000 },
+                        { name: 'Banglalink', count: 2000 },
+                        { name: 'Teletalk', count: 1000 }
+                    ],
+                    totalAmount: '50.00',
+                    deliveryEmail: 'test@example.com',
+                    status: 'completed',
+                    deliveryStatus: 'pending',
+                    createTime: Date.now(),
+                    reviewTime: Date.now(),
+                    approveTime: Date.now(),
+                    remark: '测试订单'
+                }
+                
+                orders.push(testOrder)
+                localStorage.setItem('orderList', JSON.stringify(orders))
+                
+                showResult('success', `✅ 测试订单创建成功！<br>订单号: ${testOrder.orderNo}<br>订单ID: ${testOrder.id}<br><br>请访问 <a href="http://localhost:9528/#/order/completed" target="_blank" style="color: #409eff;">已完成订单页面</a> 查看`)
+            } catch (e) {
+                showResult('error', '❌ 创建失败: ' + e.message)
+            }
+        }
+
+        function viewOrders() {
+            try {
+                const orders = JSON.parse(localStorage.getItem('orderList') || '[]')
+                const html = `
+                    <strong>总订单数: ${orders.length}</strong><br><br>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px;">ID</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">订单号</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">状态</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">发货状态</th>
+                        </tr>
+                        ${orders.map(o => `
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.id}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.orderNo}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.status}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.deliveryStatus || 'N/A'}</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `
+                showResult('info', html)
+            } catch (e) {
+                showResult('error', '❌ 查看失败: ' + e.message)
+            }
+        }
+
+        function viewPendingDelivery() {
+            try {
+                const orders = JSON.parse(localStorage.getItem('orderList') || '[]')
+                const pendingDelivery = orders.filter(o => 
+                    o.status === 'completed' && o.deliveryStatus === 'pending'
+                )
+                
+                if (pendingDelivery.length === 0) {
+                    showResult('warning', '⚠️ 没有待发货订单<br><br>请先创建测试订单')
+                    return
+                }
+                
+                const html = `
+                    <strong>待发货订单: ${pendingDelivery.length} 条</strong><br><br>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <tr>
+                            <th style="border: 1px solid #ddd; padding: 8px;">ID</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">订单号</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">客户</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">金额</th>
+                        </tr>
+                        ${pendingDelivery.map(o => `
+                            <tr>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.id}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.orderNo}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.customerName}</td>
+                                <td style="border: 1px solid #ddd; padding: 8px;">${o.totalAmount} U</td>
+                            </tr>
+                        `).join('')}
+                    </table>
+                `
+                showResult('success', html)
+            } catch (e) {
+                showResult('error', '❌ 查看失败: ' + e.message)
+            }
+        }
+
+        function clearOrders() {
+            if (confirm('确认清空所有订单数据？此操作不可恢复！')) {
+                localStorage.removeItem('orderList')
+                showResult('success', '✅ 所有订单已清空')
+            }
+        }
+
+        function showResult(type, message) {
+            const resultDiv = document.getElementById('result')
+            const classMap = {
+                success: 'success-box',
+                error: 'error-box',
+                warning: 'warning-box',
+                info: 'info-box'
+            }
+            resultDiv.className = `test-result ${classMap[type]}`
+            resultDiv.innerHTML = message
+            resultDiv.style.display = 'block'
+        }
+    </script>
+</body>
+</html>

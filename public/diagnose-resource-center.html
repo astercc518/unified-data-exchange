@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资源中心诊断工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+    .test-section {
+      padding: 25px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .test-section:last-child {
+      border-bottom: none;
+    }
+    .test-section h2 {
+      color: #333;
+      margin-bottom: 15px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    .btn:hover {
+      background: #5568d3;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    .btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .result.loading {
+      background: #f0f9ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+    .result.success {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .result.error {
+      background: #fef2f2;
+      border-left: 4px solid #ef4444;
+      color: #991b1b;
+    }
+    .result.warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin-top: 10px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background: #f9fafb;
+      color: #374151;
+      font-weight: 600;
+    }
+    tr:hover {
+      background: #f9fafb;
+    }
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-success { background: #d1fae5; color: #065f46; }
+    .tag-error { background: #fee2e2; color: #991b1b; }
+    .tag-warning { background: #fef3c7; color: #92400e; }
+    .tag-info { background: #dbeafe; color: #1e40af; }
+    .progress {
+      width: 100%;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔍 资源中心诊断工具</h1>
+      <p>全面检测印度数据显示问题</p>
+    </div>
+
+    <div class="test-section">
+      <h2>📡 步骤1: 测试后端API</h2>
+      <button class="btn" onclick="testBackendAPI()">开始测试</button>
+      <div id="backend-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>🔄 步骤2: 模拟前端数据转换</h2>
+      <button class="btn" onclick="testDataConversion()">开始测试</button>
+      <div id="conversion-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>🚫 步骤3: 测试筛选逻辑</h2>
+      <button class="btn" onclick="testFiltering()">开始测试</button>
+      <div id="filter-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>💰 步骤4: 测试动态定价</h2>
+      <button class="btn" onclick="testDynamicPricing()">开始测试</button>
+      <div id="pricing-result"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>🎯 步骤5: 完整流程测试</h2>
+      <button class="btn" onclick="testFullProcess()">开始测试</button>
+      <div id="full-result"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    // 步骤1：测试后端API
+    async function testBackendAPI() {
+      const resultDiv = document.getElementById('backend-result');
+      resultDiv.innerHTML = '<div class="result loading">⏳ 正在测试后端API...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error('API返回失败状态');
+        }
+
+        const indiaData = data.data.filter(item => item.country === 'IN');
+
+        let html = '<div class="result success">';
+        html += `<strong>✅ 后端API测试成功</strong><br><br>`;
+        html += `📊 总数据条数: ${data.data.length}<br>`;
+        html += `🇮🇳 印度数据条数: ${indiaData.length}<br><br>`;
+
+        if (indiaData.length > 0) {
+          const item = indiaData[0];
+          html += `<strong>印度数据详情：</strong><br>`;
+          html += `- ID: ${item.id}<br>`;
+          html += `- 国家代码: ${item.country}<br>`;
+          html += `- 国家名称: ${item.country_name}<br>`;
+          html += `- 数据类型: ${item.data_type}<br>`;
+          html += `- 时效性: ${item.validity}<br>`;
+          html += `- 可用数量: ${item.available_quantity.toLocaleString()}<br>`;
+          html += `- 销售价格: ${item.sell_price}<br>`;
+          html += `- 数据状态: <span class="tag tag-${item.status === 'available' ? 'success' : 'error'}">${item.status}</span><br>`;
+          html += `- 发布状态: <span class="tag tag-${item.publish_status === 'published' ? 'success' : 'warning'}">${item.publish_status}</span><br>`;
+          
+          html += `<div class="code-block">${JSON.stringify(item, null, 2)}</div>`;
+        } else {
+          html += `<span class="tag tag-error">未找到印度数据</span>`;
+        }
+
+        html += '</div>';
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error"><strong>❌ 测试失败</strong><br>${error.message}</div>`;
+      }
+    }
+
+    // 步骤2：测试数据转换
+    async function testDataConversion() {
+      const resultDiv = document.getElementById('conversion-result');
+      resultDiv.innerHTML = '<div class="result loading">⏳ 正在测试数据转换...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const apiData = await response.json();
+
+        const indiaData = apiData.data.filter(item => item.country === 'IN');
+        if (indiaData.length === 0) {
+          throw new Error('后端未返回印度数据');
+        }
+
+        const item = indiaData[0];
+
+        // 模拟前端数据转换
+        const converted = {
+          id: item.id,
+          country: item.country_name || item.country,
+          countryCode: item.country,
+          dataType: item.data_type,
+          validity: item.validity,
+          validityDisplay: item.validity_name,
+          source: item.source || '未知',
+          availableQuantity: item.available_quantity,
+          totalQuantity: item.total_quantity,
+          sellPrice: parseFloat(item.sell_price) || 0,
+          costPrice: parseFloat(item.cost_price) || 0,
+          operators: (typeof item.operators === 'string' ? JSON.parse(item.operators) : (item.operators || [])).map(op => ({
+            name: op.name,
+            count: op.quantity || op.count || 0,
+            marketShare: op.marketShare,
+            segments: op.segments
+          })),
+          uploadTime: item.upload_time,
+          publishTime: item.publish_time,
+          status: item.status,
+          remark: item.remark
+        };
+
+        let html = '<div class="result success">';
+        html += `<strong>✅ 数据转换成功</strong><br><br>`;
+        html += `<table>
+          <tr><th>字段</th><th>原始值</th><th>转换后值</th></tr>
+          <tr><td>国家</td><td>${item.country_name}</td><td>${converted.country}</td></tr>
+          <tr><td>国家代码</td><td>${item.country}</td><td>${converted.countryCode}</td></tr>
+          <tr><td>数据类型</td><td>${item.data_type}</td><td>${converted.dataType}</td></tr>
+          <tr><td>可用数量</td><td>${item.available_quantity}</td><td>${converted.availableQuantity}</td></tr>
+          <tr><td>状态</td><td>${item.status}</td><td>${converted.status}</td></tr>
+        </table>`;
+        html += `<div class="code-block">${JSON.stringify(converted, null, 2)}</div>`;
+        html += '</div>';
+
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error"><strong>❌ 测试失败</strong><br>${error.message}</div>`;
+      }
+    }
+
+    // 步骤3：测试筛选逻辑
+    async function testFiltering() {
+      const resultDiv = document.getElementById('filter-result');
+      resultDiv.innerHTML = '<div class="result loading">⏳ 正在测试筛选逻辑...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const apiData = await response.json();
+
+        // 转换数据
+        const dataList = apiData.data.map(item => ({
+          id: item.id,
+          country: item.country_name || item.country,
+          countryCode: item.country,
+          dataType: item.data_type,
+          validity: item.validity,
+          availableQuantity: item.available_quantity,
+          status: item.status
+        }));
+
+        // 模拟 applyFilters 方法
+        function applyFilters(list) {
+          return list.filter(item => {
+            const quantityCheck = item.availableQuantity > 0;
+            const statusCheck = item.status !== 'sold_out';
+            return quantityCheck && statusCheck;
+          });
+        }
+
+        const indiaDataBefore = dataList.filter(item => item.countryCode === 'IN');
+        const filteredData = applyFilters(dataList);
+        const indiaDataAfter = filteredData.filter(item => item.countryCode === 'IN');
+
+        let html = '<div class="result ';
+        html += indiaDataAfter.length > 0 ? 'success' : 'error';
+        html += '">';
+        
+        html += `<strong>${indiaDataAfter.length > 0 ? '✅' : '❌'} 筛选逻辑测试</strong><br><br>`;
+        html += `<table>
+          <tr><th>指标</th><th>值</th><th>状态</th></tr>
+          <tr>
+            <td>原始数据总数</td>
+            <td>${dataList.length}</td>
+            <td><span class="tag tag-info">-</span></td>
+          </tr>
+          <tr>
+            <td>筛选后数据</td>
+            <td>${filteredData.length}</td>
+            <td><span class="tag tag-info">-</span></td>
+          </tr>
+          <tr>
+            <td>印度数据（筛选前）</td>
+            <td>${indiaDataBefore.length}</td>
+            <td><span class="tag tag-${indiaDataBefore.length > 0 ? 'success' : 'error'}">${indiaDataBefore.length > 0 ? '存在' : '不存在'}</span></td>
+          </tr>
+          <tr>
+            <td>印度数据（筛选后）</td>
+            <td>${indiaDataAfter.length}</td>
+            <td><span class="tag tag-${indiaDataAfter.length > 0 ? 'success' : 'error'}">${indiaDataAfter.length > 0 ? '通过' : '被过滤'}</span></td>
+          </tr>
+        </table>`;
+
+        if (indiaDataBefore.length > 0) {
+          const item = indiaDataBefore[0];
+          html += `<br><strong>印度数据筛选条件检查：</strong><br>`;
+          html += `- 可用数量 > 0: <span class="tag tag-${item.availableQuantity > 0 ? 'success' : 'error'}">${item.availableQuantity} ${item.availableQuantity > 0 ? '✅' : '❌'}</span><br>`;
+          html += `- 状态 ≠ sold_out: <span class="tag tag-${item.status !== 'sold_out' ? 'success' : 'error'}">${item.status} ${item.status !== 'sold_out' ? '✅' : '❌'}</span><br>`;
+        }
+
+        html += '</div>';
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error"><strong>❌ 测试失败</strong><br>${error.message}</div>`;
+      }
+    }
+
+    // 步骤4：测试动态定价
+    async function testDynamicPricing() {
+      const resultDiv = document.getElementById('pricing-result');
+      resultDiv.innerHTML = '<div class="result loading">⏳ 正在测试动态定价...</div>';
+
+      try {
+        const response = await fetch(`${API_BASE}/api/data-library/published?country=IN`);
+        const apiData = await response.json();
+
+        if (!apiData.data || apiData.data.length === 0) {
+          throw new Error('未找到印度数据');
+        }
+
+        const item = apiData.data[0];
+        const publishTime = new Date(item.publish_time).getTime();
+        const currentTime = Date.now();
+        const daysSincePublish = Math.floor((currentTime - publishTime) / (1000 * 60 * 60 * 24));
+        const sellPrice = parseFloat(item.sell_price);
+
+        let currentPrice = sellPrice;
+        let totalDiscountRate = 0;
+        let stage = '';
+
+        if (daysSincePublish <= 3) {
+          stage = '第1阶段（0-3天）';
+          currentPrice = sellPrice;
+          totalDiscountRate = 0;
+        } else if (daysSincePublish <= 7) {
+          stage = '第2阶段（4-7天）';
+          const discountDays = daysSincePublish - 3;
+          totalDiscountRate = discountDays * 0.05;
+          currentPrice = sellPrice * (1 - totalDiscountRate);
+        } else if (daysSincePublish <= 15) {
+          stage = '第3阶段（8-15天）';
+          const firstPeriodDiscount = 4 * 0.05;
+          const discountDays = daysSincePublish - 7;
+          const secondPeriodDiscount = discountDays * 0.02;
+          totalDiscountRate = firstPeriodDiscount + secondPeriodDiscount;
+          currentPrice = sellPrice * (1 - totalDiscountRate);
+        } else if (daysSincePublish <= 30) {
+          stage = '第4阶段（16-30天）';
+          const firstPeriodDiscount = 4 * 0.05;
+          const secondPeriodDiscount = 8 * 0.02;
+          const discountDays = daysSincePublish - 15;
+          const thirdPeriodDiscount = discountDays * 0.01;
+          totalDiscountRate = firstPeriodDiscount + secondPeriodDiscount + thirdPeriodDiscount;
+          currentPrice = sellPrice * (1 - totalDiscountRate);
+        }
+
+        const maxDiscountPrice = sellPrice * 0.5;
+        if (currentPrice < maxDiscountPrice) {
+          currentPrice = maxDiscountPrice;
+        }
+
+        let html = '<div class="result success">';
+        html += `<strong>✅ 动态定价测试成功</strong><br><br>`;
+        html += `<table>
+          <tr><th>项目</th><th>值</th></tr>
+          <tr><td>发布时间</td><td>${new Date(publishTime).toLocaleString()}</td></tr>
+          <tr><td>发布天数</td><td>${daysSincePublish} 天</td></tr>
+          <tr><td>定价阶段</td><td><span class="tag tag-info">${stage}</span></td></tr>
+          <tr><td>原始价格</td><td>${sellPrice.toFixed(5)} U/条</td></tr>
+          <tr><td>折扣率</td><td><span class="tag tag-warning">${(totalDiscountRate * 100).toFixed(2)}%</span></td></tr>
+          <tr><td>当前价格</td><td><span class="tag tag-success">${currentPrice.toFixed(5)} U/条</span></td></tr>
+        </table>`;
+        html += '</div>';
+
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error"><strong>❌ 测试失败</strong><br>${error.message}</div>`;
+      }
+    }
+
+    // 步骤5：完整流程测试
+    async function testFullProcess() {
+      const resultDiv = document.getElementById('full-result');
+      resultDiv.innerHTML = '<div class="result loading">⏳ 正在执行完整流程测试...<div class="progress"><div class="progress-bar" style="width: 0%"></div></div></div>';
+
+      const steps = [
+        { name: '获取API数据', progress: 20 },
+        { name: '数据转换', progress: 40 },
+        { name: '应用筛选', progress: 60 },
+        { name: '动态定价', progress: 80 },
+        { name: '完成', progress: 100 }
+      ];
+
+      try {
+        // 步骤1: 获取API数据
+        updateProgress(resultDiv, steps[0].name, steps[0].progress);
+        const response = await fetch(`${API_BASE}/api/data-library/published`);
+        const apiData = await response.json();
+        await sleep(500);
+
+        // 步骤2: 数据转换
+        updateProgress(resultDiv, steps[1].name, steps[1].progress);
+        const dataList = apiData.data.map(item => ({
+          id: item.id,
+          country: item.country_name || item.country,
+          countryCode: item.country,
+          dataType: item.data_type,
+          validity: item.validity,
+          validityDisplay: item.validity_name,
+          source: item.source || '未知',
+          availableQuantity: item.available_quantity,
+          totalQuantity: item.total_quantity,
+          sellPrice: parseFloat(item.sell_price) || 0,
+          costPrice: parseFloat(item.cost_price) || 0,
+          operators: (typeof item.operators === 'string' ? JSON.parse(item.operators) : (item.operators || [])),
+          uploadTime: item.upload_time,
+          publishTime: item.publish_time,
+          status: item.status,
+          remark: item.remark
+        }));
+        await sleep(500);
+
+        // 步骤3: 应用筛选
+        updateProgress(resultDiv, steps[2].name, steps[2].progress);
+        const filteredDataList = dataList.filter(item => 
+          item.availableQuantity > 0 && item.status !== 'sold_out'
+        );
+        await sleep(500);
+
+        // 步骤4: 动态定价
+        updateProgress(resultDiv, steps[3].name, steps[3].progress);
+        const pricedDataList = filteredDataList.map(item => {
+          const publishTime = new Date(item.publishTime).getTime();
+          const currentTime = Date.now();
+          const daysSincePublish = Math.floor((currentTime - publishTime) / (1000 * 60 * 60 * 24));
+          
+          let currentPrice = item.sellPrice;
+          let totalDiscountRate = 0;
+
+          if (daysSincePublish > 3 && daysSincePublish <= 7) {
+            totalDiscountRate = (daysSincePublish - 3) * 0.05;
+          } else if (daysSincePublish > 7 && daysSincePublish <= 15) {
+            totalDiscountRate = 4 * 0.05 + (daysSincePublish - 7) * 0.02;
+          } else if (daysSincePublish > 15 && daysSincePublish <= 30) {
+            totalDiscountRate = 4 * 0.05 + 8 * 0.02 + (daysSincePublish - 15) * 0.01;
+          }
+
+          currentPrice = item.sellPrice * (1 - totalDiscountRate);
+          const maxDiscountPrice = item.sellPrice * 0.5;
+          if (currentPrice < maxDiscountPrice) {
+            currentPrice = maxDiscountPrice;
+          }
+
+          return {
+            ...item,
+            currentSellPrice: currentPrice,
+            originalSellPrice: item.sellPrice,
+            discountRate: totalDiscountRate
+          };
+        });
+        await sleep(500);
+
+        // 完成
+        updateProgress(resultDiv, steps[4].name, steps[4].progress);
+
+        const indiaData = pricedDataList.filter(item => item.countryCode === 'IN');
+
+        let html = '<div class="result ';
+        html += indiaData.length > 0 ? 'success' : 'error';
+        html += '">';
+        html += `<strong>${indiaData.length > 0 ? '✅' : '❌'} 完整流程测试完成</strong><br><br>`;
+        
+        html += `<table>
+          <tr><th>流程步骤</th><th>结果</th></tr>
+          <tr><td>1. API数据获取</td><td><span class="tag tag-success">${apiData.data.length} 条</span></td></tr>
+          <tr><td>2. 数据转换</td><td><span class="tag tag-success">${dataList.length} 条</span></td></tr>
+          <tr><td>3. 应用筛选</td><td><span class="tag tag-${filteredDataList.length > 0 ? 'success' : 'error'}">${filteredDataList.length} 条</span></td></tr>
+          <tr><td>4. 动态定价</td><td><span class="tag tag-success">${pricedDataList.length} 条</span></td></tr>
+          <tr><td>5. 印度数据</td><td><span class="tag tag-${indiaData.length > 0 ? 'success' : 'error'}">${indiaData.length} 条</span></td></tr>
+        </table>`;
+
+        if (indiaData.length > 0) {
+          const item = indiaData[0];
+          html += `<br><strong>印度数据最终状态：</strong>`;
+          html += `<div class="code-block">${JSON.stringify(item, null, 2)}</div>`;
+          html += `<br><strong>结论：✅ 印度数据应该能正常显示！</strong>`;
+        } else {
+          html += `<br><strong>结论：❌ 印度数据在某个环节被过滤了</strong>`;
+        }
+
+        html += '</div>';
+        resultDiv.innerHTML = html;
+
+      } catch (error) {
+        resultDiv.innerHTML = `<div class="result error"><strong>❌ 测试失败</strong><br>${error.message}</div>`;
+      }
+    }
+
+    function updateProgress(container, stepName, progress) {
+      container.innerHTML = `<div class="result loading">⏳ ${stepName}...<div class="progress"><div class="progress-bar" style="width: ${progress}%"></div></div></div>`;
+    }
+
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+</body>
+</html>

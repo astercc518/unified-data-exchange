@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单创建与显示测试工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .order-table th,
+        .order-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .order-table th {
+            background: #f5f7fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .order-table tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-processing {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .badge-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .log-container {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        .log-entry.info {
+            color: #4fc3f7;
+        }
+        
+        .log-entry.success {
+            color: #81c784;
+        }
+        
+        .log-entry.warning {
+            color: #ffb74d;
+        }
+        
+        .log-entry.error {
+            color: #e57373;
+            background: rgba(229, 115, 115, 0.1);
+        }
+        
+        .result-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .result-box.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .result-box.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 订单创建与显示测试工具</h1>
+            <p>验证购买数据后订单能否立即在列表中显示</p>
+        </div>
+        
+        <div class="content">
+            <!-- 操作按钮 -->
+            <div class="section">
+                <div class="section-title">🎯 操作控制</div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="createTestOrder()">📝 创建测试订单</button>
+                    <button class="btn btn-success" onclick="loadOrders()">🔄 刷新订单列表</button>
+                    <button class="btn btn-info" onclick="checkOrderSync()">✔️ 检查同步状态</button>
+                    <button class="btn btn-warning" onclick="clearOrders()">🗑️ 清除所有订单</button>
+                </div>
+            </div>
+            
+            <!-- 订单统计 -->
+            <div class="section">
+                <div class="section-title">📊 订单统计</div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOrders">0</div>
+                        <div class="stat-label">总订单数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="pendingOrders">0</div>
+                        <div class="stat-label">待处理</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="processingOrders">0</div>
+                        <div class="stat-label">处理中</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="completedOrders">0</div>
+                        <div class="stat-label">已完成</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 订单列表 -->
+            <div class="section">
+                <div class="section-title">📋 订单列表</div>
+                <div id="orderTableContainer"></div>
+            </div>
+            
+            <!-- 检测结果 -->
+            <div class="section">
+                <div class="section-title">✅ 检测结果</div>
+                <div id="resultBox"></div>
+            </div>
+            
+            <!-- 日志输出 -->
+            <div class="section">
+                <div class="section-title">📝 调试日志</div>
+                <div class="log-container" id="logContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 日志输出
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            console.log(`[${type.toUpperCase()}]`, message);
+        }
+        
+        // 创建测试订单
+        function createTestOrder() {
+            log('开始创建测试订单...', 'info');
+            
+            // 获取现有订单
+            const savedOrders = localStorage.getItem('orderList');
+            let orders = [];
+            let newOrderId = 1;
+            
+            if (savedOrders) {
+                orders = JSON.parse(savedOrders);
+                const maxId = orders.reduce((max, order) => Math.max(max, order.id || 0), 0);
+                newOrderId = maxId + 1;
+                log(`当前已有 ${orders.length} 条订单`, 'info');
+            }
+            
+            // 生成订单号
+            const orderNo = 'ORD' + Date.now() + Math.random().toString(36).substr(2, 4).toUpperCase();
+            
+            // 创建测试订单
+            const newOrder = {
+                id: newOrderId,
+                orderNo: orderNo,
+                customerId: 1001,
+                customerName: '测试客户',
+                dataId: Date.now(),
+                country: '印度',
+                validity: '30',
+                source: '官方采集',
+                quantity: 10000,
+                unitPrice: 0.045,
+                totalAmount: 450.00,
+                deliveryEmail: 'test@example.com',
+                operators: [
+                    { name: 'Jio', count: 6000 },
+                    { name: 'Airtel', count: 4000 }
+                ],
+                status: 'pending',
+                deliveryStatus: 'pending',
+                remark: '测试订单',
+                createTime: Date.now(),
+                deliveryTime: null
+            };
+            
+            log(`✅ 订单创建成功: ${orderNo}`, 'success');
+            log(`  - 客户: ${newOrder.customerName}`, 'info');
+            log(`  - 数据: ${newOrder.country} ${newOrder.quantity.toLocaleString()} 条`, 'info');
+            log(`  - 金额: ${newOrder.totalAmount} U`, 'info');
+            log(`  - 状态: ${newOrder.status}`, 'info');
+            
+            // 保存订单
+            orders.push(newOrder);
+            localStorage.setItem('orderList', JSON.stringify(orders));
+            
+            log(`✅ 订单已保存到 localStorage，当前总订单数: ${orders.length}`, 'success');
+            
+            // 刷新显示
+            loadOrders();
+            
+            showResult(`✅ 订单创建成功！<br>订单号: ${orderNo}<br>当前总订单数: ${orders.length}`, 'success');
+        }
+        
+        // 加载订单列表
+        function loadOrders() {
+            log('开始加载订单列表...', 'info');
+            
+            const savedOrders = localStorage.getItem('orderList');
+            let orders = [];
+            
+            if (savedOrders) {
+                try {
+                    orders = JSON.parse(savedOrders);
+                    log(`✅ 成功加载 ${orders.length} 条订单`, 'success');
+                } catch (e) {
+                    log(`❌ 解析订单数据失败: ${e.message}`, 'error');
+                    return;
+                }
+            } else {
+                log('ℹ️ 暂无订单数据', 'info');
+            }
+            
+            // 更新统计
+            updateStatistics(orders);
+            
+            // 显示订单列表
+            displayOrders(orders);
+        }
+        
+        // 更新统计
+        function updateStatistics(orders) {
+            const total = orders.length;
+            const pending = orders.filter(o => o.status === 'pending').length;
+            const processing = orders.filter(o => o.status === 'processing').length;
+            const completed = orders.filter(o => o.status === 'completed').length;
+            
+            document.getElementById('totalOrders').textContent = total;
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('processingOrders').textContent = processing;
+            document.getElementById('completedOrders').textContent = completed;
+            
+            log(`📊 统计更新: 总计 ${total}, 待处理 ${pending}, 处理中 ${processing}, 已完成 ${completed}`, 'info');
+        }
+        
+        // 显示订单列表
+        function displayOrders(orders) {
+            const container = document.getElementById('orderTableContainer');
+            
+            if (orders.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 40px 0;">暂无订单数据</p>';
+                return;
+            }
+            
+            // 按创建时间倒序排列
+            orders.sort((a, b) => b.createTime - a.createTime);
+            
+            let html = '<table class="order-table">';
+            html += '<thead><tr>';
+            html += '<th>订单号</th>';
+            html += '<th>客户</th>';
+            html += '<th>数据信息</th>';
+            html += '<th>数量</th>';
+            html += '<th>金额</th>';
+            html += '<th>状态</th>';
+            html += '<th>创建时间</th>';
+            html += '</tr></thead>';
+            html += '<tbody>';
+            
+            orders.forEach(order => {
+                const createTime = new Date(order.createTime).toLocaleString();
+                const statusClass = `badge-${order.status}`;
+                const statusText = {
+                    'pending': '待处理',
+                    'processing': '处理中',
+                    'completed': '已完成',
+                    'cancelled': '已取消'
+                }[order.status] || order.status;
+                
+                html += `<tr>
+                    <td><strong>${order.orderNo}</strong></td>
+                    <td>${order.customerName}</td>
+                    <td>${order.country} - ${order.validity}天</td>
+                    <td>${order.quantity.toLocaleString()} 条</td>
+                    <td>${order.totalAmount.toFixed(2)} U</td>
+                    <td><span class="badge ${statusClass}">${statusText}</span></td>
+                    <td>${createTime}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            
+            log(`✅ 订单列表显示完成，共 ${orders.length} 条`, 'success');
+        }
+        
+        // 检查订单同步
+        function checkOrderSync() {
+            log('=' .repeat(50), 'info');
+            log('开始检查订单同步状态...', 'info');
+            
+            const savedOrders = localStorage.getItem('orderList');
+            
+            if (!savedOrders) {
+                log('❌ localStorage 中没有订单数据', 'error');
+                showResult('❌ 检测失败：localStorage 中没有订单数据', 'error');
+                return;
+            }
+            
+            let orders = [];
+            try {
+                orders = JSON.parse(savedOrders);
+                log(`✅ localStorage 中有 ${orders.length} 条订单`, 'success');
+            } catch (e) {
+                log(`❌ 解析订单数据失败: ${e.message}`, 'error');
+                showResult('❌ 检测失败：订单数据格式错误', 'error');
+                return;
+            }
+            
+            // 检查最新订单
+            if (orders.length > 0) {
+                const latestOrder = orders.reduce((latest, order) => 
+                    order.createTime > latest.createTime ? order : latest
+                );
+                
+                const timeDiff = Date.now() - latestOrder.createTime;
+                const minutesAgo = Math.floor(timeDiff / 60000);
+                
+                log(`📋 最新订单信息:`, 'info');
+                log(`  - 订单号: ${latestOrder.orderNo}`, 'info');
+                log(`  - 客户: ${latestOrder.customerName}`, 'info');
+                log(`  - 数据: ${latestOrder.country} ${latestOrder.quantity.toLocaleString()} 条`, 'info');
+                log(`  - 创建时间: ${new Date(latestOrder.createTime).toLocaleString()}`, 'info');
+                log(`  - ${minutesAgo === 0 ? '刚刚创建' : minutesAgo + ' 分钟前创建'}`, 'success');
+                
+                showResult(`✅ 订单同步检查通过！<br>共有 ${orders.length} 条订单<br>最新订单: ${latestOrder.orderNo}<br>创建时间: ${new Date(latestOrder.createTime).toLocaleString()}`, 'success');
+            } else {
+                log('ℹ️ 暂无订单', 'info');
+                showResult('ℹ️ 暂无订单数据', 'success');
+            }
+            
+            log('=' .repeat(50), 'success');
+        }
+        
+        // 显示结果
+        function showResult(message, type) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = `result-box ${type}`;
+            resultBox.innerHTML = message;
+        }
+        
+        // 清除所有订单
+        function clearOrders() {
+            if (confirm('确定要清除所有订单数据吗？')) {
+                localStorage.removeItem('orderList');
+                
+                document.getElementById('totalOrders').textContent = '0';
+                document.getElementById('pendingOrders').textContent = '0';
+                document.getElementById('processingOrders').textContent = '0';
+                document.getElementById('completedOrders').textContent = '0';
+                document.getElementById('orderTableContainer').innerHTML = '';
+                document.getElementById('resultBox').innerHTML = '';
+                
+                log('已清除所有订单数据', 'warning');
+                showResult('已清除所有订单数据', 'success');
+            }
+        }
+        
+        // 页面加载时
+        window.onload = function() {
+            log('🚀 订单创建与显示测试工具已启动', 'success');
+            log('提示：可以先点击"创建测试订单"按钮创建测试数据', 'info');
+            
+            // 自动加载现有订单
+            const savedOrders = localStorage.getItem('orderList');
+            if (savedOrders) {
+                log('检测到已有订单数据，正在加载...', 'info');
+                loadOrders();
+            }
+        };
+    </script>
+</body>
+</html>

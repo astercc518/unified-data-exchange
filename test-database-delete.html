@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据库删除功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status-ok { color: #67c23a; font-weight: bold; }
+        .status-error { color: #f56c6c; font-weight: bold; }
+        .status-warning { color: #e6a23c; font-weight: bold; }
+        
+        button {
+            background: #409eff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #66b1ff; }
+        button.danger { background: #f56c6c; }
+        button.danger:hover { background: #f78989; }
+        
+        pre {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 4px;
+            border-left: 4px solid #409eff;
+            overflow-x: auto;
+            max-height: 300px;
+        }
+        .log {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #fafafa;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🗄️ 数据库删除功能测试</h1>
+    
+    <!-- 系统状态检查 -->
+    <div class="card">
+        <h2>📊 系统状态检查</h2>
+        <div id="status-info">检查中...</div>
+        <button onclick="checkSystemStatus()">刷新状态</button>
+    </div>
+
+    <!-- 数据库连接测试 -->
+    <div class="card">
+        <h2>🔗 数据库连接测试</h2>
+        <div id="db-status">未测试</div>
+        <button onclick="testDatabaseConnection()">测试连接</button>
+        <button onclick="viewDatabaseTables()">查看表结构</button>
+    </div>
+
+    <!-- 资源中心数据查看 -->
+    <div class="card">
+        <h2>📋 资源中心数据</h2>
+        <div id="resource-data">未加载</div>
+        <button onclick="loadResourceData()">加载数据</button>
+        <button onclick="createTestData()">创建测试数据</button>
+    </div>
+
+    <!-- 删除功能测试 -->
+    <div class="card">
+        <h2>🗑️ 删除功能测试</h2>
+        <div id="delete-controls">
+            <p>请先加载资源数据，然后选择要删除的项目</p>
+        </div>
+        <div id="delete-result"></div>
+    </div>
+
+    <!-- 操作日志 -->
+    <div class="card">
+        <h2>📝 操作日志</h2>
+        <div class="log" id="operation-log">
+            等待操作...\n
+        </div>
+        <button onclick="clearLog()">清空日志</button>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+        
+        function log(message) {
+            const logDiv = document.getElementById('operation-log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.innerHTML += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('operation-log').innerHTML = '日志已清空...\n';
+        }
+
+        async function checkSystemStatus() {
+            const statusDiv = document.getElementById('status-info');
+            statusDiv.innerHTML = '检查中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    statusDiv.innerHTML = `
+                        <div class="status-ok">✅ 系统运行正常</div>
+                        <p><strong>数据库:</strong> ${data.database} ${data.version}</p>
+                        <p><strong>时间戳:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                    `;
+                    log('✅ 系统状态检查通过');
+                } else {
+                    statusDiv.innerHTML = `<div class="status-error">❌ 系统异常</div>`;
+                    log('❌ 系统状态检查失败');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status-error">❌ 连接失败: ${error.message}</div>`;
+                log(`❌ 系统状态检查错误: ${error.message}`);
+            }
+        }
+
+        async function testDatabaseConnection() {
+            const dbStatusDiv = document.getElementById('db-status');
+            dbStatusDiv.innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/stats/system`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    dbStatusDiv.innerHTML = `
+                        <div class="status-ok">✅ 数据库连接正常</div>
+                        <p><strong>数据库:</strong> ${data.data.database} (${data.data.type})</p>
+                        <p><strong>版本:</strong> ${data.data.version}</p>
+                        <p><strong>数据统计:</strong></p>
+                        <ul>
+                            <li>用户: ${data.data.counts.users} 个</li>
+                            <li>代理: ${data.data.counts.agents} 个</li>
+                            <li>数据库: ${data.data.counts.dataLibrary} 个</li>
+                            <li>订单: ${data.data.counts.orders} 个</li>
+                        </ul>
+                    `;
+                    log('✅ 数据库连接测试通过');
+                } else {
+                    throw new Error(data.message || '数据库连接失败');
+                }
+            } catch (error) {
+                dbStatusDiv.innerHTML = `<div class="status-error">❌ 数据库连接失败: ${error.message}</div>`;
+                log(`❌ 数据库连接测试失败: ${error.message}`);
+            }
+        }
+
+        async function viewDatabaseTables() {
+            try {
+                const response = await fetch(`${API_BASE}/api/data-library/list`);
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    const tablesInfo = `
+                        <div class="status-ok">✅ 数据表查询成功</div>
+                        <p><strong>data_library表记录数:</strong> ${data.data.total}</p>
+                        <pre>${JSON.stringify(data.data.items.slice(0, 3), null, 2)}</pre>
+                    `;
+                    document.getElementById('db-status').innerHTML += tablesInfo;
+                    log(`✅ 查看数据表成功，共 ${data.data.total} 条记录`);
+                } else {
+                    throw new Error(data.message || '查询失败');
+                }
+            } catch (error) {
+                log(`❌ 查看数据表失败: ${error.message}`);
+            }
+        }
+
+        async function loadResourceData() {
+            const resourceDiv = document.getElementById('resource-data');
+            resourceDiv.innerHTML = '加载中...';
+            
+            try {
+                // 尝试从数据库加载
+                const response = await fetch(`${API_BASE}/api/data-library/list?limit=10`);
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    const items = data.data.items;
+                    let html = `
+                        <div class="status-ok">✅ 从数据库加载 ${items.length} 条数据</div>
+                        <table border="1" style="width:100%; margin-top:10px;">
+                            <tr><th>ID</th><th>名称</th><th>类型</th><th>记录数</th><th>操作</th></tr>
+                    `;
+                    
+                    items.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.name || '未知'}</td>
+                                <td>${item.type || '未知'}</td>
+                                <td>${item.record_count || 0}</td>
+                                <td>
+                                    <button class="danger" onclick="testDeleteData(${item.id}, '${item.name}')">
+                                        删除测试
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</table>';
+                    resourceDiv.innerHTML = html;
+                    
+                    // 更新删除控制区域
+                    document.getElementById('delete-controls').innerHTML = `
+                        <p class="status-ok">✅ 数据已加载，可以进行删除测试</p>
+                        <p><strong>注意:</strong> 这是真实的数据库删除操作，请谨慎测试！</p>
+                    `;
+                    
+                    log(`✅ 成功加载 ${items.length} 条资源数据`);
+                } else {
+                    throw new Error(data.message || '加载失败');
+                }
+            } catch (error) {
+                // 如果数据库加载失败，尝试从localStorage加载
+                log(`⚠️  数据库加载失败，尝试localStorage: ${error.message}`);
+                
+                const localData = localStorage.getItem('dataList');
+                if (localData) {
+                    const items = JSON.parse(localData);
+                    resourceDiv.innerHTML = `
+                        <div class="status-warning">⚠️  从localStorage加载 ${items.length} 条数据</div>
+                        <p>数据库模式未能正常工作，当前使用本地存储模式</p>
+                    `;
+                    log(`⚠️  从localStorage加载了 ${items.length} 条数据`);
+                } else {
+                    resourceDiv.innerHTML = `<div class="status-error">❌ 无法加载数据: ${error.message}</div>`;
+                    log(`❌ 加载资源数据失败: ${error.message}`);
+                }
+            }
+        }
+
+        async function createTestData() {
+            try {
+                const testData = {
+                    name: `测试数据库 ${Date.now()}`,
+                    type: '测试类型',
+                    description: '这是通过API创建的测试数据',
+                    recordCount: Math.floor(Math.random() * 10000),
+                    status: 1
+                };
+                
+                const response = await fetch(`${API_BASE}/api/data-library/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    log(`✅ 创建测试数据成功: ${testData.name} (ID: ${result.data.id})`);
+                    await loadResourceData(); // 重新加载数据
+                } else {
+                    throw new Error(result.message || '创建失败');
+                }
+            } catch (error) {
+                log(`❌ 创建测试数据失败: ${error.message}`);
+            }
+        }
+
+        async function testDeleteData(id, name) {
+            const confirmDelete = confirm(`确认删除数据: ${name} (ID: ${id})？\n\n⚠️ 这将从数据库中永久删除该记录！`);
+            if (!confirmDelete) {
+                log('❌ 用户取消了删除操作');
+                return;
+            }
+            
+            const deleteResultDiv = document.getElementById('delete-result');
+            deleteResultDiv.innerHTML = '删除中...';
+            
+            try {
+                log(`🗑️ 开始删除数据: ${name} (ID: ${id})`);
+                
+                const response = await fetch(`${API_BASE}/api/data-library/delete/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.code === 200) {
+                    deleteResultDiv.innerHTML = `
+                        <div class="status-ok">✅ 删除成功!</div>
+                        <p><strong>删除的数据:</strong> ${name} (ID: ${id})</p>
+                        <p><strong>删除时间:</strong> ${new Date().toLocaleString()}</p>
+                    `;
+                    log(`✅ 数据删除成功: ${name} (ID: ${id})`);
+                    
+                    // 重新加载数据以验证删除效果
+                    setTimeout(() => {
+                        loadResourceData();
+                    }, 1000);
+                    
+                } else {
+                    throw new Error(result.message || '删除失败');
+                }
+                
+            } catch (error) {
+                deleteResultDiv.innerHTML = `
+                    <div class="status-error">❌ 删除失败: ${error.message}</div>
+                `;
+                log(`❌ 数据删除失败: ${error.message}`);
+            }
+        }
+
+        // 页面加载时自动检查系统状态
+        window.onload = function() {
+            log('🚀 页面加载完成，开始系统检查...');
+            checkSystemStatus();
+            setTimeout(testDatabaseConnection, 1000);
+        };
+    </script>
+</body>
+</html>

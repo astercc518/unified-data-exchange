@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初始化管理员账号</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #409EFF;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #409EFF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #66b1ff;
+        }
+        .success {
+            background-color: #67C23A;
+        }
+        .success:hover {
+            background-color: #85ce61;
+        }
+        .info {
+            background-color: #E6A23C;
+        }
+        .info:hover {
+            background-color: #ebb563;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .result-success {
+            background-color: #f0f9ff;
+            border: 1px solid #409EFF;
+            color: #409EFF;
+        }
+        .result-info {
+            background-color: #fdf6ec;
+            border: 1px solid #E6A23C;
+            color: #E6A23C;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 初始化管理员账号</h1>
+        
+        <div style="margin-bottom: 20px;">
+            <p><strong>功能说明：</strong></p>
+            <ul>
+                <li>初始化管理员账号（admin/admin123）到 localStorage</li>
+                <li>检查当前 localStorage 中的用户数据</li>
+                <li>清除所有用户数据（谨慎使用）</li>
+            </ul>
+        </div>
+
+        <div>
+            <button onclick="initAdmin()" class="success">初始化 admin 账号</button>
+            <button onclick="checkUsers()">查看现有用户</button>
+            <button onclick="clearAllData()" class="info">清除所有数据</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function initAdmin() {
+            // 创建管理员账号数据
+            const adminUser = {
+                id: 1,
+                customerName: '系统管理员',
+                loginAccount: 'admin',
+                loginPassword: '111111',
+                email: 'admin@system.com',
+                status: 1,
+                accountBalance: 10000,
+                createdAt: new Date().toISOString()
+            };
+
+            // 获取现有用户列表
+            let userList = [];
+            const savedUsers = localStorage.getItem('userList');
+            
+            if (savedUsers) {
+                try {
+                    userList = JSON.parse(savedUsers);
+                } catch (e) {
+                    console.error('解析用户数据失败:', e);
+                }
+            }
+
+            // 检查是否已存在 admin 账号
+            const existingAdmin = userList.find(u => u.loginAccount === 'admin');
+            
+            if (existingAdmin) {
+                showResult('⚠️ admin 账号已存在！<br><br>账号信息：<pre>' + JSON.stringify(existingAdmin, null, 2) + '</pre>', 'info');
+            } else {
+                // 添加管理员账号
+                userList.push(adminUser);
+                localStorage.setItem('userList', JSON.stringify(userList));
+                
+                showResult('✅ 管理员账号初始化成功！<br><br>登录信息：<br>用户名：<strong>admin</strong><br>密码：<strong>111111</strong><br><br>完整信息：<pre>' + JSON.stringify(adminUser, null, 2) + '</pre><br><br>🎯 <strong>下一步：</strong><br>1. 关闭此页面<br>2. 访问 <a href="http://localhost:9528" target="_blank" style="color: #409EFF;">http://localhost:9528</a><br>3. 使用上述账号密码登录', 'success');
+            }
+        }
+
+        function checkUsers() {
+            const userList = localStorage.getItem('userList');
+            const agentList = localStorage.getItem('agentList');
+            
+            let html = '<h3>📊 当前用户数据</h3>';
+            
+            if (userList) {
+                try {
+                    const users = JSON.parse(userList);
+                    html += '<h4>客户列表 (' + users.length + ' 个):</h4>';
+                    html += '<pre>' + JSON.stringify(users, null, 2) + '</pre>';
+                } catch (e) {
+                    html += '<p style="color: red;">客户数据解析失败: ' + e.message + '</p>';
+                }
+            } else {
+                html += '<p>❌ 未找到客户数据</p>';
+            }
+            
+            if (agentList) {
+                try {
+                    const agents = JSON.parse(agentList);
+                    html += '<h4>代理列表 (' + agents.length + ' 个):</h4>';
+                    html += '<pre>' + JSON.stringify(agents, null, 2) + '</pre>';
+                } catch (e) {
+                    html += '<p style="color: red;">代理数据解析失败: ' + e.message + '</p>';
+                }
+            } else {
+                html += '<p>❌ 未找到代理数据</p>';
+            }
+            
+            showResult(html, 'info');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ 确定要清除所有用户数据吗？此操作不可恢复！')) {
+                localStorage.removeItem('userList');
+                localStorage.removeItem('agentList');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('vue_admin_token');
+                
+                showResult('✅ 所有用户数据已清除！', 'success');
+            }
+        }
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = message;
+            resultDiv.className = 'result-' + type;
+            resultDiv.style.display = 'block';
+        }
+
+        // 页面加载时自动检查
+        window.onload = function() {
+            checkUsers();
+        };
+    </script>
+</body>
+</html>

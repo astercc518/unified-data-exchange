@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>parsePhoneNumber 服务状态测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .test-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #f5f7fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .status-value {
+            font-family: monospace;
+            color: #666;
+        }
+
+        .status-success {
+            background: #f0f9ff;
+            border-left: 4px solid #67c23a;
+        }
+
+        .status-error {
+            background: #fef0f0;
+            border-left: 4px solid #f56c6c;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #f0f9ff;
+            color: #67c23a;
+            border: 1px solid #c6f6d5;
+        }
+
+        .badge-error {
+            background: #fef0f0;
+            color: #f56c6c;
+            border: 1px solid #fde2e2;
+        }
+
+        .test-details {
+            margin-top: 15px;
+        }
+
+        .test-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 parsePhoneNumber 服务状态测试</h1>
+            <p class="subtitle">实时检查号码解析服务的运行状态</p>
+        </div>
+
+        <div class="test-card">
+            <h2 style="margin-bottom: 20px; color: #333;">服务连接测试</h2>
+            
+            <div id="connectionStatus" class="status-item">
+                <span class="status-label">连接状态</span>
+                <span class="status-value">未测试</span>
+            </div>
+
+            <div id="serviceStatus" class="status-item">
+                <span class="status-label">服务可用性</span>
+                <span class="status-value">-</span>
+            </div>
+
+            <div id="versionInfo" class="status-item">
+                <span class="status-label">版本信息</span>
+                <span class="status-value">-</span>
+            </div>
+
+            <div id="testResult" class="status-item">
+                <span class="status-label">测试结果</span>
+                <span class="status-value">-</span>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <button class="btn" onclick="testService()" id="testBtn">
+                    开始测试
+                </button>
+                <button class="btn" onclick="clearResults()">
+                    清除结果
+                </button>
+            </div>
+
+            <div id="detailsBox" class="result-box" style="display: none;">
+                <div class="result-title">📊 详细测试结果</div>
+                <div id="testDetails"></div>
+            </div>
+
+            <div id="resultBox" class="result-box" style="display: none;">
+                <div class="result-title">📋 完整JSON响应</div>
+                <pre id="jsonResult"></pre>
+            </div>
+        </div>
+
+        <div class="test-card">
+            <h2 style="margin-bottom: 20px; color: #333;">💡 故障排查指南</h2>
+            
+            <div style="line-height: 1.8; color: #666;">
+                <p><strong>如果显示"无法连接到服务"，请检查：</strong></p>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li>后端服务是否正常运行：<code>pm2 list</code></li>
+                    <li>API接口是否可访问：<code>curl http://localhost:3000/api/stats/parsephone-status</code></li>
+                    <li>前端代理配置是否正确：检查 <code>vue.config.js</code></li>
+                    <li>浏览器控制台是否有CORS错误</li>
+                    <li>awesome-phonenumber模块是否已安装：<code>npm list awesome-phonenumber</code></li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testService() {
+            const testBtn = document.getElementById('testBtn');
+            const connectionStatus = document.getElementById('connectionStatus');
+            const serviceStatus = document.getElementById('serviceStatus');
+            const versionInfo = document.getElementById('versionInfo');
+            const testResult = document.getElementById('testResult');
+            const detailsBox = document.getElementById('detailsBox');
+            const testDetails = document.getElementById('testDetails');
+            const resultBox = document.getElementById('resultBox');
+            const jsonResult = document.getElementById('jsonResult');
+
+            // 禁用按钮
+            testBtn.disabled = true;
+            testBtn.innerHTML = '测试中<span class="loading"></span>';
+
+            // 重置状态
+            connectionStatus.className = 'status-item';
+            connectionStatus.querySelector('.status-value').textContent = '连接中...';
+
+            try {
+                const response = await fetch('/api/stats/parsephone-status');
+                const data = await response.json();
+
+                console.log('API响应:', data);
+
+                // 更新连接状态
+                connectionStatus.className = 'status-item status-success';
+                connectionStatus.querySelector('.status-value').innerHTML = 
+                    '<span class="badge badge-success">✓ 连接成功</span>';
+
+                // 更新服务状态
+                if (data.success && data.data) {
+                    serviceStatus.className = data.data.available ? 'status-item status-success' : 'status-item status-error';
+                    serviceStatus.querySelector('.status-value').innerHTML = 
+                        data.data.available 
+                            ? '<span class="badge badge-success">✓ 正常运行</span>'
+                            : '<span class="badge badge-error">✗ 不可用</span>';
+
+                    // 版本信息
+                    versionInfo.className = 'status-item';
+                    versionInfo.querySelector('.status-value').textContent = 
+                        data.data.version || '未知';
+
+                    // 测试结果
+                    if (data.data.testResult) {
+                        const passRate = `${data.data.testResult.success}/${data.data.testResult.total}`;
+                        const percentage = (data.data.testResult.success / data.data.testResult.total * 100).toFixed(0);
+                        testResult.className = 'status-item status-success';
+                        testResult.querySelector('.status-value').innerHTML = 
+                            `${passRate} (${percentage}%)`;
+
+                        // 显示测试详情
+                        if (data.data.testResult.details) {
+                            detailsBox.style.display = 'block';
+                            testDetails.innerHTML = data.data.testResult.details.map(item => `
+                                <div class="test-item">
+                                    <span>
+                                        <strong>${item.country}</strong>: ${item.number}
+                                    </span>
+                                    <span class="badge ${item.valid ? 'badge-success' : 'badge-error'}">
+                                        ${item.valid ? '✓ 通过' : '✗ 失败'}
+                                    </span>
+                                </div>
+                            `).join('');
+                        }
+                    }
+
+                    // 显示完整响应
+                    resultBox.style.display = 'block';
+                    jsonResult.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    throw new Error('API返回格式错误');
+                }
+
+            } catch (error) {
+                console.error('测试失败:', error);
+                
+                connectionStatus.className = 'status-item status-error';
+                connectionStatus.querySelector('.status-value').innerHTML = 
+                    '<span class="badge badge-error">✗ 连接失败</span>';
+
+                serviceStatus.className = 'status-item status-error';
+                serviceStatus.querySelector('.status-value').textContent = error.message;
+
+                resultBox.style.display = 'block';
+                jsonResult.textContent = `错误信息：\n${error.message}\n\n${error.stack}`;
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = '重新测试';
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('connectionStatus').className = 'status-item';
+            document.getElementById('connectionStatus').querySelector('.status-value').textContent = '未测试';
+            
+            document.getElementById('serviceStatus').className = 'status-item';
+            document.getElementById('serviceStatus').querySelector('.status-value').textContent = '-';
+            
+            document.getElementById('versionInfo').className = 'status-item';
+            document.getElementById('versionInfo').querySelector('.status-value').textContent = '-';
+            
+            document.getElementById('testResult').className = 'status-item';
+            document.getElementById('testResult').querySelector('.status-value').textContent = '-';
+            
+            document.getElementById('detailsBox').style.display = 'none';
+            document.getElementById('resultBox').style.display = 'none';
+            
+            document.getElementById('testBtn').textContent = '开始测试';
+        }
+
+        // 页面加载时自动测试
+        window.onload = function() {
+            setTimeout(testService, 500);
+        };
+    </script>
+</body>
+</html>

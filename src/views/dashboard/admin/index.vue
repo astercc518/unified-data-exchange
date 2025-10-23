@@ -1,96 +1,108 @@
 <template>
   <div class="dashboard-editor-container">
-    <github-corner class="github-corner" />
+    <!-- 数据统计面板 -->
+    <data-platform-panel-group @handleSetLineChartData="handleSetLineChartData" />
 
-    <panel-group @handleSetLineChartData="handleSetLineChartData" />
-
-    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+    <!-- 销售趋势图表 -->
+    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;border-radius:8px;">
+      <div class="chart-title">
+        <h3>{{ $t('dashboard.salesTrend') }}</h3>
+      </div>
       <line-chart :chart-data="lineChartData" />
     </el-row>
 
+    <!-- 数据分析图表区域 -->
     <el-row :gutter="32">
       <el-col :xs="24" :sm="24" :lg="8">
-        <div class="chart-wrapper">
-          <raddar-chart />
-        </div>
+        <data-distribution-chart />
       </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
-        <div class="chart-wrapper">
-          <pie-chart />
-        </div>
+        <system-health-card />
       </el-col>
       <el-col :xs="24" :sm="24" :lg="8">
-        <div class="chart-wrapper">
-          <bar-chart />
-        </div>
+        <service-status-card />
       </el-col>
     </el-row>
 
-    <el-row :gutter="8">
-      <el-col :xs="{span: 24}" :sm="{span: 24}" :md="{span: 24}" :lg="{span: 12}" :xl="{span: 12}" style="padding-right:8px;margin-bottom:30px;">
-        <transaction-table />
+    <!-- parsePhoneNumber 服务状态 -->
+    <el-row :gutter="32" style="margin-top:32px;">
+      <el-col :xs="24" :sm="24" :lg="8">
+        <parse-phone-card />
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
-        <todo-list />
+    </el-row>
+
+    <!-- 详细信息区域 -->
+    <el-row :gutter="32">
+      <el-col :xs="24" :sm="24" :lg="16">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            <h3>{{ $t('dashboard.recentOrders') }}</h3>
+          </div>
+          <transaction-table />
+        </div>
       </el-col>
-      <el-col :xs="{span: 24}" :sm="{span: 12}" :md="{span: 12}" :lg="{span: 6}" :xl="{span: 6}" style="margin-bottom:30px;">
-        <box-card />
+      <el-col :xs="24" :sm="24" :lg="8">
+        <div class="chart-wrapper">
+          <div class="chart-title">
+            <h3>{{ $t('dashboard.topAgents') }}</h3>
+          </div>
+          <top-agents-card />
+        </div>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <script>
-import GithubCorner from '@/components/GithubCorner'
-import PanelGroup from './components/PanelGroup'
+import DataPlatformPanelGroup from './components/DataPlatformPanelGroup'
 import LineChart from './components/LineChart'
-import RaddarChart from './components/RaddarChart'
-import PieChart from './components/PieChart'
-import BarChart from './components/BarChart'
+import DataDistributionChart from './components/DataDistributionChart'
+import SystemHealthCard from './components/SystemHealthCard'
+import ServiceStatusCard from './components/ServiceStatusCard'
+import ParsePhoneCard from './components/ParsePhoneCard'
 import TransactionTable from './components/TransactionTable'
-import TodoList from './components/TodoList'
-import BoxCard from './components/BoxCard'
+import TopAgentsCard from './components/TopAgentsCard'
 
+// 销售趋勿数据
 const lineChartData = {
-  newVisitis: {
-    expectedData: [100, 120, 161, 134, 105, 160, 165],
-    actualData: [120, 82, 91, 154, 162, 140, 145]
+  data: {
+    expectedData: [125000, 135000, 148000, 142000, 165000, 185000, 192000],
+    actualData: [128000, 142000, 135000, 156000, 178000, 165000, 185000]
   },
-  messages: {
-    expectedData: [200, 192, 120, 144, 160, 130, 140],
-    actualData: [180, 160, 151, 106, 145, 150, 130]
+  agents: {
+    expectedData: [45, 52, 58, 62, 68, 75, 82],
+    actualData: [48, 56, 54, 67, 72, 78, 85]
   },
-  purchases: {
-    expectedData: [80, 100, 121, 104, 105, 90, 100],
-    actualData: [120, 90, 100, 138, 142, 130, 130]
+  customers: {
+    expectedData: [850, 920, 1050, 1180, 1250, 1380, 1450],
+    actualData: [880, 945, 1025, 1205, 1285, 1365, 1485]
   },
-  shoppings: {
-    expectedData: [130, 140, 141, 142, 145, 150, 160],
-    actualData: [120, 82, 91, 154, 162, 140, 130]
+  server: {
+    expectedData: [95, 96, 97, 96, 98, 97, 99],
+    actualData: [94, 97, 95, 98, 96, 98, 97]
   }
 }
 
 export default {
   name: 'DashboardAdmin',
   components: {
-    GithubCorner,
-    PanelGroup,
+    DataPlatformPanelGroup,
     LineChart,
-    RaddarChart,
-    PieChart,
-    BarChart,
+    DataDistributionChart,
+    SystemHealthCard,
+    ServiceStatusCard,
+    ParsePhoneCard,
     TransactionTable,
-    TodoList,
-    BoxCard
+    TopAgentsCard
   },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis
+      lineChartData: lineChartData.data
     }
   },
   methods: {
     handleSetLineChartData(type) {
-      this.lineChartData = lineChartData[type]
+      this.lineChartData = lineChartData[type] || lineChartData.data
     }
   }
 }
@@ -101,24 +113,35 @@ export default {
   padding: 32px;
   background-color: rgb(240, 242, 245);
   position: relative;
-
-  .github-corner {
-    position: absolute;
-    top: 0px;
-    border: 0;
-    right: 0;
-  }
+  min-height: calc(100vh - 84px);
 
   .chart-wrapper {
     background: #fff;
-    padding: 16px 16px 0;
+    padding: 20px;
     margin-bottom: 32px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  }
+
+  .chart-title {
+    margin-bottom: 16px;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #303133;
+    }
   }
 }
 
 @media (max-width:1024px) {
+  .dashboard-editor-container {
+    padding: 16px;
+  }
+
   .chart-wrapper {
-    padding: 8px;
+    padding: 12px;
   }
 }
 </style>

@@ -1,0 +1,1040 @@
+{
+  "timestamp": "2025-10-17T10:10:25.745Z",
+  "totalCountries": 70,
+  "highRisk": [
+    {
+      "country": "IN",
+      "operators": 4,
+      "segments": 4,
+      "reason": "4个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "PK",
+      "operators": 4,
+      "segments": 7,
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "TH",
+      "operators": 4,
+      "segments": 14,
+      "reason": "4个运营商仅14个号段，可能不足"
+    },
+    {
+      "country": "GB",
+      "operators": 4,
+      "segments": 10,
+      "reason": "4个运营商仅10个号段，可能不足"
+    },
+    {
+      "country": "MY",
+      "operators": 4,
+      "segments": 16,
+      "reason": "4个运营商仅16个号段，可能不足"
+    },
+    {
+      "country": "SG",
+      "operators": 3,
+      "segments": 2,
+      "reason": "3个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "JP",
+      "operators": 4,
+      "segments": 3,
+      "reason": "4个运营商仅3个号段，可能不足"
+    },
+    {
+      "country": "KR",
+      "operators": 3,
+      "segments": 6,
+      "reason": "3个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "LK",
+      "operators": 4,
+      "segments": 6,
+      "reason": "4个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "NP",
+      "operators": 3,
+      "segments": 8,
+      "reason": "3个运营商仅8个号段，可能不足"
+    },
+    {
+      "country": "LA",
+      "operators": 4,
+      "segments": 5,
+      "reason": "4个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "AF",
+      "operators": 4,
+      "segments": 7,
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "IR",
+      "operators": 3,
+      "segments": 8,
+      "reason": "3个运营商仅8个号段，可能不足"
+    },
+    {
+      "country": "IQ",
+      "operators": 3,
+      "segments": 4,
+      "reason": "3个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "SA",
+      "operators": 3,
+      "segments": 6,
+      "reason": "3个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "IL",
+      "operators": 4,
+      "segments": 7,
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "KZ",
+      "operators": 3,
+      "segments": 7,
+      "reason": "3个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "UZ",
+      "operators": 4,
+      "segments": 7,
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "FR",
+      "operators": 4,
+      "segments": 2,
+      "reason": "4个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "ES",
+      "operators": 4,
+      "segments": 2,
+      "reason": "4个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "PL",
+      "operators": 4,
+      "segments": 12,
+      "reason": "4个运营商仅12个号段，可能不足"
+    },
+    {
+      "country": "RO",
+      "operators": 4,
+      "segments": 6,
+      "reason": "4个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "NL",
+      "operators": 3,
+      "segments": 1,
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "BE",
+      "operators": 3,
+      "segments": 5,
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "GR",
+      "operators": 3,
+      "segments": 1,
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "PT",
+      "operators": 3,
+      "segments": 4,
+      "reason": "3个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "CZ",
+      "operators": 3,
+      "segments": 5,
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "HU",
+      "operators": 3,
+      "segments": 3,
+      "reason": "3个运营商仅3个号段，可能不足"
+    },
+    {
+      "country": "SE",
+      "operators": 4,
+      "segments": 5,
+      "reason": "4个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "NO",
+      "operators": 3,
+      "segments": 2,
+      "reason": "3个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "DK",
+      "operators": 4,
+      "segments": 8,
+      "reason": "4个运营商仅8个号段，可能不足"
+    },
+    {
+      "country": "FI",
+      "operators": 3,
+      "segments": 5,
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "CH",
+      "operators": 3,
+      "segments": 6,
+      "reason": "3个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "AT",
+      "operators": 3,
+      "segments": 7,
+      "reason": "3个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "AR",
+      "operators": 3,
+      "segments": 2,
+      "reason": "3个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "PE",
+      "operators": 3,
+      "segments": 1,
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "VE",
+      "operators": 3,
+      "segments": 5,
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "CL",
+      "operators": 4,
+      "segments": 1,
+      "reason": "4个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "EC",
+      "operators": 3,
+      "segments": 1,
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "EG",
+      "operators": 4,
+      "segments": 4,
+      "reason": "4个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "ZA",
+      "operators": 4,
+      "segments": 4,
+      "reason": "4个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "UG",
+      "operators": 3,
+      "segments": 5,
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "TZ",
+      "operators": 4,
+      "segments": 10,
+      "reason": "4个运营商仅10个号段，可能不足"
+    },
+    {
+      "country": "AU",
+      "operators": 3,
+      "segments": 1,
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "NZ",
+      "operators": 3,
+      "segments": 3,
+      "reason": "3个运营商仅3个号段，可能不足"
+    }
+  ],
+  "mediumRisk": [
+    {
+      "country": "ID",
+      "operators": 4,
+      "segments": 28,
+      "reason": "3位号段应有更多覆盖（当前28个）"
+    },
+    {
+      "country": "DE",
+      "operators": 3,
+      "segments": 15,
+      "reason": "3位号段应有更多覆盖（当前15个）"
+    },
+    {
+      "country": "MM",
+      "operators": 4,
+      "segments": 21,
+      "reason": "3位号段应有更多覆盖（当前21个）"
+    },
+    {
+      "country": "TR",
+      "operators": 3,
+      "segments": 12,
+      "reason": "3位号段应有更多覆盖（当前12个）"
+    },
+    {
+      "country": "RU",
+      "operators": 4,
+      "segments": 28,
+      "reason": "3位号段应有更多覆盖（当前28个）"
+    },
+    {
+      "country": "IT",
+      "operators": 4,
+      "segments": 24,
+      "reason": "3位号段应有更多覆盖（当前24个）"
+    },
+    {
+      "country": "CA",
+      "operators": 4,
+      "segments": 1,
+      "reason": "区号系统应包含更多号段"
+    },
+    {
+      "country": "CO",
+      "operators": 3,
+      "segments": 12,
+      "reason": "3位号段应有更多覆盖（当前12个）"
+    },
+    {
+      "country": "NG",
+      "operators": 4,
+      "segments": 22,
+      "reason": "3位号段应有更多覆盖（当前22个）"
+    },
+    {
+      "country": "PG",
+      "operators": 2,
+      "segments": 1,
+      "reason": "3位号段应有更多覆盖（当前1个）"
+    }
+  ],
+  "allCountries": [
+    {
+      "country": "IN",
+      "operators": 4,
+      "segments": 4,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "PK",
+      "operators": 4,
+      "segments": 7,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "TH",
+      "operators": 4,
+      "segments": 14,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅14个号段，可能不足"
+    },
+    {
+      "country": "GB",
+      "operators": 4,
+      "segments": 10,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅10个号段，可能不足"
+    },
+    {
+      "country": "MY",
+      "operators": 4,
+      "segments": 16,
+      "avgLength": "2.4",
+      "lengthRange": "2-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅16个号段，可能不足"
+    },
+    {
+      "country": "SG",
+      "operators": 3,
+      "segments": 2,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "JP",
+      "operators": 4,
+      "segments": 3,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅3个号段，可能不足"
+    },
+    {
+      "country": "KR",
+      "operators": 3,
+      "segments": 6,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "LK",
+      "operators": 4,
+      "segments": 6,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "NP",
+      "operators": 3,
+      "segments": 8,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅8个号段，可能不足"
+    },
+    {
+      "country": "LA",
+      "operators": 4,
+      "segments": 5,
+      "avgLength": "2.8",
+      "lengthRange": "2-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "AF",
+      "operators": 4,
+      "segments": 7,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "IR",
+      "operators": 3,
+      "segments": 8,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅8个号段，可能不足"
+    },
+    {
+      "country": "IQ",
+      "operators": 3,
+      "segments": 4,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "SA",
+      "operators": 3,
+      "segments": 6,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "IL",
+      "operators": 4,
+      "segments": 7,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "KZ",
+      "operators": 3,
+      "segments": 7,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "UZ",
+      "operators": 4,
+      "segments": 7,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "FR",
+      "operators": 4,
+      "segments": 2,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "ES",
+      "operators": 4,
+      "segments": 2,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "PL",
+      "operators": 4,
+      "segments": 12,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅12个号段，可能不足"
+    },
+    {
+      "country": "RO",
+      "operators": 4,
+      "segments": 6,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "NL",
+      "operators": 3,
+      "segments": 1,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "BE",
+      "operators": 3,
+      "segments": 5,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "GR",
+      "operators": 3,
+      "segments": 1,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "PT",
+      "operators": 3,
+      "segments": 4,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "CZ",
+      "operators": 3,
+      "segments": 5,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "HU",
+      "operators": 3,
+      "segments": 3,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅3个号段，可能不足"
+    },
+    {
+      "country": "SE",
+      "operators": 4,
+      "segments": 5,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "NO",
+      "operators": 3,
+      "segments": 2,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "DK",
+      "operators": 4,
+      "segments": 8,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅8个号段，可能不足"
+    },
+    {
+      "country": "FI",
+      "operators": 3,
+      "segments": 5,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "CH",
+      "operators": 3,
+      "segments": 6,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅6个号段，可能不足"
+    },
+    {
+      "country": "AT",
+      "operators": 3,
+      "segments": 7,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅7个号段，可能不足"
+    },
+    {
+      "country": "AR",
+      "operators": 3,
+      "segments": 2,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅2个号段，可能不足"
+    },
+    {
+      "country": "PE",
+      "operators": 3,
+      "segments": 1,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "VE",
+      "operators": 3,
+      "segments": 5,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "CL",
+      "operators": 4,
+      "segments": 1,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "EC",
+      "operators": 3,
+      "segments": 1,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "EG",
+      "operators": 4,
+      "segments": 4,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "ZA",
+      "operators": 4,
+      "segments": 4,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅4个号段，可能不足"
+    },
+    {
+      "country": "UG",
+      "operators": 3,
+      "segments": 5,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅5个号段，可能不足"
+    },
+    {
+      "country": "TZ",
+      "operators": 4,
+      "segments": 10,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "4个运营商仅10个号段，可能不足"
+    },
+    {
+      "country": "AU",
+      "operators": 3,
+      "segments": 1,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅1个号段，可能不足"
+    },
+    {
+      "country": "NZ",
+      "operators": 3,
+      "segments": 3,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "⚠️  号段过少",
+      "riskLevel": "high",
+      "reason": "3个运营商仅3个号段，可能不足"
+    },
+    {
+      "country": "ID",
+      "operators": 4,
+      "segments": 28,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前28个）"
+    },
+    {
+      "country": "DE",
+      "operators": 3,
+      "segments": 15,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前15个）"
+    },
+    {
+      "country": "MM",
+      "operators": 4,
+      "segments": 21,
+      "avgLength": "4.0",
+      "lengthRange": "4-4",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前21个）"
+    },
+    {
+      "country": "TR",
+      "operators": 3,
+      "segments": 12,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前12个）"
+    },
+    {
+      "country": "RU",
+      "operators": 4,
+      "segments": 28,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前28个）"
+    },
+    {
+      "country": "IT",
+      "operators": 4,
+      "segments": 24,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前24个）"
+    },
+    {
+      "country": "CA",
+      "operators": 4,
+      "segments": 1,
+      "avgLength": "1.0",
+      "lengthRange": "1-1",
+      "status": "⚠️  区号不足",
+      "riskLevel": "medium",
+      "reason": "区号系统应包含更多号段"
+    },
+    {
+      "country": "CO",
+      "operators": 3,
+      "segments": 12,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前12个）"
+    },
+    {
+      "country": "NG",
+      "operators": 4,
+      "segments": 22,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前22个）"
+    },
+    {
+      "country": "PG",
+      "operators": 2,
+      "segments": 1,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "🔍 需检查",
+      "riskLevel": "medium",
+      "reason": "3位号段应有更多覆盖（当前1个）"
+    },
+    {
+      "country": "US",
+      "operators": 3,
+      "segments": 311,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": "号段配置充足"
+    },
+    {
+      "country": "BD",
+      "operators": 4,
+      "segments": 71,
+      "avgLength": "2.9",
+      "lengthRange": "2-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "CN",
+      "operators": 3,
+      "segments": 36,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "VN",
+      "operators": 4,
+      "segments": 31,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "PH",
+      "operators": 4,
+      "segments": 76,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "BR",
+      "operators": 4,
+      "segments": 20,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "KH",
+      "operators": 4,
+      "segments": 23,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "AE",
+      "operators": 2,
+      "segments": 6,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "UA",
+      "operators": 3,
+      "segments": 12,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "MX",
+      "operators": 3,
+      "segments": 275,
+      "avgLength": "3.0",
+      "lengthRange": "2-3",
+      "status": "✅ 优秀",
+      "riskLevel": "low",
+      "reason": "号段配置充足"
+    },
+    {
+      "country": "KE",
+      "operators": 3,
+      "segments": 50,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "ET",
+      "operators": 2,
+      "segments": 5,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "DZ",
+      "operators": 3,
+      "segments": 30,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "MA",
+      "operators": 3,
+      "segments": 30,
+      "avgLength": "3.0",
+      "lengthRange": "3-3",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    },
+    {
+      "country": "GH",
+      "operators": 3,
+      "segments": 10,
+      "avgLength": "2.0",
+      "lengthRange": "2-2",
+      "status": "✅ 正常",
+      "riskLevel": "low",
+      "reason": ""
+    }
+  ]
+}

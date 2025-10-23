@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阶梯动态定价逻辑测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .pricing-table th,
+        .pricing-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        .pricing-table th {
+            background: #f5f7fa;
+            font-weight: bold;
+            color: #333;
+        }
+        .pricing-table tr:hover {
+            background: #f5f7fa;
+        }
+        .price-cell {
+            font-weight: bold;
+            color: #667eea;
+        }
+        .discount-cell {
+            color: #f56c6c;
+            font-weight: bold;
+        }
+        .rule-box {
+            background: #f0f9ff;
+            border-left: 4px solid #0284c7;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .rule-item {
+            padding: 8px 0;
+            line-height: 1.6;
+        }
+        .highlight {
+            background: #fef9d7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .chart-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 阶梯动态定价逻辑测试</h1>
+            <p class="subtitle">
+                测试新的动态定价规则：<br>
+                0-3天：原价 | 4-7天：每天降5% | 8-15天：每天降2% | 16-30天：每天降1% | 最大降价50%
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 定价规则说明</div>
+            <div class="rule-box">
+                <div class="rule-item">
+                    <strong>阶段1 (0-3天):</strong> 保持<span class="highlight">原价100%</span>
+                </div>
+                <div class="rule-item">
+                    <strong>阶段2 (4-7天):</strong> 从第4天开始，<span class="highlight">每天降价5%叠加</span>，最多降价 20% (4天 × 5%)
+                </div>
+                <div class="rule-item">
+                    <strong>阶段3 (8-15天):</strong> 在第7天价格基础上，<span class="highlight">每天降价2%叠加</span>，最多再降价 16% (8天 × 2%)
+                </div>
+                <div class="rule-item">
+                    <strong>阶段4 (16-30天):</strong> 在第15天价格基础上，<span class="highlight">每天降价1%叠加</span>，最多再降价 15% (15天 × 1%)
+                </div>
+                <div class="rule-item">
+                    <strong>限制条件:</strong> 最大降价比例不超过<span class="highlight">原价的50%</span>，且不低于成本价
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🧪 定价测试 (原价 $0.10)</div>
+            <button class="btn btn-primary" onclick="runTest()">运行测试</button>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📊 完整30天价格趋势</div>
+            <div id="fullTrend"></div>
+        </div>
+    </div>
+
+    <script>
+        // 动态定价计算函数（与后端逻辑一致）
+        function calculatePrice(sellPrice, daysSincePublish, costPrice = 0) {
+            let currentPrice = sellPrice;
+            let totalDiscountRate = 0;
+            let discountInfo = '';
+            let validityDisplay = '';
+            
+            if (daysSincePublish <= 3) {
+                // 0-3天：原价
+                currentPrice = sellPrice;
+                validityDisplay = '3天内';
+                discountInfo = '原价';
+                totalDiscountRate = 0;
+            } else if (daysSincePublish <= 7) {
+                // 4-7天：每天降价5%叠加
+                const discountDays = daysSincePublish - 3;
+                totalDiscountRate = discountDays * 0.05;
+                currentPrice = sellPrice * (1 - totalDiscountRate);
+                validityDisplay = '7天内';
+                discountInfo = `第${daysSincePublish}天，每天降5%，已降${(totalDiscountRate * 100).toFixed(0)}%`;
+            } else if (daysSincePublish <= 15) {
+                // 8-15天：在第7天价格基础上，每天降价2%叠加
+                const firstPeriodDiscount = 4 * 0.05; // 20%
+                const discountDays = daysSincePublish - 7;
+                const secondPeriodDiscount = discountDays * 0.02;
+                totalDiscountRate = firstPeriodDiscount + secondPeriodDiscount;
+                currentPrice = sellPrice * (1 - totalDiscountRate);
+                validityDisplay = '15天内';
+                discountInfo = `第${daysSincePublish}天，前期降20%，每天再降2%，已降${(totalDiscountRate * 100).toFixed(0)}%`;
+            } else if (daysSincePublish <= 30) {
+                // 16-30天：在第15天价格基础上，每天降价1%叠加
+                const firstPeriodDiscount = 4 * 0.05; // 20%
+                const secondPeriodDiscount = 8 * 0.02; // 16%
+                const discountDays = daysSincePublish - 15;
+                const thirdPeriodDiscount = discountDays * 0.01;
+                totalDiscountRate = firstPeriodDiscount + secondPeriodDiscount + thirdPeriodDiscount;
+                currentPrice = sellPrice * (1 - totalDiscountRate);
+                validityDisplay = '30天内';
+                discountInfo = `第${daysSincePublish}天，前期降36%，每天再降1%，已降${(totalDiscountRate * 100).toFixed(0)}%`;
+            } else {
+                // 30天以上：达到最大降价
+                const firstPeriodDiscount = 4 * 0.05; // 20%
+                const secondPeriodDiscount = 8 * 0.02; // 16%
+                const thirdPeriodDiscount = 15 * 0.01; // 15%
+                totalDiscountRate = Math.min(firstPeriodDiscount + secondPeriodDiscount + thirdPeriodDiscount, 0.50);
+                currentPrice = sellPrice * (1 - totalDiscountRate);
+                validityDisplay = '近期';
+                discountInfo = `第${daysSincePublish}天，已达最大降价50%`;
+            }
+            
+            // 确保最大降价不超过50%
+            const maxDiscountPrice = sellPrice * 0.5;
+            if (currentPrice < maxDiscountPrice) {
+                currentPrice = maxDiscountPrice;
+                totalDiscountRate = 0.50;
+                discountInfo += '（已限制为最大降价50%）';
+            }
+            
+            // 确保价格不低于成本价
+            if (costPrice && currentPrice < costPrice) {
+                currentPrice = costPrice;
+                totalDiscountRate = (sellPrice - costPrice) / sellPrice;
+                discountInfo += '（已限制为成本价）';
+            }
+            
+            return {
+                currentPrice: currentPrice.toFixed(4),
+                discountPercent: (totalDiscountRate * 100).toFixed(1),
+                discountInfo,
+                validityDisplay
+            };
+        }
+        
+        function runTest() {
+            const sellPrice = 0.10;
+            const costPrice = 0.02;
+            const testDays = [0, 1, 3, 4, 5, 7, 8, 10, 15, 16, 20, 30, 35];
+            
+            let html = '<table class="pricing-table">';
+            html += '<thead><tr>';
+            html += '<th>天数</th><th>时效</th><th>原价</th><th>当前价</th><th>降价比例</th><th>说明</th>';
+            html += '</tr></thead><tbody>';
+            
+            testDays.forEach(day => {
+                const result = calculatePrice(sellPrice, day, costPrice);
+                html += '<tr>';
+                html += `<td>第 ${day} 天</td>`;
+                html += `<td>${result.validityDisplay}</td>`;
+                html += `<td>$${sellPrice.toFixed(4)}</td>`;
+                html += `<td class="price-cell">$${result.currentPrice}</td>`;
+                html += `<td class="discount-cell">${result.discountPercent}%</td>`;
+                html += `<td>${result.discountInfo}</td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('testResults').innerHTML = html;
+            
+            // 生成完整趋势
+            generateFullTrend(sellPrice, costPrice);
+        }
+        
+        function generateFullTrend(sellPrice, costPrice) {
+            let html = '<table class="pricing-table">';
+            html += '<thead><tr>';
+            html += '<th>天数</th><th>时效</th><th>价格</th><th>降价%</th><th>说明</th>';
+            html += '</tr></thead><tbody>';
+            
+            for (let day = 0; day <= 35; day++) {
+                const result = calculatePrice(sellPrice, day, costPrice);
+                const isKeyDay = [0, 3, 4, 7, 8, 15, 16, 30].includes(day);
+                html += `<tr style="${isKeyDay ? 'background: #fff7e6;' : ''}">`;
+                html += `<td><strong>第 ${day} 天</strong></td>`;
+                html += `<td>${result.validityDisplay}</td>`;
+                html += `<td class="price-cell">$${result.currentPrice}</td>`;
+                html += `<td class="discount-cell">${result.discountPercent}%</td>`;
+                html += `<td style="font-size: 12px;">${result.discountInfo}</td>`;
+                html += '</tr>';
+            }
+            
+            html += '</tbody></table>';
+            document.getElementById('fullTrend').innerHTML = html;
+        }
+        
+        // 页面加载时自动运行测试
+        window.addEventListener('load', () => {
+            setTimeout(runTest, 500);
+        });
+    </script>
+</body>
+</html>

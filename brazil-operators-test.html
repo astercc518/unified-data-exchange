@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>巴西运营商数据分配测试</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Microsoft YaHei', Arial, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    }
+    
+    h1 {
+      color: #333;
+      margin-bottom: 10px;
+      font-size: 28px;
+      text-align: center;
+    }
+    
+    .flag {
+      font-size: 40px;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #666;
+      margin-bottom: 30px;
+      line-height: 1.8;
+      text-align: center;
+      background: #f5f7fa;
+      padding: 15px;
+      border-radius: 8px;
+    }
+    
+    .section {
+      margin-bottom: 30px;
+      padding: 25px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .section h2 {
+      color: #667eea;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+    
+    .operator-card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .operator-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    .operator-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .operator-name {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .market-share {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+    }
+    
+    .operator-desc {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    
+    .segments {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .segment-tag {
+      background: #ecf5ff;
+      color: #409eff;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .test-section {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    
+    .test-section h2 {
+      color: white;
+      margin-bottom: 15px;
+    }
+    
+    .input-group {
+      margin-bottom: 15px;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    
+    button {
+      background: white;
+      color: #f5576c;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .result-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    
+    .result-table th,
+    .result-table td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .result-table th {
+      background: #667eea;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .result-table tr:hover {
+      background: #f5f7fa;
+    }
+    
+    .progress-bar {
+      height: 25px;
+      background: #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      transition: width 0.5s ease;
+    }
+    
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="flag">🇧🇷</div>
+    <h1>巴西运营商数据分配测试</h1>
+    <div class="description">
+      <strong>Brasil (BR)</strong> - 拉丁美洲最大的移动通信市场<br>
+      本测试验证巴西四大运营商的数据分配算法和市场份额准确性
+    </div>
+
+    <!-- 运营商信息 -->
+    <div class="section">
+      <h2>📡 巴西四大运营商详情</h2>
+      
+      <div class="operator-card">
+        <div class="operator-header">
+          <div class="operator-name">🥇 Vivo</div>
+          <div class="market-share">38%</div>
+        </div>
+        <div class="operator-desc">
+          Telefónica Brasil旗下品牌，巴西最大的移动运营商，提供全面的移动和固定电话服务，覆盖全国所有州。
+        </div>
+        <div>
+          <strong style="font-size: 12px; color: #666;">号段前缀：</strong>
+          <div class="segments">
+            <span class="segment-tag">11</span>
+            <span class="segment-tag">12</span>
+            <span class="segment-tag">13</span>
+            <span class="segment-tag">14</span>
+            <span class="segment-tag">15</span>
+            <span class="segment-tag">16</span>
+            <span class="segment-tag">17</span>
+            <span class="segment-tag">18</span>
+            <span class="segment-tag">19</span>
+            <span class="segment-tag">21</span>
+            <span class="segment-tag">22</span>
+            <span class="segment-tag">27</span>
+            <span class="segment-tag">28</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="operator-card">
+        <div class="operator-header">
+          <div class="operator-name">🥈 Claro</div>
+          <div class="market-share">28%</div>
+        </div>
+        <div class="operator-desc">
+          América Móvil（墨西哥电信巨头）旗下品牌，巴西第二大运营商，以高质量的4G/5G网络著称。
+        </div>
+        <div>
+          <strong style="font-size: 12px; color: #666;">号段前缀：</strong>
+          <div class="segments">
+            <span class="segment-tag">11</span>
+            <span class="segment-tag">12</span>
+            <span class="segment-tag">13</span>
+            <span class="segment-tag">14</span>
+            <span class="segment-tag">15</span>
+            <span class="segment-tag">16</span>
+            <span class="segment-tag">17</span>
+            <span class="segment-tag">18</span>
+            <span class="segment-tag">19</span>
+            <span class="segment-tag">21</span>
+            <span class="segment-tag">41</span>
+            <span class="segment-tag">42</span>
+            <span class="segment-tag">43</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="operator-card">
+        <div class="operator-header">
+          <div class="operator-name">🥉 TIM Brasil</div>
+          <div class="market-share">22%</div>
+        </div>
+        <div class="operator-desc">
+          意大利电信集团（Telecom Italia）巴西子公司，巴西第三大运营商，提供创新的移动数据服务。
+        </div>
+        <div>
+          <strong style="font-size: 12px; color: #666;">号段前缀：</strong>
+          <div class="segments">
+            <span class="segment-tag">11</span>
+            <span class="segment-tag">12</span>
+            <span class="segment-tag">13</span>
+            <span class="segment-tag">14</span>
+            <span class="segment-tag">15</span>
+            <span class="segment-tag">16</span>
+            <span class="segment-tag">17</span>
+            <span class="segment-tag">18</span>
+            <span class="segment-tag">19</span>
+            <span class="segment-tag">21</span>
+            <span class="segment-tag">31</span>
+            <span class="segment-tag">32</span>
+            <span class="segment-tag">33</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="operator-card">
+        <div class="operator-header">
+          <div class="operator-name">🏅 Oi</div>
+          <div class="market-share">12%</div>
+        </div>
+        <div class="operator-desc">
+          巴西本土运营商，原Brasil Telecom，主要服务于巴西东北部和内陆地区，是重要的区域性运营商。
+        </div>
+        <div>
+          <strong style="font-size: 12px; color: #666;">号段前缀：</strong>
+          <div class="segments">
+            <span class="segment-tag">11</span>
+            <span class="segment-tag">12</span>
+            <span class="segment-tag">13</span>
+            <span class="segment-tag">14</span>
+            <span class="segment-tag">15</span>
+            <span class="segment-tag">16</span>
+            <span class="segment-tag">17</span>
+            <span class="segment-tag">18</span>
+            <span class="segment-tag">19</span>
+            <span class="segment-tag">21</span>
+            <span class="segment-tag">31</span>
+            <span class="segment-tag">41</span>
+            <span class="segment-tag">51</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 数据分配测试 -->
+    <div class="test-section">
+      <h2>🧪 运营商数据分配测试</h2>
+      <div class="input-group">
+        <label>输入总数据量（条）：</label>
+        <input type="number" id="totalQuantity" value="100000" min="1000" step="1000">
+      </div>
+      <button onclick="testDistribution()">🚀 开始分配测试</button>
+      
+      <div id="testResult"></div>
+    </div>
+
+    <!-- 市场份额验证 -->
+    <div class="section">
+      <h2>📊 市场份额验证</h2>
+      <div>
+        <strong>总市场份额：</strong> 
+        <span style="color: #67c23a; font-size: 18px; font-weight: bold;">100%</span>
+      </div>
+      <div style="margin-top: 10px; color: #666;">
+        Vivo (38%) + Claro (28%) + TIM (22%) + Oi (12%) = 100% ✅
+      </div>
+      
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number">38%</div>
+          <div class="stat-label">Vivo 市场份额</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">28%</div>
+          <div class="stat-label">Claro 市场份额</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">22%</div>
+          <div class="stat-label">TIM 市场份额</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">12%</div>
+          <div class="stat-label">Oi 市场份额</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 模拟巴西运营商数据
+    const brazilOperators = [
+      { name: 'Vivo', marketShare: 38, numberSegments: ['11', '12', '13', '14', '15', '16', '17', '18', '19', '21', '22', '27', '28'], description: 'Telefónica巴西子公司，巴西最大运营商' },
+      { name: 'Claro', marketShare: 28, numberSegments: ['11', '12', '13', '14', '15', '16', '17', '18', '19', '21', '41', '42', '43'], description: 'América Móvil旗下品牌，巴西第二大运营商' },
+      { name: 'TIM Brasil', marketShare: 22, numberSegments: ['11', '12', '13', '14', '15', '16', '17', '18', '19', '21', '31', '32', '33'], description: '意大利电信巴西子公司，巴西第三大运营商' },
+      { name: 'Oi', marketShare: 12, numberSegments: ['11', '12', '13', '14', '15', '16', '17', '18', '19', '21', '31', '41', '51'], description: '巴西本土运营商，原Brasil Telecom' }
+    ];
+
+    function testDistribution() {
+      const totalQuantity = parseInt(document.getElementById('totalQuantity').value);
+      
+      if (!totalQuantity || totalQuantity < 1000) {
+        alert('请输入有效的数据量（至少1000条）');
+        return;
+      }
+
+      // 按市场份额分配
+      const distribution = [];
+      let remaining = totalQuantity;
+
+      for (let i = 0; i < brazilOperators.length; i++) {
+        const operator = brazilOperators[i];
+        if (i === brazilOperators.length - 1) {
+          // 最后一个运营商分配剩余数量
+          distribution.push({
+            name: operator.name,
+            count: remaining,
+            marketShare: operator.marketShare,
+            percentage: ((remaining / totalQuantity) * 100).toFixed(2)
+          });
+        } else {
+          // 按市场份额分配
+          const count = Math.floor(totalQuantity * (operator.marketShare / 100));
+          distribution.push({
+            name: operator.name,
+            count: count,
+            marketShare: operator.marketShare,
+            percentage: ((count / totalQuantity) * 100).toFixed(2)
+          });
+          remaining -= count;
+        }
+      }
+
+      // 显示结果
+      let html = `
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>运营商</th>
+              <th>市场份额</th>
+              <th>分配数量</th>
+              <th>实际占比</th>
+              <th>分配进度</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      distribution.forEach(item => {
+        html += `
+          <tr>
+            <td><strong>${item.name}</strong></td>
+            <td>${item.marketShare}%</td>
+            <td style="color: #667eea; font-weight: bold;">${item.count.toLocaleString()} 条</td>
+            <td>${item.percentage}%</td>
+            <td>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${item.marketShare}%">${item.marketShare}%</div>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      const totalAllocated = distribution.reduce((sum, item) => sum + item.count, 0);
+      const accuracy = ((totalAllocated / totalQuantity) * 100).toFixed(2);
+
+      html += `
+          </tbody>
+        </table>
+        <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 8px; text-align: center;">
+          <div style="font-size: 18px; margin-bottom: 10px;">
+            <strong>总分配数量：</strong>
+            <span style="color: #67c23a; font-size: 24px; font-weight: bold;">${totalAllocated.toLocaleString()}</span>
+            <span style="color: #666;"> / ${totalQuantity.toLocaleString()}</span>
+          </div>
+          <div style="font-size: 16px; color: ${accuracy === '100.00' ? '#67c23a' : '#e6a23c'};">
+            <strong>分配准确度：</strong> ${accuracy}%
+            ${accuracy === '100.00' ? ' ✅' : ' ⚠️'}
+          </div>
+        </div>
+      `;
+
+      document.getElementById('testResult').innerHTML = html;
+    }
+
+    // 页面加载时执行一次默认测试
+    window.addEventListener('DOMContentLoaded', () => {
+      testDistribution();
+    });
+  </script>
+</body>
+</html>

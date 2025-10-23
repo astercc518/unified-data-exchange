@@ -27,6 +27,32 @@ export default {
       title: 'Vue Element Admin',
       logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
     }
+  },
+  created() {
+    this.loadConfig()
+    // 监听配置更新事件
+    this.$root.$on('updateSystemConfig', this.handleConfigUpdate)
+  },
+  beforeDestroy() {
+    this.$root.$off('updateSystemConfig', this.handleConfigUpdate)
+  },
+  methods: {
+    loadConfig() {
+      try {
+        const savedConfig = localStorage.getItem('systemConfig')
+        if (savedConfig) {
+          const config = JSON.parse(savedConfig)
+          this.title = config.projectName || this.title
+          this.logo = config.logoUrl || this.logo
+        }
+      } catch (error) {
+        console.error('加载系统配置失败:', error)
+      }
+    },
+    handleConfigUpdate(config) {
+      this.title = config.projectName || this.title
+      this.logo = config.logoUrl || this.logo
+    }
   }
 }
 </script>

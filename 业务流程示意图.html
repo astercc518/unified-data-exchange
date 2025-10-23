@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据购买业务流程示意图</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .flow-container {
+            margin-top: 30px;
+        }
+
+        .role-section {
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .role-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #409eff;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 4px solid #409eff;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: #409eff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-arrow {
+            width: 30px;
+            height: 2px;
+            background: #409eff;
+            margin: 0 10px;
+            position: relative;
+        }
+
+        .step-arrow::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -4px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid #409eff;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .step-content {
+            flex: 1;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .status-pending {
+            background: #fef0cd;
+            color: #e6a23c;
+        }
+
+        .status-reviewing {
+            background: #d9ecff;
+            color: #409eff;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #67c23a;
+        }
+
+        .status-delivered {
+            background: #e1f3d8;
+            color: #52c41a;
+        }
+
+        .status-cancelled {
+            background: #fde2e2;
+            color: #f56c6c;
+        }
+
+        .page-link {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #ecf5ff;
+            color: #409eff;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-top: 5px;
+            text-decoration: none;
+            border: 1px solid #b3d8ff;
+        }
+
+        .transition-arrow {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            color: #409eff;
+        }
+
+        .legend {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f5f7fa;
+            border-radius: 8px;
+        }
+
+        .legend-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .legend-item {
+            display: inline-block;
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+
+        .data-structure {
+            margin-top: 30px;
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .data-structure pre {
+            margin: 0;
+            color: #ecf0f1;
+        }
+
+        .highlight {
+            background: rgba(255, 255, 0, 0.2);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #409eff;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .info-box-title {
+            font-weight: bold;
+            color: #409eff;
+            margin-bottom: 8px;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+            margin: 30px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: -35px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            background: #409eff;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #409eff;
+        }
+
+        .timeline-content {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .timeline-desc {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 数据购买业务流程示意图</h1>
+
+        <div class="info-box">
+            <div class="info-box-title">💡 业务流程说明</div>
+            <div>
+                本流程图展示了从客户购买数据到最终发货的完整业务流程，涉及客户端和代理端两个角色的协同操作。
+                订单状态将依次流转: <strong>pending → reviewing → completed → delivered</strong>
+            </div>
+        </div>
+
+        <!-- 客户端操作流程 -->
+        <div class="role-section">
+            <div class="role-title">👤 客户端操作流程</div>
+            
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">资源中心选择数据</div>
+                    <div class="step-desc">
+                        客户在资源中心浏览可购买的数据资源，选择合适的数据并点击购买按钮
+                        <br><a href="#" class="page-link">/resource/center</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">提交购买生成订单</div>
+                    <div class="step-desc">
+                        填写购买数量、选择运营商、输入发货邮箱后提交，系统自动生成订单
+                        <br><span class="status-badge status-pending">订单状态: pending</span>
+                        <span class="status-badge status-pending">发货状态: pending</span>
+                        <br><a href="#" class="page-link">/resource/purchase/:id</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">待处理订单页面</div>
+                    <div class="step-desc">
+                        订单创建后，客户可以在待处理订单页面查看自己的订单列表
+                        <br><a href="#" class="page-link">/order/pending</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">4</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">提交订单审核</div>
+                    <div class="step-desc">
+                        客户点击"提交审核"按钮，将订单提交给代理进行审核
+                        <br><span class="status-badge status-reviewing">订单状态: reviewing</span>
+                        <br>记录提交审核时间: <code>reviewTime</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="transition-arrow">⬇️ 等待代理审核</div>
+        </div>
+
+        <!-- 代理端操作流程 -->
+        <div class="role-section">
+            <div class="role-title">🛡️ 代理端操作流程</div>
+            
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">审核订单页面</div>
+                    <div class="step-desc">
+                        代理查看待审核订单列表，可以看到所有客户提交的订单
+                        <br><span class="status-badge status-reviewing">显示状态: reviewing</span>
+                        <br><a href="#" class="page-link">/order/review</a>
+                        <br><strong>权限:</strong> 仅代理(agent)和管理员(admin)可访问
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">审核通过或拒绝</div>
+                    <div class="step-desc">
+                        代理查看订单详情后，可以选择"通过"或"拒绝"
+                        <br><br>
+                        <strong>✅ 审核通过:</strong>
+                        <br><span class="status-badge status-completed">订单状态: completed</span>
+                        <span class="status-badge status-pending">发货状态: pending</span>
+                        <br>记录审核通过时间: <code>approveTime</code>
+                        <br><br>
+                        <strong>❌ 审核拒绝:</strong>
+                        <br><span class="status-badge status-cancelled">订单状态: cancelled</span>
+                        <br>记录拒绝原因: <code>rejectReason</code>
+                        <br>记录拒绝时间: <code>rejectTime</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="transition-arrow">⬇️ 订单流转到已完成订单</div>
+        </div>
+
+        <!-- 发货流程 -->
+        <div class="role-section">
+            <div class="role-title">📦 发货流程 (客户端/代理端均可)</div>
+            
+            <div class="flow-step">
+                <div class="step-number">1</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">已完成订单页面</div>
+                    <div class="step-desc">
+                        审核通过的订单会出现在已完成订单列表中
+                        <br><span class="status-badge status-completed">订单状态: completed</span>
+                        <span class="status-badge status-pending">发货状态: 待发货</span>
+                        <br><a href="#" class="page-link">/order/completed</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">2</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">点击发货按钮</div>
+                    <div class="step-desc">
+                        在已完成订单列表中，待发货的订单会显示"发货"按钮，点击后跳转到发货页面
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">3</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">发货页面</div>
+                    <div class="step-desc">
+                        <strong>📊 数据基本信息:</strong> 订单号、国家、时效、来源、数量、运营商分布
+                        <br><strong>👤 客户基本信息:</strong> 客户名称、下单时间、订单金额、审核通过时间
+                        <br><strong>📧 发货方式选择:</strong>
+                        <br>• 邮箱发货: 输入接收邮箱地址
+                        <br>• TGbot发货: 输入Telegram Bot ID和用户名
+                        <br><a href="#" class="page-link">/order/delivery/:id</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">4</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">提交发货</div>
+                    <div class="step-desc">
+                        填写完发货信息后点击"确认发货"，系统模拟发货过程(2秒)
+                        <br><span class="status-badge status-completed">订单状态: completed</span>
+                        <span class="status-badge status-delivered">发货状态: delivered</span>
+                        <br>记录发货时间: <code>deliveryTime</code>
+                        <br>记录发货方式: <code>deliveryMethod</code> (email/tgbot)
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-step">
+                <div class="step-number">5</div>
+                <div class="step-arrow"></div>
+                <div class="step-content">
+                    <div class="step-title">发货成功</div>
+                    <div class="step-desc">
+                        提示"发货成功！数据已发送到指定地址"，自动返回已完成订单页面
+                        <br>订单在列表中显示为"已发货"状态，提供"下载"按钮
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 时间线 -->
+        <h2 style="margin-top: 50px; margin-bottom: 20px;">⏰ 订单生命周期时间线</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-time">createTime</div>
+                    <div class="timeline-title">订单创建</div>
+                    <div class="timeline-desc">客户在资源中心购买数据，订单状态: pending</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-time">reviewTime</div>
+                    <div class="timeline-title">提交审核</div>
+                    <div class="timeline-desc">客户提交订单给代理审核，订单状态: reviewing</div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-time">approveTime / rejectTime</div>
+                    <div class="timeline-title">审核完成</div>
+                    <div class="timeline-desc">
+                        代理审核通过: completed + 待发货
+                        <br>代理审核拒绝: cancelled
+                    </div>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-time">deliveryTime</div>
+                    <div class="timeline-title">发货完成</div>
+                    <div class="timeline-desc">订单发货成功，发货状态: delivered</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-title">📌 订单状态说明</div>
+            <div class="legend-item">
+                <span class="status-badge status-pending">pending</span> 待处理
+            </div>
+            <div class="legend-item">
+                <span class="status-badge status-reviewing">reviewing</span> 审核中
+            </div>
+            <div class="legend-item">
+                <span class="status-badge status-completed">completed</span> 已完成
+            </div>
+            <div class="legend-item">
+                <span class="status-badge status-delivered">delivered</span> 已发货
+            </div>
+            <div class="legend-item">
+                <span class="status-badge status-cancelled">cancelled</span> 已取消
+            </div>
+        </div>
+
+        <!-- 数据结构 -->
+        <h2 style="margin-top: 50px; margin-bottom: 20px;">💾 订单数据结构</h2>
+        <div class="data-structure">
+<pre>{
+  id: 1,
+  orderNo: "ORD1697123456789ABCD",
+  customerName: "张三",
+  
+  // 数据信息
+  country: "孟加拉国",
+  validity: "3",
+  source: "公开数据",
+  quantity: 10000,
+  operators: [
+    { name: "Grameenphone", count: 4000 },
+    { name: "Robi", count: 3000 }
+  ],
+  totalAmount: "50.00",
+  
+  // 状态字段
+  <span class="highlight">status: "completed"</span>,        // pending/reviewing/completed/cancelled
+  <span class="highlight">deliveryStatus: "pending"</span>,  // pending/delivered
+  
+  // 时间字段
+  <span class="highlight">createTime: 1697123456789</span>,   // 创建时间
+  <span class="highlight">reviewTime: 1697123556789</span>,   // 提交审核时间
+  <span class="highlight">approveTime: 1697123656789</span>,  // 审核通过时间
+  <span class="highlight">rejectTime: null</span>,            // 拒绝时间
+  <span class="highlight">deliveryTime: null</span>,          // 发货时间
+  
+  // 发货信息
+  deliveryEmail: "customer@example.com",
+  deliveryMethod: "email",      // email/tgbot
+  tgBotId: "",
+  tgUsername: "",
+  deliveryRemark: "",
+  
+  // 其他
+  rejectReason: "",
+  remark: ""
+}</pre>
+        </div>
+
+        <div style="margin-top: 50px; padding: 20px; background: #f0f9ff; border-radius: 8px; text-align: center;">
+            <h3 style="color: #1890ff; margin-bottom: 10px;">🎉 完整业务流程已实现</h3>
+            <p style="color: #666; font-size: 14px;">
+                客户购买 → 提交审核 → 代理审核 → 订单发货 → 完成交易
+            </p>
+        </div>
+    </div>
+</body>
+</html>

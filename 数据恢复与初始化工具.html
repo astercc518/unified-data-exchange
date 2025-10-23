@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据恢复与初始化工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; color: white; margin-bottom: 30px; }
+    .header h1 { font-size: 32px; margin-bottom: 10px; }
+    .card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .card-title { font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #333; border-left: 4px solid #667eea; padding-left: 12px; }
+    .btn { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin-right: 10px; }
+    .btn:hover { background: #5568d3; }
+    .btn-danger { background: #dc3545; }
+    .btn-success { background: #28a745; }
+    .alert { padding: 15px 20px; border-radius: 8px; margin: 15px 0; }
+    .alert-info { background: #d1ecf1; border-left: 4px solid #17a2b8; color: #0c5460; }
+    .alert-success { background: #d4edda; border-left: 4px solid #28a745; color: #155724; }
+    .alert-danger { background: #f8d7da; border-left: 4px solid #dc3545; color: #721c24; }
+    .alert-warning { background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+    .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; text-align: center; }
+    .stat-card h3 { font-size: 32px; margin-bottom: 5px; }
+    .stat-card p { font-size: 14px; opacity: 0.9; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e0e0e0; }
+    th { background: #f8f9fa; font-weight: 600; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 3px; color: #e83e8c; font-family: monospace; }
+    .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .status-active { background: #d4edda; color: #155724; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; color: #666; }
+    .form-group input, .form-group select { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🔧 数据恢复与初始化工具</h1>
+      <p>检查系统数据状态并初始化必要的数据</p>
+    </div>
+
+    <!-- 当前数据状态 -->
+    <div class="card">
+      <h2 class="card-title">📊 当前数据状态</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3 id="userCount">0</h3>
+          <p>客户数量</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="agentCount">0</h3>
+          <p>代理数量</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="dataCount">0</h3>
+          <p>数据库记录</p>
+        </div>
+        <div class="stat-card">
+          <h3 id="orderCount">0</h3>
+          <p>订单数量</p>
+        </div>
+      </div>
+      <button class="btn btn-success" onclick="checkDataStatus()">🔍 检查数据状态</button>
+      <button class="btn" onclick="showAllData()">📋 显示所有数据</button>
+      <div id="statusResult"></div>
+    </div>
+
+    <!-- 快速创建KL01880V01账户 -->
+    <div class="card">
+      <h2 class="card-title">⚡ 快速创建 KL01880V01 账户</h2>
+      <div class="alert alert-info">
+        ℹ️ 如果您的账户丢失，可以使用此功能快速重建账户和上传数据
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>客户名称</label>
+          <input type="text" id="customerName" value="KL01880V01客户" />
+        </div>
+        <div class="form-group">
+          <label>登录账号</label>
+          <input type="text" id="loginAccount" value="KL01880V01" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>登录密码</label>
+          <input type="text" id="loginPassword" value="123456" />
+        </div>
+        <div class="form-group">
+          <label>邮箱</label>
+          <input type="email" id="email" value="kl01880v01@example.com" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>所属代理</label>
+          <select id="agentId">
+            <option value="">-- 请选择代理 --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>初始余额</label>
+          <input type="number" id="accountBalance" value="10000" step="100" />
+        </div>
+      </div>
+
+      <button class="btn btn-success" onclick="createKL01880V01()">✅ 创建账户</button>
+      <button class="btn" onclick="createWithSampleData()">📦 创建账户+示例数据</button>
+      <div id="createResult"></div>
+    </div>
+
+    <!-- 初始化系统数据 -->
+    <div class="card">
+      <h2 class="card-title">🚀 初始化系统数据</h2>
+      <div class="alert alert-warning">
+        ⚠️ <strong>注意：</strong> 初始化操作会创建默认的代理、客户和数据库记录。如果数据已存在，将会追加新数据。
+      </div>
+      
+      <button class="btn btn-success" onclick="initializeSystemData()">🔧 初始化系统数据</button>
+      <button class="btn btn-danger" onclick="clearAllData()">🗑️ 清空所有数据</button>
+      <div id="initResult"></div>
+    </div>
+
+    <!-- 数据详情 -->
+    <div class="card">
+      <h2 class="card-title">📋 数据详情</h2>
+      <div id="dataDetails"></div>
+    </div>
+  </div>
+
+  <script>
+    // 检查数据状态
+    function checkDataStatus() {
+      const users = JSON.parse(localStorage.getItem('userList') || '[]');
+      const agents = JSON.parse(localStorage.getItem('agentList') || '[]');
+      const dataLibrary = JSON.parse(localStorage.getItem('dataLibrary') || '[]');
+      const orders = JSON.parse(localStorage.getItem('orderList') || '[]');
+
+      document.getElementById('userCount').textContent = users.length;
+      document.getElementById('agentCount').textContent = agents.length;
+      document.getElementById('dataCount').textContent = dataLibrary.length;
+      document.getElementById('orderCount').textContent = orders.length;
+
+      // 检查KL01880V01账户
+      const kl01880v01 = users.find(u => u.loginAccount === 'KL01880V01');
+      
+      let statusHtml = '<div style="margin-top: 20px;">';
+      
+      if (kl01880v01) {
+        statusHtml += `
+          <div class="alert alert-success">
+            ✅ <strong>找到 KL01880V01 账户</strong>
+            <br>客户名称: ${kl01880v01.customerName}
+            <br>登录密码: <code>${kl01880v01.loginPassword}</code>
+            <br>账户余额: ${kl01880v01.accountBalance || 0}
+            <br>状态: <span class="status-badge ${kl01880v01.status === 1 ? 'status-active' : ''}">${kl01880v01.status === 1 ? '激活' : '停用'}</span>
+          </div>
+        `;
+      } else {
+        statusHtml += `
+          <div class="alert alert-danger">
+            ❌ <strong>未找到 KL01880V01 账户</strong>
+            <br>建议使用下方"快速创建"功能重建账户
+          </div>
+        `;
+      }
+
+      if (agents.length === 0) {
+        statusHtml += `
+          <div class="alert alert-warning">
+            ⚠️ <strong>系统中没有代理</strong>
+            <br>建议先初始化系统数据，创建默认代理
+          </div>
+        `;
+      }
+
+      if (dataLibrary.length === 0) {
+        statusHtml += `
+          <div class="alert alert-warning">
+            ⚠️ <strong>数据库为空</strong>
+            <br>您之前上传的数据已丢失，建议使用"创建账户+示例数据"恢复
+          </div>
+        `;
+      }
+
+      statusHtml += '</div>';
+      document.getElementById('statusResult').innerHTML = statusHtml;
+
+      loadAgents();
+    }
+
+    // 加载代理列表
+    function loadAgents() {
+      const agents = JSON.parse(localStorage.getItem('agentList') || '[]');
+      const select = document.getElementById('agentId');
+      select.innerHTML = '<option value="">-- 请选择代理 --</option>';
+      
+      agents.forEach(agent => {
+        if (agent.status === 1) {
+          const option = document.createElement('option');
+          option.value = agent.id;
+          option.textContent = agent.agentName;
+          select.appendChild(option);
+        }
+      });
+    }
+
+    // 创建KL01880V01账户
+    function createKL01880V01() {
+      const customerName = document.getElementById('customerName').value;
+      const loginAccount = document.getElementById('loginAccount').value;
+      const loginPassword = document.getElementById('loginPassword').value;
+      const email = document.getElementById('email').value;
+      const agentId = document.getElementById('agentId').value;
+      const accountBalance = parseFloat(document.getElementById('accountBalance').value);
+
+      if (!customerName || !loginAccount || !loginPassword || !email) {
+        alert('请填写所有必填字段');
+        return;
+      }
+
+      if (!agentId) {
+        if (!confirm('未选择代理，是否继续创建？（建议先初始化系统数据）')) {
+          return;
+        }
+      }
+
+      const users = JSON.parse(localStorage.getItem('userList') || '[]');
+      
+      // 检查是否已存在
+      const existing = users.find(u => u.loginAccount === loginAccount);
+      if (existing) {
+        if (!confirm(`账号 ${loginAccount} 已存在，是否更新信息？`)) {
+          return;
+        }
+        // 更新现有账户
+        existing.customerName = customerName;
+        existing.loginPassword = loginPassword;
+        existing.email = email;
+        existing.agentId = agentId;
+        existing.accountBalance = accountBalance;
+        existing.status = 1;
+        localStorage.setItem('userList', JSON.stringify(users));
+        
+        document.getElementById('createResult').innerHTML = `
+          <div class="alert alert-success" style="margin-top: 15px;">
+            ✅ <strong>账户更新成功！</strong>
+            <br>登录账号: <code>${loginAccount}</code>
+            <br>登录密码: <code>${loginPassword}</code>
+            <br>账户余额: ${accountBalance}
+          </div>
+        `;
+      } else {
+        // 创建新账户
+        const agents = JSON.parse(localStorage.getItem('agentList') || '[]');
+        const selectedAgent = agents.find(a => String(a.id) === String(agentId));
+        
+        const newId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+        
+        const newUser = {
+          id: newId,
+          loginAccount: loginAccount,
+          loginPassword: loginPassword,
+          customerName: customerName,
+          email: email,
+          agentId: agentId,
+          agentName: selectedAgent ? selectedAgent.agentName : '',
+          salePriceRate: 1,
+          accountBalance: accountBalance,
+          overdraftAmount: 0,
+          status: 1,
+          createTime: Date.now(),
+          remark: '通过数据恢复工具创建'
+        };
+
+        users.push(newUser);
+        localStorage.setItem('userList', JSON.stringify(users));
+
+        // 创建初始充值记录
+        if (accountBalance > 0) {
+          const rechargeRecords = JSON.parse(localStorage.getItem('rechargeRecords') || '[]');
+          const newRechargeId = rechargeRecords.length > 0 ? Math.max(...rechargeRecords.map(r => r.id)) + 1 : 1;
+          
+          rechargeRecords.push({
+            id: newRechargeId,
+            customerId: newId,
+            customerName: customerName,
+            type: 'customer',
+            amount: accountBalance.toFixed(5),
+            method: 'initial',
+            status: 'success',
+            createTime: Date.now(),
+            remark: '创建账户初始金额'
+          });
+          
+          localStorage.setItem('rechargeRecords', JSON.stringify(rechargeRecords));
+        }
+
+        document.getElementById('createResult').innerHTML = `
+          <div class="alert alert-success" style="margin-top: 15px;">
+            ✅ <strong>账户创建成功！</strong>
+            <br>客户ID: ${newId}
+            <br>登录账号: <code>${loginAccount}</code>
+            <br>登录密码: <code>${loginPassword}</code>
+            <br>账户余额: ${accountBalance}
+            <br><br>
+            <strong>下一步：</strong> 现在可以使用此账号密码登录系统了
+          </div>
+        `;
+      }
+
+      checkDataStatus();
+    }
+
+    // 创建账户并添加示例数据
+    function createWithSampleData() {
+      createKL01880V01();
+      
+      setTimeout(() => {
+        // 创建示例数据库记录
+        const dataLibrary = JSON.parse(localStorage.getItem('dataLibrary') || '[]');
+        const loginAccount = document.getElementById('loginAccount').value;
+        
+        const sampleData = [
+          {
+            id: dataLibrary.length + 1,
+            country: 'US',
+            countryName: '美国',
+            validity: 'within_3_days',
+            validityName: '3天内',
+            totalQuantity: 50000,
+            availableQuantity: 50000,
+            operators: [
+              { name: 'Verizon', count: 20000 },
+              { name: 'AT&T', count: 15000 },
+              { name: 'T-Mobile', count: 15000 }
+            ],
+            uploadTime: Date.now(),
+            uploadBy: loginAccount,
+            status: 'available'
+          },
+          {
+            id: dataLibrary.length + 2,
+            country: 'UK',
+            countryName: '英国',
+            validity: 'within_30_days',
+            validityName: '30天内',
+            totalQuantity: 30000,
+            availableQuantity: 30000,
+            operators: [
+              { name: 'EE', count: 12000 },
+              { name: 'Vodafone', count: 10000 },
+              { name: 'O2', count: 8000 }
+            ],
+            uploadTime: Date.now(),
+            uploadBy: loginAccount,
+            status: 'available'
+          }
+        ];
+
+        sampleData.forEach(data => dataLibrary.push(data));
+        localStorage.setItem('dataLibrary', JSON.stringify(dataLibrary));
+
+        document.getElementById('createResult').innerHTML += `
+          <div class="alert alert-success" style="margin-top: 15px;">
+            ✅ <strong>示例数据已添加！</strong>
+            <br>已创建 2 条数据库记录：
+            <ul style="margin-top: 10px;">
+              <li>美国 - 3天内 - 50,000条</li>
+              <li>英国 - 30天内 - 30,000条</li>
+            </ul>
+          </div>
+        `;
+
+        checkDataStatus();
+      }, 500);
+    }
+
+    // 初始化系统数据
+    function initializeSystemData() {
+      if (!confirm('确定要初始化系统数据吗？这将创建默认的代理和配置。')) {
+        return;
+      }
+
+      // 创建默认代理
+      const agents = JSON.parse(localStorage.getItem('agentList') || '[]');
+      
+      if (agents.length === 0) {
+        const defaultAgent = {
+          id: 1,
+          agentName: '默认代理',
+          loginAccount: 'agent001',
+          loginPassword: '123456',
+          agentCode: 'AGENT001',
+          parentAgent: '',
+          level: '一级代理',
+          commission: 10,
+          region: '全国',
+          email: 'agent001@example.com',
+          bindUsers: 0,
+          totalCommission: 0,
+          monthlyCommission: 0,
+          status: 1,
+          createTime: Date.now(),
+          remark: '系统默认代理'
+        };
+        
+        agents.push(defaultAgent);
+        localStorage.setItem('agentList', JSON.stringify(agents));
+      }
+
+      document.getElementById('initResult').innerHTML = `
+        <div class="alert alert-success" style="margin-top: 15px;">
+          ✅ <strong>系统数据初始化完成！</strong>
+          <br>已创建:
+          <ul style="margin-top: 10px;">
+            <li>默认代理: agent001 (密码: 123456)</li>
+          </ul>
+          <br>
+          <strong>下一步：</strong> 现在可以创建 KL01880V01 账户了
+        </div>
+      `;
+
+      checkDataStatus();
+    }
+
+    // 清空所有数据
+    function clearAllData() {
+      if (!confirm('⚠️ 警告：此操作将清空所有数据，包括用户、代理、订单、数据库等。确定要继续吗？')) {
+        return;
+      }
+
+      if (!confirm('⚠️ 最后确认：真的要清空所有数据吗？此操作不可恢复！')) {
+        return;
+      }
+
+      const keys = ['userList', 'agentList', 'dataLibrary', 'orderList', 'rechargeRecords', 'currentUser'];
+      keys.forEach(key => localStorage.removeItem(key));
+
+      document.getElementById('initResult').innerHTML = `
+        <div class="alert alert-success" style="margin-top: 15px;">
+          ✅ <strong>所有数据已清空</strong>
+          <br>建议先初始化系统数据，然后创建用户账户
+        </div>
+      `;
+
+      checkDataStatus();
+    }
+
+    // 显示所有数据
+    function showAllData() {
+      const users = JSON.parse(localStorage.getItem('userList') || '[]');
+      const agents = JSON.parse(localStorage.getItem('agentList') || '[]');
+      const dataLibrary = JSON.parse(localStorage.getItem('dataLibrary') || '[]');
+
+      let html = '<h3 style="margin-top: 20px;">客户列表</h3>';
+      
+      if (users.length > 0) {
+        html += '<table><tr><th>ID</th><th>客户名称</th><th>登录账号</th><th>密码</th><th>余额</th><th>状态</th></tr>';
+        users.forEach(user => {
+          html += `
+            <tr>
+              <td>${user.id}</td>
+              <td>${user.customerName}</td>
+              <td><code>${user.loginAccount}</code></td>
+              <td><code>${user.loginPassword}</code></td>
+              <td>${user.accountBalance || 0}</td>
+              <td><span class="status-badge ${user.status === 1 ? 'status-active' : ''}">${user.status === 1 ? '激活' : '停用'}</span></td>
+            </tr>
+          `;
+        });
+        html += '</table>';
+      } else {
+        html += '<div class="alert alert-info">暂无客户数据</div>';
+      }
+
+      html += '<h3 style="margin-top: 20px;">代理列表</h3>';
+      
+      if (agents.length > 0) {
+        html += '<table><tr><th>ID</th><th>代理名称</th><th>登录账号</th><th>密码</th><th>状态</th></tr>';
+        agents.forEach(agent => {
+          html += `
+            <tr>
+              <td>${agent.id}</td>
+              <td>${agent.agentName}</td>
+              <td><code>${agent.loginAccount}</code></td>
+              <td><code>${agent.loginPassword}</code></td>
+              <td><span class="status-badge ${agent.status === 1 ? 'status-active' : ''}">${agent.status === 1 ? '激活' : '停用'}</span></td>
+            </tr>
+          `;
+        });
+        html += '</table>';
+      } else {
+        html += '<div class="alert alert-info">暂无代理数据</div>';
+      }
+
+      html += '<h3 style="margin-top: 20px;">数据库记录</h3>';
+      
+      if (dataLibrary.length > 0) {
+        html += '<table><tr><th>ID</th><th>国家</th><th>时效</th><th>总数量</th><th>可用数量</th><th>上传人</th></tr>';
+        dataLibrary.forEach(data => {
+          html += `
+            <tr>
+              <td>${data.id}</td>
+              <td>${data.countryName}</td>
+              <td>${data.validityName}</td>
+              <td>${data.totalQuantity}</td>
+              <td>${data.availableQuantity}</td>
+              <td><code>${data.uploadBy || '-'}</code></td>
+            </tr>
+          `;
+        });
+        html += '</table>';
+      } else {
+        html += '<div class="alert alert-info">暂无数据库记录</div>';
+      }
+
+      document.getElementById('dataDetails').innerHTML = html;
+    }
+
+    // 页面加载时检查状态
+    window.onload = function() {
+      checkDataStatus();
+    };
+  </script>
+</body>
+</html>

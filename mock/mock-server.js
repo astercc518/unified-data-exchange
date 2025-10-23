@@ -37,7 +37,10 @@ const responseFake = (url, type, respond) => {
     url: new RegExp(`${process.env.VUE_APP_BASE_API}${url}`),
     type: type || 'get',
     response(req, res) {
-      console.log('request invoke:' + req.path)
+      // 减少日志输出，只在需要时打印
+      if (process.env.MOCK_DEBUG) {
+        console.log('request invoke:' + req.path)
+      }
       res.json(Mock.mock(respond instanceof Function ? respond(req, res) : respond))
     }
   }
