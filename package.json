@@ -1,8 +1,8 @@
 {
   "name": "unified-data-exchange",
   "version": "1.0.0",
-  "description": "Unified Data Exchange (UDE) - A modern data management and exchange platform built with Vue.js and Element UI",
-  "author": "Pan <panfree23@gmail.com>",
+  "description": "Unified Data Exchange (UDE) - 统一数据交换平台。A modern data management and exchange system built with Vue.js and Element UI",
+  "author": "astercc518",
   "scripts": {
     "dev": "vue-cli-service serve",
     "lint": "eslint --ext .js,.vue src",
@@ -77,7 +77,7 @@
     "last 2 versions"
   ],
   "bugs": {
-    "url": "https://github.com/PanJiaChen/vue-element-admin/issues"
+    "url": "https://github.com/astercc518/unified-data-exchange/issues"
   },
   "engines": {
     "node": ">=8.9",
@@ -85,12 +85,12 @@
   },
   "keywords": [
     "vue",
-    "admin",
-    "dashboard",
+    "data-exchange",
+    "ude",
+    "unified-data-exchange",
     "element-ui",
-    "boilerplate",
-    "admin-template",
-    "management-system"
+    "data-management",
+    "admin-template"
   ],
   "license": "MIT",
   "lint-staged": {
@@ -106,6 +106,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PanJiaChen/vue-element-admin.git"
+    "url": "git+https://github.com/astercc518/unified-data-exchange.git"
   }
 }

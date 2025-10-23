@@ -1,7 +1,7 @@
 {
-  "name": "vue-element-admin-backend",
+  "name": "unified-data-exchange-backend",
   "version": "1.0.0",
-  "description": "Vue Element Admin Backend API Server",
+  "description": "Unified Data Exchange (UDE) Backend API Server - 统一数据交换平台后端服务",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,14 +11,15 @@
     "seed": "node scripts/seed.js"
   },
   "keywords": [
-    "vue",
-    "element-ui",
-    "admin",
+    "ude",
+    "unified-data-exchange",
+    "data-exchange",
     "backend",
     "api",
-    "mysql"
+    "mysql",
+    "express"
   ],
-  "author": "Vue Element Admin Team",
+  "author": "astercc518",
   "license": "MIT",
   "dependencies": {
     "awesome-phonenumber": "^7.5.0",

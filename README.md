@@ -1,10 +1,10 @@
-# Unified Data Exchange (UDE) - 统一数据交换平台
+# Vue Element Admin - 数据管理系统
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Vue](https://img.shields.io/badge/vue-2.6.10-brightgreen.svg)](https://vuejs.org/)
 
-一个基于 Vue.js 和 Element UI 的现代化统一数据交换平台，提供完整的用户管理、数据管理、订单管理和系统配置功能。
+一个基于 Vue.js 和 Element UI 的现代化数据管理系统，提供完整的用户管理、数据管理、订单管理和系统配置功能。
 
 ## ✨ 特性
 
@@ -27,7 +27,7 @@
 
 ### 一键部署
 
-```bash
+```
 # 克隆项目
 git clone https://github.com/your-username/vue-element-admin.git
 cd vue-element-admin
@@ -41,7 +41,7 @@ chmod +x deploy.sh
 
 #### 1. 安装依赖
 
-```bash
+```
 # 安装前端依赖
 npm install
 
@@ -71,7 +71,7 @@ CREATE DATABASE vue_admin CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 #### 3. 初始化数据库
 
-```bash
+```
 node backend/scripts/init-database.js
 ```
 
@@ -285,7 +285,7 @@ LOG_LEVEL=info
 
 ### 1. 端口被占用
 
-```bash
+```
 # 查看占用端口的进程
 lsof -i :9527
 lsof -i :3000
@@ -303,7 +303,7 @@ kill -9 <PID>
 
 ### 3. PM2 服务异常
 
-```bash
+```
 # 查看详细日志
 pm2 logs --lines 100
 
@@ -316,7 +316,7 @@ pm2 reload ecosystem.config.js
 
 ### 4. 前端编译错误
 
-```bash
+```
 # 清除缓存
 rm -rf node_modules/.cache
 
