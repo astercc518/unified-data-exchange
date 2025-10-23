@@ -1,5 +1,5 @@
 module.exports = {
-  title: 'Vue 后台管理系统',
+  title: 'Unified Data Exchange (UDE)',
 
   /**
    * @type {boolean} true | false

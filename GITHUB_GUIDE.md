@@ -1,6 +1,6 @@
 # GitHub 上传和部署指南
 
-本指南将帮助您将项目上传到 GitHub 并部署到服务器。
+本指南将帮助您将 Unified Data Exchange (UDE) 项目上传到 GitHub 并部署到服务器。
 
 ## 📤 上传到 GitHub
 
@@ -9,8 +9,8 @@
 1. 访问 [GitHub](https://github.com)
 2. 点击右上角 `+` → `New repository`
 3. 填写仓库信息：
-   - Repository name: `vue-element-admin`（或其他名称）
-   - Description: `基于 Vue.js 和 Element UI 的数据管理系统`
+   - Repository name: `unified-data-exchange`
+   - Description: `Unified Data Exchange (UDE) - 统一数据交换平台`
    - 选择 `Public` 或 `Private`
    - **不要** 勾选 "Initialize this repository with a README"
 4. 点击 `Create repository`

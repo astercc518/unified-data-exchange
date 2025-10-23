@@ -1,6 +1,6 @@
 # 贡献指南
 
-首先，感谢您考虑为 Vue Element Admin 做出贡献！
+首先，感谢您考虑为 Unified Data Exchange (UDE) 做出贡献！
 
 ## 🤝 如何贡献
 

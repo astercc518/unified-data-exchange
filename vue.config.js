@@ -7,7 +7,7 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const name = 'Vue Element Admin' // 页面标题
+const name = 'Unified Data Exchange (UDE)' // 页面标题
 const port = process.env.port || process.env.npm_config_port || 9527 // 开发服务器端口
 
 module.exports = {

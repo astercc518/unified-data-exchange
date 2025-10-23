@@ -22,7 +22,7 @@ if [ -z "$1" ]; then
 fi
 
 GITHUB_USERNAME="$1"
-REPO_NAME="vue-element-admin"
+REPO_NAME="unified-data-exchange"
 
 echo -e "${BLUE}╔════════════════════════════════════════════════╗${NC}"
 echo -e "${BLUE}║   GitHub MCP 自动化上传                        ║${NC}"
@@ -129,7 +129,7 @@ echo ""
 
 # 步骤 8: 创建提交
 echo -e "${BLUE}[8/10] 创建初始提交...${NC}"
-git commit -m "Initial commit: Vue Element Admin 数据管理系统
+git commit -m "Initial commit: Unified Data Exchange (UDE) 统一数据交换平台
 
 主要功能：
 - ✨ 完整的用户管理系统（客户、代理、管理员）

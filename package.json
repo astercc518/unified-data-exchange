@@ -1,7 +1,7 @@
 {
-  "name": "vue-element-admin",
-  "version": "4.4.0",
-  "description": "A magical vue admin. An out-of-box UI solution for enterprise applications. Newest development stack of vue. Lots of awesome features",
+  "name": "unified-data-exchange",
+  "version": "1.0.0",
+  "description": "Unified Data Exchange (UDE) - A modern data management and exchange platform built with Vue.js and Element UI",
   "author": "Pan <panfree23@gmail.com>",
   "scripts": {
     "dev": "vue-cli-service serve",

@@ -1,10 +1,10 @@
-# Vue Element Admin - 数据管理系统
+# Unified Data Exchange (UDE) - 统一数据交换平台
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
 [![Vue](https://img.shields.io/badge/vue-2.6.10-brightgreen.svg)](https://vuejs.org/)
 
-一个基于 Vue.js 和 Element UI 的现代化数据管理系统，提供完整的用户管理、数据管理、订单管理和系统配置功能。
+一个基于 Vue.js 和 Element UI 的现代化统一数据交换平台，提供完整的用户管理、数据管理、订单管理和系统配置功能。
 
 ## ✨ 特性
 

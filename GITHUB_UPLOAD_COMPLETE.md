@@ -8,7 +8,7 @@
 
 - **仓库地址**: https://github.com/astercc518/vue-element-admin
 - **用户名**: astercc518  
-- **仓库名**: vue-element-admin
+- **仓库名**: unified-data-exchange
 - **状态**: Public（公开）
 - **默认分支**: main
 - **创建时间**: 2025-10-23
@@ -55,7 +55,7 @@
 
 #### ✅ 步骤 7/8: 创建初始提交
 - 提交 ID: 558e05a
-- 提交信息: "Initial commit: Vue Element Admin 数据管理系统"
+- 提交信息: "Initial commit: Unified Data Exchange (UDE) 统一数据交换平台"
 - 提交文件数: 872
 - **状态**: ✅ 完成
 
