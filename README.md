@@ -1,4 +1,4 @@
-# Owner avatar
+# unified-data-exchange - 一站式数据管理系统
 unified-data-exchange - 数据管理系统
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
