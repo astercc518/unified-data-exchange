@@ -1,0 +1,162 @@
+#!/bin/bash
+#
+# UDE 快速部署检查清单
+# 确保所有配置正确应用
+#
+
+echo "========================================="
+echo "UDE 快速部署检查清单"
+echo "========================================="
+echo ""
+
+# 颜色定义
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+echo -e "${BLUE}请按顺序执行以下步骤：${NC}"
+echo ""
+
+# 步骤 1
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}✅ 步骤 1: 配置定时任务 (必做)${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "执行命令:"
+echo -e "${YELLOW}  /home/vue-element-admin/scripts/setup-crontab.sh${NC}"
+echo ""
+echo "功能:"
+echo "  - 数据库每日备份 (凌晨 2:00)"
+echo "  - 文件每周备份 (周日凌晨 3:00)"
+echo "  - 日志自动清理 (凌晨 4:00)"
+echo "  - PM2 进程监控 (每 5 分钟)"
+echo ""
+read -p "按 Enter 继续到下一步..."
+echo ""
+
+# 步骤 2
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}✅ 步骤 2: 配置数据库备份密码 (必做)${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "执行命令:"
+echo -e "${YELLOW}  vi /home/vue-element-admin/scripts/backup-database.sh${NC}"
+echo ""
+echo "修改内容:"
+echo "  找到这一行: DB_PASS=\"your_password\""
+echo "  改为:      DB_PASS=\"你的实际数据库密码\""
+echo ""
+echo "保存并退出 (ESC :wq)"
+echo ""
+read -p "按 Enter 继续到下一步..."
+echo ""
+
+# 步骤 3
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}✅ 步骤 3: 测试数据库备份 (必做)${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "执行命令:"
+echo -e "${YELLOW}  /home/vue-element-admin/scripts/backup-database.sh${NC}"
+echo ""
+echo "验证备份:"
+echo -e "${YELLOW}  ls -lh /home/vue-element-admin/backups/database/${NC}"
+echo ""
+read -p "按 Enter 继续到下一步..."
+echo ""
+
+# 步骤 4
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}✅ 步骤 4: 重启前端服务 (必做)${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "执行命令:"
+echo -e "${YELLOW}  pm2 restart frontend${NC}"
+echo ""
+echo "验证:"
+echo -e "${YELLOW}  pm2 list${NC}"
+echo -e "${YELLOW}  curl http://localhost:9527${NC}"
+echo ""
+read -p "按 Enter 继续到下一步..."
+echo ""
+
+# 步骤 5
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${BLUE}📊 步骤 5: 安装 Prometheus + Grafana (可选)${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "执行命令:"
+echo -e "${YELLOW}  /home/vue-element-admin/scripts/install-monitoring.sh${NC}"
+echo ""
+echo "预计耗时: 15-30 分钟"
+echo ""
+echo "安装后访问:"
+echo "  - Prometheus: http://服务器IP:9090"
+echo "  - Grafana:    http://服务器IP:3000 (admin/admin)"
+echo ""
+echo "⚠️  注意: Grafana 默认也使用 3000 端口，会与后端 API 冲突"
+echo "   建议修改 Grafana 端口或通过不同 IP 访问"
+echo ""
+read -p "是否现在安装? (y/N) " -n 1 -r
+echo ""
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    /home/vue-element-admin/scripts/install-monitoring.sh
+fi
+echo ""
+
+# 步骤 6
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${BLUE}🔒 步骤 6: 配置 SSL/HTTPS (可选，生产环境推荐)${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "前提条件:"
+echo "  - 已有域名指向服务器"
+echo "  - 服务器 80 和 443 端口对外开放"
+echo ""
+echo "执行命令:"
+echo -e "${YELLOW}  yum install -y certbot python2-certbot-nginx${NC}"
+echo -e "${YELLOW}  certbot --nginx -d your-domain.com${NC}"
+echo ""
+echo "Certbot 会自动:"
+echo "  - 申请免费 SSL 证书 (Let's Encrypt)"
+echo "  - 配置 Nginx HTTPS"
+echo "  - 设置自动续期"
+echo ""
+read -p "按 Enter 继续..."
+echo ""
+
+# 完成
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}🎉 部署检查清单完成！${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "下一步操作:"
+echo ""
+echo "1. 运行健康检查:"
+echo -e "   ${YELLOW}/home/vue-element-admin/scripts/health-check.sh${NC}"
+echo ""
+echo "2. 查看详细配置报告:"
+echo -e "   ${YELLOW}cat /home/vue-element-admin/PERFORMANCE_OPTIMIZATION_REPORT.md${NC}"
+echo ""
+echo "3. 查看部署总结:"
+echo -e "   ${YELLOW}cat /home/vue-element-admin/DEPLOYMENT_SUMMARY.md${NC}"
+echo ""
+echo "4. 实时监控进程:"
+echo -e "   ${YELLOW}pm2 monit${NC}"
+echo ""
+echo "5. 查看应用日志:"
+echo -e "   ${YELLOW}pm2 logs${NC}"
+echo ""
+echo "6. 验证 Nginx 反向代理:"
+echo -e "   ${YELLOW}curl http://localhost/health${NC}"
+echo -e "   ${YELLOW}curl http://localhost/api/auth/info${NC}"
+echo ""
+echo "7. 验证 Redis 缓存:"
+echo -e "   ${YELLOW}redis-cli ping${NC}"
+echo -e "   ${YELLOW}curl http://localhost:3000/metrics | grep cache${NC}"
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo -e "${GREEN}✅ 所有配置已完成，系统运行正常！${NC}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""

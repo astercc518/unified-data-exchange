@@ -155,6 +155,117 @@
           </el-col>
         </el-row>
 
+        <!-- Redis 状态 -->
+        <el-row :gutter="20" class="status-section">
+          <el-col :span="24">
+            <h4 class="section-title">Redis 缓存状态</h4>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="6">
+            <div class="info-item">
+              <div class="info-label">服务状态</div>
+              <div class="info-value">
+                <el-tag
+                  :type="serverData.redis && serverData.redis.status === 'connected' ? 'success' : 'danger'"
+                  size="small"
+                >
+                  {{ serverData.redis && serverData.redis.status === 'connected' ? '运行中' : '未连接' }}
+                </el-tag>
+              </div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="6">
+            <div class="info-item">
+              <div class="info-label">版本</div>
+              <div class="info-value">{{ (serverData.redis && serverData.redis.version) || '-' }}</div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="6">
+            <div class="info-item">
+              <div class="info-label">内存使用</div>
+              <div class="info-value">{{ (serverData.redis && serverData.redis.usedMemory) || '-' }}</div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="6">
+            <div class="info-item">
+              <div class="info-label">连接数</div>
+              <div class="info-value">{{ (serverData.redis && serverData.redis.connectedClients) || 0 }}</div>
+            </div>
+          </el-col>
+        </el-row>
+
+        <!-- Nginx 状态 -->
+        <el-row :gutter="20" class="status-section">
+          <el-col :span="24">
+            <h4 class="section-title">Nginx 服务状态</h4>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="8">
+            <div class="info-item">
+              <div class="info-label">服务状态</div>
+              <div class="info-value">
+                <el-tag
+                  :type="serverData.nginx && serverData.nginx.status === 'running' ? 'success' : 'danger'"
+                  size="small"
+                >
+                  {{ serverData.nginx && serverData.nginx.status === 'running' ? '运行中' : '已停止' }}
+                </el-tag>
+              </div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="8">
+            <div class="info-item">
+              <div class="info-label">版本</div>
+              <div class="info-value">{{ (serverData.nginx && serverData.nginx.version) || '-' }}</div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="8">
+            <div class="info-item">
+              <div class="info-label">配置文件</div>
+              <div class="info-value">/etc/nginx/conf.d/ude.conf</div>
+            </div>
+          </el-col>
+        </el-row>
+
+        <!-- Prometheus 状态 -->
+        <el-row :gutter="20" class="status-section">
+          <el-col :span="24">
+            <h4 class="section-title">Prometheus 监控状态</h4>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="8">
+            <div class="info-item">
+              <div class="info-label">服务状态</div>
+              <div class="info-value">
+                <el-tag
+                  :type="serverData.prometheus && serverData.prometheus.status === 'running' ? 'success' : 'info'"
+                  size="small"
+                >
+                  {{ serverData.prometheus && serverData.prometheus.status === 'running' ? '运行中' : '不可用' }}
+                </el-tag>
+              </div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="8">
+            <div class="info-item">
+              <div class="info-label">Metrics 接口</div>
+              <div class="info-value">
+                <el-tag
+                  :type="serverData.prometheus && serverData.prometheus.metricsAvailable ? 'success' : 'info'"
+                  size="small"
+                >
+                  {{ serverData.prometheus && serverData.prometheus.metricsAvailable ? '可用' : '不可用' }}
+                </el-tag>
+              </div>
+            </div>
+          </el-col>
+          <el-col :xs="24" :sm="12" :md="8">
+            <div class="info-item">
+              <div class="info-label">端点地址</div>
+              <div class="info-value" style="font-size: 12px;">
+                {{ (serverData.prometheus && serverData.prometheus.endpoint) || '-' }}
+              </div>
+            </div>
+          </el-col>
+        </el-row>
+
         <!-- parsePhoneNumber 服务状态 -->
         <el-row :gutter="20" class="status-section">
           <el-col :span="24">
@@ -270,6 +381,23 @@ export default {
         database: {
           status: 'disconnected'
         },
+        redis: {
+          status: 'disconnected',
+          version: '-',
+          usedMemory: '-',
+          connectedClients: 0,
+          uptimeInDays: 0
+        },
+        nginx: {
+          status: 'unknown',
+          version: '-',
+          active: false
+        },
+        prometheus: {
+          status: 'unknown',
+          metricsAvailable: false,
+          endpoint: 'http://localhost:3000/metrics'
+        },
         parsePhone: {
           available: false,
           version: null,
@@ -318,7 +446,7 @@ export default {
         } else {
           this.$message.error('获取服务器状态失败')
         }
-        
+
         // 同时获取 parsePhoneNumber 状态
         try {
           const parsePhoneResponse = await request({
@@ -430,7 +558,7 @@ export default {
     font-weight: 600;
     color: #303133;
   }
-  
+
   .status-content {
     min-height: 200px;
   }

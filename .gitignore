@@ -1,80 +1,45 @@
-# 依赖文件
+.DS_Store
 node_modules/
-backend/node_modules/
+dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-lerna-debug.log*
 package-lock.json
-yarn.lock
+tests/**/coverage/
 
-# 构建输出
-dist/
-build/
-.temp/
-.cache/
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
-# 编辑器和 IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-*~
-.DS_Store
-*.sublime-project
-*.sublime-workspace
-
-# 环境变量和配置
-.env
+# 环境配置（敏感信息）
 .env.local
 .env.*.local
-backend/config/database.js
-backend/.env
+
+# PM2 相关
+.pm2/
 
 # 日志文件
-logs/
 *.log
-backend/logs/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# 测试覆盖率
-coverage/
-*.lcov
-.nyc_output/
-
-# PM2
-.pm2/
-ecosystem.config.js.backup
-
-# 操作系统
-.DS_Store
-Thumbs.db
-Desktop.ini
-
-# 上传文件
-uploads/
-backend/uploads/
-public/uploads/
-
-# 数据库文件
-*.sql.backup
-*.db
-*.sqlite
+logs/
+*.log.*
 
 # 临时文件
-tmp/
-temp/
 *.tmp
+*.temp
+.cache/
+
+# 备份文件
 *.bak
-*.swp
+backups/*.sql
+backups/*.sql.gz
+backups/database/*.sql
+backups/database/*.sql.gz
 
-# TypeScript
-*.tsbuildinfo
-
-# 其他
-.eslintcache
-.stylelintcache
+# 系统文件
+.DS_Store
+Thumbs.db

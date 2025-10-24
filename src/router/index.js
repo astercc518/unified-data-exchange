@@ -674,6 +674,16 @@ export const asyncRoutes = [
         }
       },
       {
+        path: 'backup',
+        component: () => import('@/views/system/backup'),
+        name: 'SystemBackup',
+        meta: {
+          title: '系统备份',
+          icon: 'files',
+          roles: ['admin']
+        }
+      },
+      {
         path: 'logs',
         component: () => import('@/views/system/logs'),
         name: 'OperationLogs',

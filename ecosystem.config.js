@@ -4,7 +4,8 @@ module.exports = {
       name: 'backend',
       script: './backend/server.js',
       cwd: '/home/vue-element-admin',
-      instances: 1,
+      instances: 2,  // Cluster 模式：2 个实例实现负载均衡
+      exec_mode: 'cluster',  // 启用 cluster 模式
       autorestart: true,
       watch: false,
       // max_memory_restart: '2G',  // 已移除内存限制，不限制内存使用
@@ -14,7 +15,7 @@ module.exports = {
       kill_timeout: 5000,         // 优雅关闭超时5秒
       listen_timeout: 10000,      // 监听超时10秒
       env: {
-        NODE_ENV: 'development',
+        NODE_ENV: 'production',  // 生产环境
         PORT: 3000
       },
       error_file: '/tmp/pm2-backend-error.log',
