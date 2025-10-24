@@ -169,48 +169,46 @@ const monitorDbQuery = (operation, table) => {
  */
 const updateBusinessMetrics = async (models) => {
   try {
-    const { User, Order, RechargeRecord } = models;
+    const { User, Agent, Order, RechargeRecord, sequelize } = models;
     const { Op } = require('sequelize');
+    const { fn, col } = require('sequelize');
     
-    // 更新用户统计
-    const userCounts = await User.findAll({
-      attributes: [
-        'role',
-        [models.sequelize.fn('COUNT', models.sequelize.col('id')), 'count']
-      ],
-      group: ['role']
-    });
+    // 更新用户统计（客户和代理分别统计）
+    const customerCount = await User.count();
+    const agentCount = await Agent.count();
     
-    userCounts.forEach(item => {
-      usersTotal.labels(item.role).set(parseInt(item.getDataValue('count')));
-    });
+    usersTotal.labels('customer').set(customerCount);
+    usersTotal.labels('agent').set(agentCount);
+    usersTotal.labels('admin').set(1); // 默认一个管理员
     
     // 更新订单统计
     const orderStats = await Order.findAll({
       attributes: [
         'status',
-        [models.sequelize.fn('COUNT', models.sequelize.col('id')), 'count'],
-        [models.sequelize.fn('SUM', models.sequelize.col('total_amount')), 'amount']
+        [fn('COUNT', col('id')), 'count'],
+        [fn('SUM', col('total_amount')), 'amount']
       ],
-      group: ['status']
+      group: ['status'],
+      raw: true
     });
     
     orderStats.forEach(item => {
-      ordersTotal.labels(item.status).set(parseInt(item.getDataValue('count')));
-      orderAmount.labels(item.status).set(parseFloat(item.getDataValue('amount') || 0));
+      ordersTotal.labels(item.status).set(parseInt(item.count || 0));
+      orderAmount.labels(item.status).set(parseFloat(item.amount || 0));
     });
     
     // 更新充值统计
     const rechargeStats = await RechargeRecord.findAll({
       attributes: [
         'status',
-        [models.sequelize.fn('SUM', models.sequelize.col('amount')), 'amount']
+        [fn('SUM', col('amount')), 'amount']
       ],
-      group: ['status']
+      group: ['status'],
+      raw: true
     });
     
     rechargeStats.forEach(item => {
-      rechargeAmount.labels(item.status).set(parseFloat(item.getDataValue('amount') || 0));
+      rechargeAmount.labels(item.status).set(parseFloat(item.amount || 0));
     });
     
   } catch (error) {

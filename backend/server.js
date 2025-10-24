@@ -31,6 +31,7 @@ const favoriteRoutes = require('./routes/favorites');
 const feedbackRoutes = require('./routes/feedbacks');  // 新增反馈路由
 const systemLogsRoutes = require('./routes/system/logs');  // 系统日志路由
 const systemSecurityRoutes = require('./routes/system/security');  // 系统安全路由
+const systemNginxRoutes = require('./routes/system/nginx');  // Nginx 配置路由
 const deliveryRoutes = require('./routes/delivery');  // 发货配置路由
 const dataProcessingRoutes = require('./routes/dataProcessing');  // 数据处理路由
 const usPhoneCarrierRoutes = require('./routes/usPhoneCarrier');  // 美国号码归属查询路由
@@ -41,6 +42,7 @@ const smsChannelCountriesRoutes = require('./routes/smsChannelCountries');  // �
 const settlementsRoutes = require('./routes/settlements');  // 短信结算路由
 const agentSettlementsRoutes = require('./routes/agentSettlements');  // 代理结算路由
 const channelSettlementsRoutes = require('./routes/channelSettlements');  // 通道结算路由
+const systemConfigRoutes = require('./routes/systemConfig');  // 系统配置路由
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -94,6 +96,7 @@ app.use('/api/favorites', favoriteRoutes);
 app.use('/api/feedbacks', feedbackRoutes);  // 新增反馈路由
 app.use('/api/system/logs', systemLogsRoutes);  // 系统日志路由
 app.use('/api/system/security', systemSecurityRoutes);  // 系统安全路由
+app.use('/api/system/nginx', systemNginxRoutes);  // Nginx 配置路由
 app.use('/api/delivery', deliveryRoutes);  // 发货配置路由
 app.use('/api/data-processing', dataProcessingRoutes);  // 数据处理路由
 app.use('/api/us-phone-carrier', usPhoneCarrierRoutes);  // 美国号码归属查询路由
@@ -104,6 +107,7 @@ app.use('/api/sms', smsChannelCountriesRoutes);  // 通道国家配置路由
 app.use('/api/sms/settlements', settlementsRoutes);  // 短信结算路由
 app.use('/api/sms/agent-settlements', agentSettlementsRoutes);  // 代理结算路由
 app.use('/api/sms/channel-settlements', channelSettlementsRoutes);  // 通道结算路由
+app.use('/api/system/config', systemConfigRoutes);  // 系统配置路由
 
 // 404处理
 app.use('*', (req, res) => {
@@ -153,9 +157,9 @@ async function startServer() {
       startSettlementTasks();
       
       // 定时更新业务指标（每分钟）
-      const { models } = require('./config/database');
-      setInterval(() => updateBusinessMetrics(models), 60000);
-      updateBusinessMetrics(models);  // 立即执行一次
+      const { models, sequelize } = require('./config/database');
+      setInterval(() => updateBusinessMetrics({ ...models, sequelize }), 60000);
+      updateBusinessMetrics({ ...models, sequelize });  // 立即执行一次
     });
     
   } catch (error) {
